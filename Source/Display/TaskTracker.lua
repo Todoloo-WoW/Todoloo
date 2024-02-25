@@ -134,9 +134,7 @@ local function TodolooTaskTracker_DoTasks(self, group, groupCompleted, existingG
     if not completing then --groupCompleted and
         if not Todoloo.Config.Get(Todoloo.Config.Options.SHOW_COMPLETED_TASKS) then
             for _, task in pairs(group.tasks) do
-                -- only trigger the task fade out animation, if the player do not want to see their completed tasks
-                --TODO: Test this functionality
-    
+                -- only trigger the task fade out animation, if the player do not want to see their completed tasks    
                 if task.state == TODOLOO_TRACKER_TASK_STATE_COMPLETED then
                     task.FadeOutAnim:Play()
                     task.state = TODOLOO_TRACKER_TASK_STATE_FADING
@@ -176,7 +174,6 @@ function TODOLOO_TASK_TRACKER_MODULE:UpdateSingle(groupInfo)
                 end
             end
         end
-        --TODO: Don't we need to add the task if we want to see completed tasks?
     else
         TodolooTaskTracker_DoTasks(self, group, isComplete, existingGroup, useFullHeight)
     end

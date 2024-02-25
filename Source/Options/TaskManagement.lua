@@ -164,7 +164,6 @@ function TodolooTaskManagement_AddTask(self, group, id, taskInfo)
     task.name = taskInfo.name
     task.reset = taskInfo.reset
 
-    --TODO: Set description
     task.description = taskInfo.description
 
     group.height = group.height + task:GetHeight() + self.taskSpacing
@@ -247,7 +246,6 @@ function TodolooTaskManagement_Update()
 
     self.isUpdateDirty = true
 
-    --TODO: Is the value ever used or are we only using groupsFrame.contentsHeight?
     self.contentsHeight = 0
     self.groupsFrame.currentGroup = nil
     self.groupsFrame.contentsHeight = 0
@@ -322,7 +320,6 @@ end
 -- *****************************************************************************************************
 
 function TodolooTaskManagement_Initialize(self)
-    --TODO: Remove function if nothing relevant during initialization
     self.initialized = true
 end
 
@@ -333,7 +330,7 @@ function TodolooTaskManagement_OnLoad(self)
     self.groupTemplate = "TodolooGroupConfigTemplate"
     self.taskTemplate = "TodolooTaskConfigTemplate"
     self.groupSpacing = 5
-    self.taskWidth = 240 --TODO: Is this being used?
+    self.taskWidth = 240
     self.taskSpacing = 0
     self.usedGroups = {}
     self.freeTasks = {}

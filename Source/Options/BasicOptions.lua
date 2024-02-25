@@ -61,8 +61,6 @@ function TodolooConfigBasicOptionsFrameMixin:Save()
             TodolooTracker_Update()
         end
     end
-
-    --TodolooTaskTracker_Update() --TODO: We need to trigger an update if either SHOW_COMPLETED GROUPS or SHOW_COMPLETED_TASKS are changed, right?
 end
 
 function TodolooConfigBasicOptionsFrameMixin:Cancel()
