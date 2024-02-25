@@ -1,10 +1,15 @@
 ## Interface: 100205
+
 ## Title: Todoloo
-## Notes: A simple task manager to keep track of your daily/weekly tasks
+## Notes: Your friendly task manager!
 ## Author: Detilium
+
 ## Version: 0.1
+
 ## SavedVariables: TODOLOO_CONFIG
 ## SavedVariablesPerCharacter: TODOLOO_TASKS
+
 ## DefaultState: enabled
+## OptionalDeps: LibStub, LibDBIcon-1.0, LibDataBroker-1.1
 
 Source\Manifest.xml
