@@ -48,21 +48,21 @@ function TODOLOO_DEFAULT_TRACKER_MODULE:OnLoad(friendlyName, defaultTemplate)
     self.groupTemplate = defaultTemplate or "TodolooTrackerGroupTemplate"
     self.groupType = "Frame"
     self.taskTemplate = "TodolooTrackerTaskTemplate"
-    self.taskSpacing = 2 --TODO: What does this do?
+    self.taskSpacing = 2
     self.taskWidth = TODOLOO_TRACKER_TEXT_WIDTH
     self.poolCollection = CreateFramePoolCollection()
     self.usedGroups = {}
     self.freeTasks = {}
     self.fromHeaderOffsetY = -10
     self.fromModuleOffsetY = -10
-    self.contentsHeight = 0 --TODO: What does this do?
-    self.contentsAnimHeight = 0 --TODO: What does this do?
-    self.oldContentsHeight = 0 --TODO: What does this do?
-    self.hasSkippedGroups = false --TODO: What does this do?
-    self.userProgressBars = {} --TODO: What does this do?
-    self.freeProgressBars = {} --TODO: What does this do?
-    self.updateReasonModule = 0 --TODO: What does this do?
-    self.updateReasonEvents = 0 --TODO: What does this do?
+    self.contentsHeight = 0
+    self.contentsAnimHeight = 0
+    self.oldContentsHeight = 0
+    self.hasSkippedGroups = false
+    self.userProgressBars = {}
+    self.freeProgressBars = {}
+    self.updateReasonModule = 0
+    self.updateReasonEvents = 0
 
     self.groupsFrame = TodolooTrackerFrame.GroupsFrame
 
@@ -81,7 +81,7 @@ function TodolooTracker_GetModuleInfoTable(friendlyName, baseModule, defaultTemp
 end
 
 ---Begin building new layout
----@param staticReanchor boolean|nil --TODO: What?
+---@param staticReanchor boolean|nil
 function TODOLOO_DEFAULT_TRACKER_MODULE:BeginLayout(staticReanchor)
     self.topGroup = nil
     self.firstGroup = nil
@@ -99,7 +99,7 @@ function TODOLOO_DEFAULT_TRACKER_MODULE:BeginLayout(staticReanchor)
 end
 
 ---End build new layout
----@param isStaticReanchor boolean|nil --TODO: What?
+---@param isStaticReanchor boolean|nil
 function TODOLOO_DEFAULT_TRACKER_MODULE:EndLayout(isStaticReanchor)
     self.lastGroup = self.groupsFrame.currentGroup
     self:FreeUnusedGroups()
@@ -108,7 +108,7 @@ end
 ---Set the header of the module
 ---@param group Frame Header frame
 ---@param text string String value to display in the header
----@param animateReason any --TODO: What?
+---@param animateReason any
 function TODOLOO_DEFAULT_TRACKER_MODULE:SetHeader(group, text, animateReason)
     group.module = self
     group.isHeader = true
@@ -173,7 +173,7 @@ function TODOLOO_DEFAULT_TRACKER_MODULE:FreeTask(group, task)
     task:Hide()
 end
 
----Get existing group frame --TODO: Validate documentation
+---Get existing group frame
 ---@param id integer Group ID
 ---@param overrideTemplate any
 ---@return unknown
@@ -280,7 +280,7 @@ end
 ---@param taskIndex integer|string The index of the task or string if not relevant
 ---@param text string Name/title of the task
 ---@param taskType any --TODO: Add documentation
----@param useFullHeight boolean Whether or not to use full height --TODO: What does this mean?
+---@param useFullHeight boolean Whether or not to use full height
 ---@param dashStyle integer The dash style to use fo the task
 ---@param colorStyle table|nil The color style to use for the task
 function TODOLOO_DEFAULT_TRACKER_MODULE:AddTask(group, taskIndex, text, taskType, useFullHeight, dashStyle, colorStyle)
@@ -429,9 +429,7 @@ end
 ---@param task Frame
 ---@param mouseButton string
 function TODOLOO_DEFAULT_TRACKER_MODULE:OnTaskClick(task, mouseButton)
-    if mouseButton == "RightButton" then
-        --TODO: IDK; do something?
-    elseif IsShiftKeyDown() then
+    if IsShiftKeyDown() then
         -- if we're currently showing group complete, do nothing
         if task.id == "GroupComplete" then
             return
@@ -458,7 +456,7 @@ end
 ---Set text and style on the given font string element
 ---@param fontString FontString Font string element
 ---@param text string Value to display
----@param useFullHeight boolean Whether or not to use full height --TODO: What does this mean?
+---@param useFullHeight boolean Whether or not to use full height
 ---@param colorStyle table|nil The color style to use for the font string
 ---@param useHighlight boolean Whether or not to highlight the text
 ---@return integer height The resulting height of the font string element
@@ -560,7 +558,7 @@ local function InternalAddGroup(group)
 
     local offsetY = AnchorGroup(group, groupsFrame.currentGroup)
     if not offsetY then
-        return false --TODO: Why? See line 1180 in Blizzard_ObjectiveTracker.lua
+        return false
     end
 
     if not module.topGroup then
@@ -610,7 +608,6 @@ function TodolooTracker_AddGroup(group)
 end
 
 ---Check if this group can fit into the tracker frame
---TODO: Take tasks into consideration or something?
 ---@param group Frame
 ---@param header Frame
 ---@return boolean canFit True if there's room, otherwise false
@@ -674,7 +671,7 @@ function TodolooTracker_OnLoad(self)
     task.Text:SetText("Double line|ntest")
     tinsert(self.freeTasks, task)
     TODOLOO_TRACKER_DASH_WIDTH = task.Dash:GetWidth()
-    TODOLOO_TRACKER_TEXT_WIDTH = TODOLOO_TRACKER_TASK_WIDTH - TODOLOO_TRACKER_DASH_WIDTH - 12 --TODO: Why '-12'?
+    TODOLOO_TRACKER_TEXT_WIDTH = TODOLOO_TRACKER_TASK_WIDTH - TODOLOO_TRACKER_DASH_WIDTH - 12
     task.Text:SetWidth(TODOLOO_TRACKER_TEXT_WIDTH)
 
     -- set header menu frame level
@@ -745,15 +742,6 @@ function TodolooTracker_UpdateBackground()
     Todoloo.Debug.Message("TodolooTracker_UpdateBackground")
     TodolooTrackerFrame.NineSlice:Hide()
     --TODO: Implement
-    -- local lastGroup
-    -- if TodolooTrackerFrame.initialized then
-    --     for index, module in ipairs_reverse(TodolooTrackerFrame.MODULES_UI_ORDER) do
-    --         if module.topGroup then
-    --             lastGroup = module.lastGroup
-    --             break
-    --         end
-    --     end
-    -- end
 
     -- if lastGroup and not TodolooTrackerFrame.collapsed then
     --     TodolooTrackerFrame.NineSlice:Show()
@@ -864,11 +852,8 @@ function TodolooTracker_Update(reason, id, subInfo)
         tracker.HeaderMenu:Hide()
     end
 
-    --TODOLOO_DEFAULT_TRACKER_MODULE:Update()
-
     TodolooTracker_UpdateResizeButton()
     TodolooTracker_UpdateBackground()
-    --TODO: animate header?
     
     tracker.currentGroup = nil
     tracker.isUpdating = false

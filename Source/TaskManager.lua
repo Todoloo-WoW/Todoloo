@@ -123,11 +123,6 @@ end
 ---Initialize task manager
 function Todoloo.TaskManager.Initialize()
     Todoloo.Debug.Message("Initializing task manager")
-
-    -- DEBUGGING PURPOSES
-    --Todoloo.TaskManager.Reset()
-    --Todoloo.TaskManager.FirstTimeSetup()
-    -- DEBUGGING PURPOSES
     
     if TODOLOO_TASKS == nil then
         Todoloo.TaskManager.FirstTimeSetup()
