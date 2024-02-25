@@ -28,6 +28,10 @@ function TodolooConfigBasicOptionsFrameMixin:OnLoad()
     end
 end
 
+function TodolooConfigBasicOptionsFrameMixin:ResetTrackerPosition()
+    TodolooTrackerFrame:SetPoint("LEFT", nil, "LEFT", 100, 0)
+end
+
 function TodolooConfigBasicOptionsFrameMixin:OnShow()
     Todoloo.Debug.Message("TodolooConfigBasicOptionsFrameMixin:OnShow")
     self.ShowTaskTracker:SetChecked(Todoloo.Config.Get(Todoloo.Config.Options.SHOW_TASK_TRACKER))

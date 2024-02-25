@@ -26,13 +26,24 @@
                     <Anchor point="TOPLEFT" relativeKey="$parent.FrameTitle" relativePoint="BOTTOMLEFT" />
                 </Anchors>
             </Frame>
+            
+            <Button inherits="UIPanelDynamicResizeButtonTemplate" text="Reset tracker position" parentKey="ResetPosition">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeKey="$parent.TaskTrackerHeader" relativePoint="BOTTOMLEFT" x="20" />
+                </Anchors>
+                <Scripts>
+                    <OnClick>
+                        self:GetParent():ResetTrackerPosition()
+                    </OnClick>
+                </Scripts>
+            </Button>
 
             <Frame inherits="TodolooConfigCheckbox" parentKey="ShowTaskTracker">
                 <KeyValues>
                     <KeyValue key="labelText" value="Show task tracker" />
                 </KeyValues>
                 <Anchors>
-                    <Anchor point="TOPLEFT" relativeKey="$parent.TaskTrackerHeader" relativePoint="BOTTOMLEFT" />
+                    <Anchor point="TOPLEFT" relativeKey="$parent.ResetPosition" relativePoint="BOTTOMLEFT" x="-20" />
                 </Anchors>
             </Frame>
 
