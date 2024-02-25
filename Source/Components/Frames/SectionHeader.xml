@@ -1,0 +1,27 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/FrameXML/UI_shared.xsd">
+  <Frame name="TodolooSectionHeader" mixin="TodolooSectionHeaderMixin" virtual="true">
+    <!--
+      <KeyValues>
+        <KeyValue key="headingText" value="" type="string" />
+      </KeyValues>
+    -->
+    <Size y="30" />
+    <Scripts>
+      <OnLoad method="OnLoad"/>
+    </Scripts>
+    <Anchors>
+      <Anchor point="TOPLEFT" relativeKey="$parent" relativePoint="TOPLEFT"/>
+      <Anchor point="RIGHT" relativeKey="$parent" relativePoint="RIGHT"/>
+    </Anchors>
+    <Layers>
+      <Layer level="ARTWORK">
+        <FontString inherits="GameFontNormalMed2" justifyH="LEFT" parentKey="Header">
+          <Anchors>
+            <Anchor point="TOPLEFT" x="20" y="-10" />
+          </Anchors>
+        </FontString>
+      </Layer>
+    </Layers>
+  </Frame>
+</Ui>

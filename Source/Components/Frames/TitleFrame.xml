@@ -1,0 +1,34 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/FrameXML/UI_shared.xsd">
+    <Frame name="TodolooTitleFrame" mixin="TodolooTitleFrameMixin" virtual="true">
+        <!--
+            <KeyValues>
+                <KeyValue key="titleText" value="" type="string" />
+                <KeyValue key="subTitleText" value="" type="string"/>
+            </KeyValues>
+        -->
+        <Size y="60" />
+        <Scripts>
+            <OnLoad method="OnLoad" />
+        </Scripts>
+        <Anchors>
+            <Anchor point="TOPLEFT" relativeKey="$parent" relativePoint="TOPLEFT" />
+            <Anchor point="RIGHT" relativeKey="$parent" relativePoint="RIGHT" />
+        </Anchors>
+        <Layers>
+            <Layer level="ARTWORK">
+                <FontString inherits="GameFontNormalLarge" parentKey="Title">
+                    <Anchors>
+                        <Anchor point="TOPLEFT" x="20" y="-15" />
+                    </Anchors>
+                </FontString>
+                <FontString inherits="GameFontHighlightSmall" justifyH="LEFT" justifyV="TOP" parentKey="SubTitle">
+                    <Anchors>
+                        <Anchor point="TOPLEFT" x="20" y="-40" />
+                        <Anchor point="TOPRIGHT" x="-20" y="-40" />
+                    </Anchors>
+                </FontString>
+            </Layer>
+        </Layers>
+    </Frame>
+</Ui>

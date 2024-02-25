@@ -1,0 +1,39 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/FrameXML/UI_shared.xsd">
+    <Frame name="TodolooConfigCheckbox" mixin="TodolooConfigCheckboxMixin" virtual="true">
+        <Size y="40" />
+
+        <Scripts>
+            <OnLoad method="OnLoad" />
+            <OnMouseUp method="OnMouseUp" />
+            <OnEnter method="OnEnter" />
+            <OnLeave method="OnLeave" />
+        </Scripts>
+
+        <Anchors>
+            <Anchor point="LEFT" relativeKey="$parent" relativePoint="LEFT" />
+            <Anchor point="RIGHT" relativeKey="$parent" relativePoint="RIGHT" />
+        </Anchors>
+
+        <Frames>
+            <CheckButton inherits="UICheckButtonTemplate" parentkey="Checkbox">
+                <Anchors>
+                    <Anchor point="TOPLEFT" x="20" />
+                </Anchors>
+                <Layers>
+                    <Layer level="BACKGROUND">
+                        <FontString inherits="GameFontHighlight" parentKey="Label">
+                            <Anchors>
+                                <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeKey="$parent" x="58" y="-8" />
+                            </Anchors>
+                        </FontString>
+                    </Layer>
+                </Layers>
+                <Scripts>
+                    <OnEnter>self:GetParent():OnEnter()</OnEnter>
+                    <OnLeave>self:GetParent():OnLeave()</OnLeave>
+                </Scripts>
+            </CheckButton>
+        </Frames>
+    </Frame>
+</Ui>

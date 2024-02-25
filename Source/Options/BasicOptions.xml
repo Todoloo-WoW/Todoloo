@@ -1,0 +1,78 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
+    <Frame
+        name="TodolooConfigBasicOptionsFrame"
+        mixin="TodolooConfigBasicOptionsFrameMixin"
+        hidden="true">
+    
+        <Scripts>
+            <OnLoad method="OnLoad" />
+            <OnShow method="OnShow" />
+            <OnHide method="Save" />
+        </Scripts>
+
+        <Frames>
+            <Frame inherits="TodolooTitleFrame" parentKey="FrameTitle">
+                <KeyValues>
+                    <KeyValue key="titleText" value="Basic Options" />
+                    <KeyValue key="subTitleText" value="Basic options for enabling features in Todoloo" />
+                </KeyValues>
+            </Frame>
+
+            <Frame inherits="TodolooSectionHeader" parentKey="TaskTrackerHeader">
+                <KeyValues>
+                    <KeyValue key="headerText" value="Task tracker" />
+                </KeyValues>
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeKey="$parent.FrameTitle" relativePoint="BOTTOMLEFT" />
+                </Anchors>
+            </Frame>
+
+            <Frame inherits="TodolooConfigCheckbox" parentKey="ShowTaskTracker">
+                <KeyValues>
+                    <KeyValue key="labelText" value="Show task tracker" />
+                </KeyValues>
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeKey="$parent.TaskTrackerHeader" relativePoint="BOTTOMLEFT" />
+                </Anchors>
+            </Frame>
+
+            <!--TODO: Implement slider for background opacity (see TodolooTracker_UpdateOpacity and TodolooTracker_UpdateBackground)-->
+
+            <Frame inherits="TodolooConfigCheckbox" parentKey="ShowCompletedGroups">
+                <KeyValues>
+                    <KeyValue key="labelText" value="Show completed groups" />
+                </KeyValues>
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeKey="$parent.ShowTaskTracker" relativePoint="BOTTOMLEFT" />
+                </Anchors>
+            </Frame>
+
+            <Frame inherits="TodolooConfigCheckbox" parentKey="ShowCompletedTasks">
+                <KeyValues>
+                    <KeyValue key="labelText" value="Show completed tasks" />
+                </KeyValues>
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeKey="$parent.ShowCompletedGroups" relativePoint="BOTTOMLEFT" />
+                </Anchors>
+            </Frame>
+
+            <Frame inherits="TodolooSectionHeader" parentKey="MinimapIconHeader">
+                <KeyValues>
+                    <KeyValue key="headerText" value="Minimap Icon" />
+                </KeyValues>
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeKey="$parent.ShowCompletedTasks" relativePoint="BOTTOMLEFT" />
+                </Anchors>
+            </Frame>
+
+            <Frame inherits="TodolooConfigCheckbox" parentKey="ShowMinimapIcon">
+                <KeyValues>
+                    <KeyValue key="labelText" value="Show minimap icon" />
+                </KeyValues>
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeKey="$parent.MinimapIconHeader" relativePoint="BOTTOMLEFT" />
+                </Anchors>
+            </Frame>
+        </Frames>
+    </Frame>
+</Ui>

@@ -1,0 +1,31 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/FrameXML/UI_shared.xsd">
+    
+    <Frame name="TodolooDropDownTemplate" mixin="TodolooDropDownMixin" virtual="true">
+        <!-- <KeyValues>
+            <KeyValue key="labelText" value="text" type="string" />
+            <KeyValue key="optionLabels" value="text1,text2,text3" type="string" />
+            <KeyValue key="optionValues" value="1,2,3" type="string" />
+        </KeyValues> -->
+        <Frames>
+            <Frame name="$parentInternal" inherits="UIDropDownMenuTemplate" mixin="TodolooDropDownInternalMixin" parentKey="DropDownMenu">
+                <Size x="150" />
+                <Anchors>
+                    <Anchor point="TOPLEFT" />
+                </Anchors>
+            </Frame>
+        </Frames>
+        <Layers>
+            <Layer level="BACKGROUND">
+                <FontString inherits="GameFontHighlight" parentKey="Label">
+                    <Anchors>
+                        <Anchor point="TOPLEFT" relativeKey="$parent.DropDownMenu" relativePoint="TOPRIGHT" x="5" y="-7" />
+                    </Anchors>
+                </FontString>
+            </Layer>
+        </Layers>
+        <Scripts>
+            <OnLoad method="OnLoad" />
+        </Scripts>
+    </Frame>
+</Ui>

@@ -1,0 +1,12 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
+    <Script file="Main.lua" />
+
+    <Script file="TaskManagement.lua"/>
+    <Include file="TaskManagement.xml" />
+
+    <Script file="BasicOptions.lua"/>
+    <Include file="BasicOptions.xml" />
+
+    <Script file="AdvancedOptions.lua"/>
+    <Include file="AdvancedOptions.xml" />
+</Ui>
