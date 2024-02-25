@@ -123,9 +123,15 @@ end
 ---Initialize task manager
 function Todoloo.TaskManager.Initialize()
     Todoloo.Debug.Message("Initializing task manager")
-    
+
     if TODOLOO_TASKS == nil then
-        Todoloo.TaskManager.FirstTimeSetup()
+        if not Todoloo.Config.Get(Todoloo.Config.Options.FIRST_TIME_STARTUP_INITIALIZED) then
+            -- setup first time use if this is indeed the first time the addon is loaded on the account
+            Todoloo.TaskManager.FirstTimeSetup()
+            Todoloo.Config.Set(Todoloo.Config.Options.FIRST_TIME_STARTUP_INITIALIZED, true)
+        else
+            Todoloo.TaskManager.Reset()
+        end
     end
 end
 
@@ -140,16 +146,7 @@ end
 ---Get all groups
 ---@return Group[]
 function Todoloo.TaskManager.GetAll()
-    if TODOLOO_TASKS == nil then
-        error("TODOLOO_TASKS not initialized")
-    end
-
-    return TODOLOO_TASKS
-end
-
----Get all groups for character
----@return Group[]
-function Todoloo.TaskManager.GetCharacterGroups()
+    Todoloo.Debug.Message("Todoloo.TaskManager.GetAll")
     if TODOLOO_TASKS == nil then
         error("TODOLOO_TASKS not initialized")
     end

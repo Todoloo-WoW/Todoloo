@@ -7,7 +7,9 @@ Todoloo.Config.Options = {
     TASK_TRACKER_HEIGHT = "task_tracker_height",
 
     DEBUG = "debug",
-    MINIMAP_ICON = "minimap_icon"
+    MINIMAP_ICON = "minimap_icon",
+
+    FIRST_TIME_STARTUP_INITIALIZED = "first_time_startup_initialized"
 }
 
 Todoloo.Config.Defaults = {
@@ -19,7 +21,9 @@ Todoloo.Config.Defaults = {
     [Todoloo.Config.Options.TASK_TRACKER_HEIGHT] = "500",
 
     [Todoloo.Config.Options.DEBUG] = false,
-    [Todoloo.Config.Options.MINIMAP_ICON] = { hide = false }
+    [Todoloo.Config.Options.MINIMAP_ICON] = { hide = false },
+
+    [Todoloo.Config.Options.FIRST_TIME_STARTUP_INITIALIZED] = false
 }
 
 function Todoloo.Config.Reset()

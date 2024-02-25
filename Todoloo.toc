@@ -3,7 +3,8 @@
 ## Notes: A simple task manager to keep track of your daily/weekly tasks
 ## Author: Detilium
 ## Version: 0.1
-## SavedVariables: TODOLOO_CONFIG, TODOLOO_TASKS
+## SavedVariables: TODOLOO_CONFIG
+## SavedVariablesPerCharacter: TODOLOO_TASKS
 ## DefaultState: enabled
 
 Source\Manifest.xml
