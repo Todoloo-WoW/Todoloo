@@ -285,12 +285,10 @@ function TodolooTaskManagement_SaveGroups(groups)
     for _, group in pairs(groups) do
         if group.deleted then
             -- if the group has been deleted
-            Todoloo.Debug.Message("Group " .. group.id .. " deleted")
             Todoloo.TaskManager.RemoveGroup(group.id)
             group.deleted = nil
         elseif group.hasUpdates then
             -- if the group is not deleted but has updates
-            Todoloo.Debug.Message("Group " .. group.id .. " has updates")
             Todoloo.TaskManager.UpdateGroup(group.id, group.name)
             group.hasUpdates = false
         end

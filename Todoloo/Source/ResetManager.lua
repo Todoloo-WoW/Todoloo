@@ -11,11 +11,9 @@ local function ShouldResetTask(task, previousDailyReset, previousWeeklyReset)
     local lastResetPerformed = Todoloo.Config.Get(Todoloo.Config.Options.LAST_RESET_PERFORMED)
     if task.reset == Todoloo.TaskManager.ResetIntervals.Daily and lastResetPerformed < previousDailyReset then
         -- reset daily task
-        Todoloo.Debug.Message("Task '" .. task.name .. "' should reset (daily)")
         return true
     elseif task.reset == Todoloo.TaskManager.ResetIntervals.Weekly and lastResetPerformed < previousWeeklyReset then
         -- reset weekly task
-        Todoloo.Debug.Message("Task '" .. task.name .. "' should reset (weekly)")
         return true
     end
 

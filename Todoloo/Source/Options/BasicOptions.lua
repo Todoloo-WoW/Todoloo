@@ -33,7 +33,6 @@ function TodolooConfigBasicOptionsFrameMixin:ResetTrackerPosition()
 end
 
 function TodolooConfigBasicOptionsFrameMixin:OnShow()
-    Todoloo.Debug.Message("TodolooConfigBasicOptionsFrameMixin:OnShow")
     self.ShowTaskTracker:SetChecked(Todoloo.Config.Get(Todoloo.Config.Options.SHOW_TASK_TRACKER))
     self.ShowCompletedGroups:SetChecked(Todoloo.Config.Get(Todoloo.Config.Options.SHOW_COMPLETED_GROUPS))
     self.ShowCompletedTasks:SetChecked(Todoloo.Config.Get(Todoloo.Config.Options.SHOW_COMPLETED_TASKS))
@@ -43,7 +42,6 @@ function TodolooConfigBasicOptionsFrameMixin:OnShow()
 end
 
 function TodolooConfigBasicOptionsFrameMixin:Save()
-    Todoloo.Debug.Message("TodolooConfigBasicOptionsFrameMixin:Save")
     Todoloo.Config.Set(Todoloo.Config.Options.SHOW_TASK_TRACKER, self.ShowTaskTracker:GetChecked())
     Todoloo.Config.Set(Todoloo.Config.Options.SHOW_COMPLETED_GROUPS, self.ShowCompletedGroups:GetChecked())
     Todoloo.Config.Set(Todoloo.Config.Options.SHOW_COMPLETED_TASKS, self.ShowCompletedTasks:GetChecked())
@@ -68,5 +66,4 @@ function TodolooConfigBasicOptionsFrameMixin:Save()
 end
 
 function TodolooConfigBasicOptionsFrameMixin:Cancel()
-    Todoloo.Debug.Message("TodolooConfigBasicOptionsFrameMixin:Cancel")
 end

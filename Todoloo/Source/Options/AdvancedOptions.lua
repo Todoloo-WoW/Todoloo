@@ -29,17 +29,14 @@ function TodolooConfigAdvancedOptionsFrameMixin:OnLoad()
 end
 
 function TodolooConfigAdvancedOptionsFrameMixin:OnShow()
-    Todoloo.Debug.Message("TodolooConfigAdvancedOptionsFrameMixin:OnShow")
     self.DebugOutput:SetChecked(Todoloo.Config.Get(Todoloo.Config.Options.DEBUG))
 
     self.shownSettings = true
 end
 
 function TodolooConfigAdvancedOptionsFrameMixin:Save()
-    Todoloo.Debug.Message("TodolooConfigAdvancedOptionsFrameMixin:Save")
     Todoloo.Config.Set(Todoloo.Config.Options.DEBUG, self.DebugOutput:GetChecked())
 end
 
 function TodolooConfigAdvancedOptionsFrameMixin:Cancel()
-    Todoloo.Debug.Message("TodolooConfigAdvancedOptionsFrameMixin:Cancel")
 end

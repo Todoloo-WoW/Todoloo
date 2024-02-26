@@ -683,7 +683,6 @@ function TodolooTracker_OnLoad(self)
 end
 
 function TodolooTracker_Initialize(self)
-    Todoloo.Debug.Message("TodolooTracker_Initialize")
     self.MODULES = { TODOLOO_TASK_TRACKER_MODULE }
     self.MODULES_UI_ORDER = { TODOLOO_TASK_TRACKER_MODULE }
 
@@ -703,7 +702,6 @@ end
 ---@param ... unknown
 function TodolooTracker_OnEvent(self, event, ...)
     if event == "PLAYER_ENTERING_WORLD" then
-        Todoloo.Debug.Message("PLAYER_ENTERING_WORLD")
         if not self.initialized then
             TodolooTracker_Initialize(self)
         end
@@ -739,7 +737,6 @@ end
 ---Update the background
 --TODO: Awaiting implementation
 function TodolooTracker_UpdateBackground()
-    Todoloo.Debug.Message("TodolooTracker_UpdateBackground")
     TodolooTrackerFrame.NineSlice:Hide()
     --TODO: Implement
 
@@ -799,7 +796,6 @@ function TodolooTracker_Update(reason, id, subInfo)
 
     -- we're already updating, try again next frame
     if tracker.isUpdating then
-        Todoloo.Debug.Message("Update in progress - aborting")
         tracker.isUpdateDirty = true
         return
     end
@@ -834,7 +830,6 @@ function TodolooTracker_Update(reason, id, subInfo)
     end
 
     -- run update
-    Todoloo.Debug.Message("Run update")
     for _, module in ipairs(tracker.MODULES) do
         if module.Header then
             module.Header.enabled = nil
