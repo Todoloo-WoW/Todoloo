@@ -897,7 +897,7 @@ end
 ---@param mouseButton string Definition of which mouse button was clicked
 function TodolooTrackerGroupHeader_OnClick(self, mouseButton)
     local block = self:GetParent()
-    block.module:OnGroupHeaderClick(block, mouseButton)
+    --block.module:OnGroupHeaderClick(block, mouseButton)
 end
 
 ---On enter (mouse hover) on group header
