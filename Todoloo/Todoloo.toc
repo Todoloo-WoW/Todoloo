@@ -10,8 +10,7 @@
 ## X-Curse-Project-ID: 979806
 ## X-Wago-ID: mNwQDBKo
 
-## SavedVariables: TODOLOO_CONFIG
-## SavedVariablesPerCharacter: TODOLOO_TASKS, TODOLOO_RESET_INFO
+## SavedVariables: TODOLOO_CONFIG, TODOLOO_TASKS
 
 ## DefaultState: enabled
 ## OptionalDeps: LibStub, LibDBIcon-1.0, LibDataBroker-1.1

@@ -103,36 +103,79 @@ Todoloo.TaskManager.ExampleTasks = {
     }
 }
 
+---Base setup for new characters
+Todoloo.TaskManager.EmptyCharacterSetup = {
+    groups = {}
+}
+
 -- *****************************************************************************************************
 -- ***** SETUP & INITIALIZATION
 -- *****************************************************************************************************
 
 ---Setup Todoloo tasks for first time use
-function Todoloo.TaskManager.FirstTimeSetup()
-    Todoloo.Debug.Message("Setting up first time use")
-    TODOLOO_TASKS = Todoloo.TaskManager.ExampleTasks
+---@param characterFullName string Full character name in format "player-realm"
+function Todoloo.TaskManager.FirstTimeSetup(characterFullName)
+    TODOLOO_TASKS[characterFullName] = { groups = Todoloo.TaskManager.ExampleTasks }
 end
 
----Reset Todoloo removing all tasks and groups
----
----WARNING: This completely removes the users current group and task setup. Use with caution.
-function Todoloo.TaskManager.Reset()
-    TODOLOO_TASKS = {}
+---Reset Todoloo removing all tasks and groups.
+---WARNING: This completely removes the characters current group and task setup. Use with caution.
+---@param characterFullName string? Full character name in format "player-realm" (defaults to the currently logged in character)
+function Todoloo.TaskManager.Reset(characterFullName)
+    characterFullName = characterFullName or Todoloo.Utils.GetCharacterFullName()
+    Todoloo.TaskManager.FirstTimeCharacterSetup(characterFullName)
+end
+
+---Do first time setup on character
+---@param characterFullName string Character fule name in format "player-realm"
+function Todoloo.TaskManager.FirstTimeCharacterSetup(characterFullName)
+    TODOLOO_TASKS[characterFullName] = Todoloo.TaskManager.EmptyCharacterSetup
 end
 
 ---Initialize task manager
 function Todoloo.TaskManager.Initialize()
-    Todoloo.Debug.Message("Initializing task manager")
+    local characterFullName = Todoloo.Utils.GetCharacterFullName()
 
     if TODOLOO_TASKS == nil then
-        if not Todoloo.Config.Get(Todoloo.Config.Options.FIRST_TIME_STARTUP_INITIALIZED) then
-            -- setup first time use if this is indeed the first time the addon is loaded on the account
-            Todoloo.TaskManager.FirstTimeSetup()
-            Todoloo.Config.Set(Todoloo.Config.Options.FIRST_TIME_STARTUP_INITIALIZED, true)
-        else
-            Todoloo.TaskManager.Reset()
-        end
+        TODOLOO_TASKS = {}
+        Todoloo.TaskManager.FirstTimeSetup(characterFullName)
     end
+
+    local character = TODOLOO_TASKS[characterFullName]
+    if character == nil then
+        -- character doesn't exist - do first time character setup
+        Todoloo.TaskManager.FirstTimeCharacterSetup(characterFullName)
+    end
+end
+
+-- *****************************************************************************************************
+-- ***** CHARACTERS
+-- *****************************************************************************************************
+
+---@class Character
+---@field groups Group[] All groups for character
+
+---Get all characters
+---@return Character[]
+function Todoloo.TaskManager.GetAllCharacters()
+    if TODOLOO_TASKS == nil then
+        error("TODOLOO_TASKS not initialized")
+    end
+
+    return TODOLOO_TASKS
+end
+
+---Get character
+---@param characterFullName string? Full character name in format "player-realm" (defaults to the currently logged in character)
+---@return Character
+function Todoloo.TaskManager.GetCharacter(characterFullName)
+    if TODOLOO_TASKS == nil then
+        error("TODOLOO_TASKS not initialized")
+    end
+
+    characterFullName = characterFullName or Todoloo.Utils.GetCharacterFullName()
+
+    return TODOLOO_TASKS[characterFullName]
 end
 
 -- *****************************************************************************************************
@@ -144,55 +187,47 @@ end
 ---@field tasks Task[] Array of tasks nested under the group
 
 ---Get all groups
+---@param characterFullName string? Full character name in format "player-realm" (defaults to the currently logged in character)
 ---@return Group[]
-function Todoloo.TaskManager.GetAll()
-    Todoloo.Debug.Message("Todoloo.TaskManager.GetAll")
-    if TODOLOO_TASKS == nil then
-        error("TODOLOO_TASKS not initialized")
-    end
-
-    return TODOLOO_TASKS
+function Todoloo.TaskManager.GetAllGroups(characterFullName)
+    characterFullName = characterFullName or Todoloo.Utils.GetCharacterFullName()
+    return TODOLOO_TASKS[characterFullName].groups
 end
 
 ---Get specific group by index
 ---@param index integer Index of the group within the task table
+---@param characterFullName string? Full character name in format "player-realm" (defaults to the currently logged in character)
 ---@return Group
-function Todoloo.TaskManager.GetGroup(index)
-    if index == nil then
-        error("Cannot retrieve group at index 'nil'")
-    end
+function Todoloo.TaskManager.GetGroup(index, characterFullName)
+    assert(index)
 
-    if TODOLOO_TASKS == nil then
-        error("TODOLOO_TASKS not initialized")
-    end
+    characterFullName = characterFullName or Todoloo.Utils.GetCharacterFullName()
 
-    return TODOLOO_TASKS[index]
+    return TODOLOO_TASKS[characterFullName].groups[index]
 end
 
 ---Get the total number of tasks for a given group
 ---@param index integer Index of the group within the task table
----@return integer number Total number of tasks
-function Todoloo.TaskManager.GetNumTasks(index)
+---@param characterFullName string? Full character name in format "player-realm" (defaults to the currently logged in character)
+---@return integer # Total number of tasks
+function Todoloo.TaskManager.GetNumTasks(index, characterFullName)
     assert(index)
 
-    if TODOLOO_TASKS == nil then
-        error("TODOLOO_TASKS not initialized")
-    end
+    characterFullName = characterFullName or Todoloo.Utils.GetCharacterFullName()
 
-    local group = TODOLOO_TASKS[index]
+    local group = TODOLOO_TASKS[characterFullName].groups[index]
     return #group.tasks
 end
 
 ---Are all tasks in this group complete?
 ---@param index integer Index of the group within the task table
-function Todoloo.TaskManager.IsGroupComplete(index)
+---@param characterFullName string? Full character name in format "player-realm" (defaults to the currently logged in character)
+---@return boolean
+function Todoloo.TaskManager.IsGroupComplete(index, characterFullName)
     assert(index)
 
-    if TODOLOO_TASKS == nil then
-        error("TODOLOO_TASKS not initialized")
-    end
-
-    local group = TODOLOO_TASKS[index]
+    characterFullName = characterFullName or Todoloo.Utils.GetCharacterFullName()
+    local group = TODOLOO_TASKS[characterFullName].groups[index]
     local isComplete = true
     for _, task in pairs(group.tasks) do
         if not task.completed then
@@ -205,58 +240,46 @@ end
 
 ---Add new group
 ---@param name string Name/title of the group
-function Todoloo.TaskManager.AddGroup(name)
-    if name == nil then
-        error("Group name cannot be nil")
-    end
+---@param characterFullName string? Full character name in format "player-realm" (defaults to the currently logged in character)
+function Todoloo.TaskManager.AddGroup(name, characterFullName)
+    assert(name)
 
-    if TODOLOO_TASKS == nil then
-        error("TODOLOO_TASKS not initialized")
-    else
-        table.insert(TODOLOO_TASKS, { name = name, tasks = {} })
-    end
+    characterFullName = characterFullName or Todoloo.Utils.GetCharacterFullName()
+    local character = TODOLOO_TASKS[characterFullName]
+
+    table.insert(character.groups, { name = name, tasks = {} })
 end
 
 ---Update group
 ---@param index integer Index of the group within the task table
 ---@param new_name string New name/title of the group
-function Todoloo.TaskManager.UpdateGroup(index, new_name)
+---@param characterFullName string? Full character name in format "player-realm" (defaults to the currently logged in character)
+function Todoloo.TaskManager.UpdateGroup(index, new_name, characterFullName)
     assert(index)
     assert(new_name)
 
-    if TODOLOO_TASKS == nil then
-        error("TODOLOO_TASKS not initialized")
-    else
-        TODOLOO_TASKS[index].name = new_name
-    end
+    characterFullName = characterFullName or Todoloo.Utils.GetCharacterFullName()
+    TODOLOO_TASKS[characterFullName].groups[index].name = new_name
 end
 
 ---Remove group
 ---@param index integer Index of the group within the task table
-function Todoloo.TaskManager.RemoveGroup(index)
-    if index == nil then
-        error("Cannot remove group at index 'nil'")
-    end
+---@param characterFullName string? Full character name in format "player-realm" (defaults to the currently logged in character)
+function Todoloo.TaskManager.RemoveGroup(index, characterFullName)
+    assert(index)
 
-    if TODOLOO_TASKS == nil then
-        error("TODOLOO_TASKS not initialized")
-    else
-        table.remove(TODOLOO_TASKS, index)
-    end
+    characterFullName = characterFullName or Todoloo.Utils.GetCharacterFullName()
+    table.remove(TODOLOO_TASKS[characterFullName].groups, index)
 end
 
 ---Reset group, removing all tasks
 ---@param index integer Index of the group within the task table
-function Todoloo.TaskManager.ResetGroup(index)
-    if index == nil then
-        error("Cannot remove group at index 'nil'")
-    end
+---@param characterFullName string? Full character name in format "player-realm" (defaults to the currently logged in character)
+function Todoloo.TaskManager.ResetGroup(index, characterFullName)
+    assert(index)
 
-    if TODOLOO_TASKS == nil then
-        error("TODOLOO_TASKS not initialized")
-    else
-        TODOLOO_TASKS[index].tasks = {}
-    end
+    characterFullName = characterFullName or Todoloo.Utils.GetCharacterFullName()
+    TODOLOO_TASKS[characterFullName].groups[index].tasks = {}
 end
 
 -- *****************************************************************************************************
@@ -272,19 +295,14 @@ end
 ---Get specific task in group by index
 ---@param groupIndex integer Index of the group within the task table
 ---@param index integer Index of the task within the group
+---@param characterFullName string? Full character name in format "player-realm" (defaults to the currently logged in character)
 ---@return Task
-function Todoloo.TaskManager.GetTask(groupIndex, index)
-    if groupIndex == nil then
-        error("Cannot retrieve group at index 'nil'")
-    elseif index == nil then
-        error("Cannot retrieve task at index 'nil'")
-    end
+function Todoloo.TaskManager.GetTask(groupIndex, index, characterFullName)
+    assert(groupIndex)
+    assert(index)
 
-    if TODOLOO_TASKS == nil then
-        error("TODOLOO_TASKS not initialized")
-    end
-
-    return TODOLOO_TASKS[groupIndex].tasks[index]
+    characterFullName = characterFullName or Todoloo.Utils.GetCharacterFullName()
+    return TODOLOO_TASKS[characterFullName].groups[groupIndex].tasks[index]
 end
 
 ---Add new task to group
@@ -292,25 +310,20 @@ end
 ---@param name string Name/title of the task
 ---@param description string? Optional description of the task
 ---@param reset reset Reset interval
-function Todoloo.TaskManager.AddTask(groupIndex, name, description, reset)
-    if groupIndex == nil then
-        error("Group index cannot be nil")
-    elseif name == nil then
-        error("Task name cannot be nil")
-    end
+---@param characterFullName string? Full character name in format "player-realm" (defaults to the currently logged in character)
+function Todoloo.TaskManager.AddTask(groupIndex, name, description, reset, characterFullName)
+    assert(groupIndex)
+    assert(name)
 
+    characterFullName = characterFullName or Todoloo.Utils.GetCharacterFullName()
     reset = reset or Todoloo.TaskManager.DefaultResetInterval
-
-    if TODOLOO_TASKS == nil then
-        error("TODOLOO_TASKS not initialized")
-    else
-        table.insert(TODOLOO_TASKS[groupIndex].tasks, {
-            name = name,
-            description = description,
-            reset = reset,
-            completed = false
-        })
-    end
+    
+    table.insert(TODOLOO_TASKS[characterFullName].groups[groupIndex].tasks, {
+        name = name,
+        description = description,
+        reset = reset,
+        completed = false
+    })
 end
 
 ---Update task
@@ -319,77 +332,57 @@ end
 ---@param name string New name for the task
 ---@param description string? New description for the task
 ---@param reset reset New reset interval for the task
-function Todoloo.TaskManager.UpdateTask(groupIndex, index, name, description, reset)
-    if groupIndex == nil then
-        error("Group index cannot be nil")
-    elseif index == nil then
-        error("Index cannot be nil")
-    elseif name == nil then
-        error("Task name cannot be nil")
-    elseif reset == nil then
-        error("Task reset interval cannot be nil")
-    end
+---@param characterFullName string? Full character name in format "player-realm" (defaults to the currently logged in character)
+function Todoloo.TaskManager.UpdateTask(groupIndex, index, name, description, reset, characterFullName)
+    assert(groupIndex)
+    assert(index)
+    assert(name)
+    assert(reset)
 
-    if TODOLOO_TASKS == nil then
-        error("TODOLOO_TASKS not initialized")
-    else
-        local completed = TODOLOO_TASKS[groupIndex].tasks[index].completed
-        TODOLOO_TASKS[groupIndex].tasks[index] = {
-            name = name,
-            description = description,
-            reset = reset,
-            completed = completed
-        }
-    end
+    characterFullName = characterFullName or Todoloo.Utils.GetCharacterFullName()
+
+    local completed = TODOLOO_TASKS[characterFullName].groups[groupIndex].tasks[index].completed
+    TODOLOO_TASKS[characterFullName].groups[groupIndex].tasks[index] = {
+        name = name,
+        description = description,
+        reset = reset,
+        completed = completed
+    }
 end
 
 ---Remove task
 ---@param groupIndex integer Index of the group within the table
 ---@param index integer Index of the task within the group
-function Todoloo.TaskManager.RemoveTask(groupIndex, index)
-    if groupIndex == nil then
-        error("Cannot remove task at group index 'nil'")
-    elseif index == nil then
-        error("Cannot remove task at index 'nil'")
-    end
+---@param characterFullName string? Full character name in format "player-realm" (defaults to the currently logged in character)
+function Todoloo.TaskManager.RemoveTask(groupIndex, index, characterFullName)
+    assert(groupIndex)
+    assert(index)
 
-    if TODOLOO_TASKS == nil then
-        error("TODOLOO_TASKS not initialized")
-    else
-        table.remove(TODOLOO_TASKS[groupIndex].tasks, index)
-    end
+    characterFullName = characterFullName or Todoloo.Utils.GetCharacterFullName()
+    table.remove(TODOLOO_TASKS[characterFullName].groups[groupIndex].tasks, index)
 end
 
 ---Set task completion
 ---@param groupIndex integer Index of the group within the table
 ---@param index integer Index of the task within the group
 ---@param completed boolean Whether or not the task should be marked as completed
-function Todoloo.TaskManager.SetTaskCompletion(groupIndex, index, completed)
-    if groupIndex == nil then
-        error("Cannot retrieve group at index 'nil'")
-    elseif index == nil then
-        error("Cannot retrieve task at index 'nil'")
-    elseif completed == nil then
-        error("Completed cannot be nil")  
-    end
-
-    if TODOLOO_TASKS == nil then
-        error("TODOLOO_TASKS not initialized")
-    end
-
-    TODOLOO_TASKS[groupIndex].tasks[index].completed = completed
+---@param characterFullName string? Full character name in format "player-realm" (defaults to the currently logged in character)
+function Todoloo.TaskManager.SetTaskCompletion(groupIndex, index, completed, characterFullName)
+    assert(groupIndex)
+    assert(index)
+    
+    characterFullName = characterFullName or Todoloo.Utils.GetCharacterFullName()
+    TODOLOO_TASKS[characterFullName].groups[groupIndex].tasks[index].completed = completed
 end
 
 ---Reset completion state on task
 ---@param groupIndex integer Index of the group within the task table
 ---@param index integer Index of the task within the group
-function Todoloo.TaskManager.ResetTask(groupIndex, index)
+---@param characterFullName string? Full character name in format "player-realm" (defaults to the currently logged in character)
+function Todoloo.TaskManager.ResetTask(groupIndex, index, characterFullName)
     assert(groupIndex)
     assert(index)
 
-    if TODOLOO_TASKS == nil then
-        error("TODOLOO_TASKS not initialized")
-    end
-
-    TODOLOO_TASKS[groupIndex].tasks[index].completed = false
+    characterFullName = characterFullName or Todoloo.Utils.GetCharacterFullName()
+    TODOLOO_TASKS[characterFullName].groups[groupIndex].tasks[index].completed = false
 end

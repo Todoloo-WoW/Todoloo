@@ -187,7 +187,7 @@ end
 function TodolooTaskManagement_BuildGroupInfos()
     local infos = {}
 
-    for index, group in pairs(Todoloo.TaskManager.GetAll()) do
+    for index, group in pairs(Todoloo.TaskManager.GetAllGroups()) do
         table.insert(infos, { name = group.name, id = index })
     end
 

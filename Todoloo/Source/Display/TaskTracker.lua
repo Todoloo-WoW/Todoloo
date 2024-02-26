@@ -33,7 +33,7 @@ end
 function TODOLOO_TASK_TRACKER_MODULE:BuildGroupInfos()
     local infos = {}
 
-    for index, group in pairs(Todoloo.TaskManager.GetAll()) do
+    for index, group in pairs(Todoloo.TaskManager.GetAllGroups()) do
         if self:ShouldDisplayGroup(group) then
             table.insert(infos, { name = group.name, id = index})
         end

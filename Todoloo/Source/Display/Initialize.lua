@@ -1,9 +1,5 @@
 local function InitializeBase()
-    Todoloo.Debug.Message("Initializing display")
     Todoloo.MinimapIcon.Initialize()
-    
-    -- OLD TASK TRACKER
-    --CreateFrame("Frame", "TodolooTaskTrackerView", UIParent, "TodolooTaskTracker")
 
     Todoloo.ToggleView = function()
         --TODO: Show something else than just the task tracker?)
