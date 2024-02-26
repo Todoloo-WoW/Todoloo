@@ -5,7 +5,7 @@ ignore:
 
 externals:
     Todoloo/Libs/LibStub: https://repos.wowace.com/wow/libstub/trunk
-    Todoloo/Libs/LiDataBroker-1.1: https://github.com/tekkub/libdatabroker-1-1
+    Todoloo/Libs/LibDataBroker-1.1: https://github.com/tekkub/libdatabroker-1-1
     Todoloo/Libs/LibDBIcon-1.0: https://repos.wowace.com/wow/libdbicon-1-0/trunk/LibDBIcon-1.0
 
 move-folders:
