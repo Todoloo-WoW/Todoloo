@@ -18,6 +18,8 @@ function Todoloo.MinimapIcon.Initialize()
         end,
         OnTooltipShow = function(tip)
             tip:SetText("Todoloo")
+            tip:AddLine("Left-Click: " .. WHITE_FONT_COLOR:WrapTextInColorCode("Toggle task tracker"))
+            tip:AddLine("Right-Click: ".. WHITE_FONT_COLOR:WrapTextInColorCode("Open task manager"))
         end
     })
 

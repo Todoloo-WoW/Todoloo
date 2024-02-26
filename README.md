@@ -1,5 +1,5 @@
 # Todoloo
-Todoloo is your friendly in-game task manegement helper, making sure you've never forget your mount runs, transmog runs, profession tasks, and so much more.
+Todoloo is your friendly in-game task management helper, making sure you've never forget your mount runs, transmog runs, profession tasks, and so much more.
 
 ## Key features
 * Create character specific tasks that automatically reset every day/week, or manually
