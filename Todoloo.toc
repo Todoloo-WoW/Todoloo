@@ -6,7 +6,9 @@
 
 ## Author: Detilium
 
-## Version: 0.1
+## Version: @project-version@
+## X-Curse-Project-ID: 979806
+## X-Wago-ID: mNwQDBKo
 
 ## SavedVariables: TODOLOO_CONFIG
 ## SavedVariablesPerCharacter: TODOLOO_TASKS, TODOLOO_RESET_INFO
