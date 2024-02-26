@@ -1,7 +1,9 @@
 ## Interface: 100205
 
 ## Title: Todoloo
-## Notes: Your friendly task manager!
+## Notes: Your friendly task management assistant!
+## IconTexture: Interface\AddOns\Todoloo\Images\Logo
+
 ## Author: Detilium
 
 ## Version: 0.1

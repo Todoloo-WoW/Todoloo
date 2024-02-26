@@ -6,7 +6,7 @@ function Todoloo.MinimapIcon.Initialize()
     local ldb = LibStub:GetLibrary("LibDataBroker-1.1")
     local dataObj = ldb:NewDataObject("Todoloo", {
         type = "launcher",
-        icon = "Interface\\AddOns\\Todoloo\\Images\\Todoloo_Icon",
+        icon = "Interface\\AddOns\\Todoloo\\Images\\Logo",
         label = "Todoloo",
         tocname = "Todoloo",
         OnClick = function(clickedFrame, button)
