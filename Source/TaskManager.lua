@@ -155,7 +155,7 @@ function Todoloo.TaskManager.GetAll()
 end
 
 ---Get specific group by index
----@param index integer The index of the group within the table
+---@param index integer Index of the group within the task table
 ---@return Group
 function Todoloo.TaskManager.GetGroup(index)
     if index == nil then
@@ -170,7 +170,7 @@ function Todoloo.TaskManager.GetGroup(index)
 end
 
 ---Get the total number of tasks for a given group
----@param index integer Index of the group
+---@param index integer Index of the group within the task table
 ---@return integer number Total number of tasks
 function Todoloo.TaskManager.GetNumTasks(index)
     assert(index)
@@ -184,7 +184,7 @@ function Todoloo.TaskManager.GetNumTasks(index)
 end
 
 ---Are all tasks in this group complete?
----@param index integer The index of the group within the table
+---@param index integer Index of the group within the task table
 function Todoloo.TaskManager.IsGroupComplete(index)
     assert(index)
 
@@ -218,7 +218,7 @@ function Todoloo.TaskManager.AddGroup(name)
 end
 
 ---Update group
----@param index integer The index of the group within the table
+---@param index integer Index of the group within the task table
 ---@param new_name string New name/title of the group
 function Todoloo.TaskManager.UpdateGroup(index, new_name)
     assert(index)
@@ -232,7 +232,7 @@ function Todoloo.TaskManager.UpdateGroup(index, new_name)
 end
 
 ---Remove group
----@param index integer The index of the group within the table
+---@param index integer Index of the group within the task table
 function Todoloo.TaskManager.RemoveGroup(index)
     if index == nil then
         error("Cannot remove group at index 'nil'")
@@ -246,7 +246,7 @@ function Todoloo.TaskManager.RemoveGroup(index)
 end
 
 ---Reset group, removing all tasks
----@param index integer The index of the group within the table
+---@param index integer Index of the group within the task table
 function Todoloo.TaskManager.ResetGroup(index)
     if index == nil then
         error("Cannot remove group at index 'nil'")
@@ -270,8 +270,8 @@ end
 ---@field completed boolean Whether or not this task has been completed
 
 ---Get specific task in group by index
----@param groupIndex integer The index of the group within the table
----@param index integer The index of the task within the group task table
+---@param groupIndex integer Index of the group within the task table
+---@param index integer Index of the task within the group
 ---@return Task
 function Todoloo.TaskManager.GetTask(groupIndex, index)
     if groupIndex == nil then
@@ -288,7 +288,7 @@ function Todoloo.TaskManager.GetTask(groupIndex, index)
 end
 
 ---Add new task to group
----@param groupIndex integer The index of the group in the table
+---@param groupIndex integer Index of the group in the task table
 ---@param name string Name/title of the task
 ---@param description string? Optional description of the task
 ---@param reset reset Reset interval
@@ -314,8 +314,8 @@ function Todoloo.TaskManager.AddTask(groupIndex, name, description, reset)
 end
 
 ---Update task
----@param groupIndex integer The index of the group within the table
----@param index integer The index of the task within the group task table
+---@param groupIndex integer Index of the group within the table
+---@param index integer Index of the task within the group
 ---@param name string New name for the task
 ---@param description string? New description for the task
 ---@param reset reset New reset interval for the task
@@ -344,8 +344,8 @@ function Todoloo.TaskManager.UpdateTask(groupIndex, index, name, description, re
 end
 
 ---Remove task
----@param groupIndex integer The index of the group within the table
----@param index integer The index of the task within the group task table
+---@param groupIndex integer Index of the group within the table
+---@param index integer Index of the task within the group
 function Todoloo.TaskManager.RemoveTask(groupIndex, index)
     if groupIndex == nil then
         error("Cannot remove task at group index 'nil'")
@@ -361,8 +361,8 @@ function Todoloo.TaskManager.RemoveTask(groupIndex, index)
 end
 
 ---Set task completion
----@param groupIndex integer The index of the group within the table
----@param index integer The index of the task within the group task table
+---@param groupIndex integer Index of the group within the table
+---@param index integer Index of the task within the group
 ---@param completed boolean Whether or not the task should be marked as completed
 function Todoloo.TaskManager.SetTaskCompletion(groupIndex, index, completed)
     if groupIndex == nil then
@@ -378,4 +378,18 @@ function Todoloo.TaskManager.SetTaskCompletion(groupIndex, index, completed)
     end
 
     TODOLOO_TASKS[groupIndex].tasks[index].completed = completed
+end
+
+---Reset completion state on task
+---@param groupIndex integer Index of the group within the task table
+---@param index integer Index of the task within the group
+function Todoloo.TaskManager.ResetTask(groupIndex, index)
+    assert(groupIndex)
+    assert(index)
+
+    if TODOLOO_TASKS == nil then
+        error("TODOLOO_TASKS not initialized")
+    end
+
+    TODOLOO_TASKS[groupIndex].tasks[index].completed = false
 end

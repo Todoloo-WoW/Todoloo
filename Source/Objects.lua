@@ -1,5 +1,6 @@
 Todoloo = {
     TaskManager = {},
+    ResetManager = {},
     Config = {},
     MinimapIcon = {},
     Debug = {},

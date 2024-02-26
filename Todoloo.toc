@@ -7,7 +7,7 @@
 ## Version: 0.1
 
 ## SavedVariables: TODOLOO_CONFIG
-## SavedVariablesPerCharacter: TODOLOO_TASKS
+## SavedVariablesPerCharacter: TODOLOO_TASKS, TODOLOO_RESET_INFO
 
 ## DefaultState: enabled
 ## OptionalDeps: LibStub, LibDBIcon-1.0, LibDataBroker-1.1

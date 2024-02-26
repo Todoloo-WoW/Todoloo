@@ -2,6 +2,7 @@ local function InitializeBase()
     Todoloo.Debug.Message("Initializing addon")
     Todoloo.Config.Initialize()
     Todoloo.TaskManager.Initialize()
+    Todoloo.ResetManager.Initialize()
 end
 
 local CORE_EVENTS = {
