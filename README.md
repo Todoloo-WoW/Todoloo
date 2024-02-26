@@ -7,7 +7,7 @@ Todoloo is your friendly in-game task manegement helper, making sure you've neve
 * Blizzard styled task tracker to visualize your tasks
 * Hide completed tasks and groups from the task tracker
 
-# Contributing
+# Feedback
 ## Bug
 Bugs can be reported in the [issues page](https://github.com/Todoloo-WoW/Todoloo/issues).
 
