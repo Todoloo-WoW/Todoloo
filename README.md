@@ -2,7 +2,7 @@
 Todoloo is your friendly in-game task manegement helper, making sure you've never forget your mount runs, transmog runs, profession tasks, and so much more.
 
 ## Key features
-* Create tasks taht automatically reset every day/week, or manually
+* Create character specific tasks that automatically reset every day/week, or manually
 * Organize your tasks in custom made groups
 * Blizzard styled task tracker to visualize your tasks
 * Hide completed tasks and groups from the task tracker
