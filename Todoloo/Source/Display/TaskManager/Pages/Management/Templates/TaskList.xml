@@ -1,0 +1,179 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/FrameXML/UI_shared.xsd">
+
+    <!-- Todoloo divider template used within the group list -->
+    <!-- TODO: Is this ever used? -->
+    <Frame name="TodolooTaskListDividerTemplate" virtual="true">
+        <Size y="30"/>
+        <Layers>
+            <Layer>
+                <FontString parentKey="Label" text="PROFESSIONS_CATEGORY_UNLEARNED" inherits="GameFontNormal_NoShadow">
+                    <Size x="0" y="13"/>
+                    <Anchors>
+                        <Anchor point="BOTTOMLEFT" x="10" y="10"/>
+                    </Anchors>
+                </FontString>
+                <Texture atlas="Options_HorizontalDivider">
+                    <Size x="250" y="2"/>
+                    <Anchors>
+                        <Anchor point="BOTTOMLEFT" x="5" y="5"/>
+                    </Anchors>
+                    <Color color="NORMAL_FONT_COLOR"/>
+                </Texture>
+                <Texture atlas="Options_HorizontalDivider" alphaMode="ADD">
+                    <Size x="250" y="2"/>
+                    <Anchors>
+                        <Anchor point="BOTTOMLEFT" x="5" y="5"/>
+                    </Anchors>
+                    <Color color="NORMAL_FONT_COLOR" a=".5"/>
+                </Texture>
+            </Layer>
+        </Layers>
+    </Frame>
+
+    <!-- Todoloo group template used within the group list -->
+    <Button name="TodolooTaskListGroupTemplate" mixin="TodolooTaskListGroupMixin" virtual="true">
+        <Size y="25" />
+        <Layers>
+            <Layer level="OVERLAY" textureSubLevel="1">
+                <FontString parentKey="Label" inherits="GameFontNormal_NoShadow" justifyH="LEFT">
+                    <Size y="10" />
+                    <Anchors>
+                        <Anchor point="LEFT" x="10" y="2" />
+                    </Anchors>
+                </FontString>
+            </Layer>
+            <Layer level="BACKGROUND">
+                <Texture parentKey="LeftPiece" atlas="Professions-recipe-header-left" useAtlasSize="true">
+                    <Anchors>
+                        <Anchor point="LEFT" y="2" />
+                    </Anchors>
+                </Texture>
+                <Texture parentKey="RightPiece" atlas="Professions-recipe-header-right" useAtlasSize="true">
+                    <Anchors>
+                        <Anchor point="RIGHT" y="2" />
+                    </Anchors>
+                </Texture>
+                <Texture parentKey="CenterPiece" atlas="Professions-recipe-header-middle" useAtlasSize="true">
+                    <Anchors>
+                        <Anchor point="TOPLEFT" relativeKey="$parent.LeftPiece" relativePoint="TOPRIGHT" />
+                        <Anchor point="BOTTOMRIGHT" relativeKey="$parent.RightPiece" relativePoint="BOTTOMLEFT" />
+                    </Anchors>
+                </Texture>
+            </Layer>
+            <Layer level="ARTWORK">
+                <Texture parentKey="CollapseIcon">
+                    <Anchors>
+                        <Anchor point="RIGHT" x="-10" y="2" />
+                    </Anchors>
+                </Texture>
+            </Layer>
+            <Layer level="HIGHLIGHT">
+                <Texture parentKey="CollapseIconAlphaAdd" alphaMode="ADD">
+                    <Anchors>
+                        <Anchor point="CENTER" relativeKey="$parent.CollapseIcon" />
+                    </Anchors>
+                </Texture>
+            </Layer>
+        </Layers>
+        <Scripts>
+            <OnEnter method="OnEnter" />
+            <OnLeave method="OnLeave" />
+        </Scripts>
+    </Button>
+
+    <!-- Todoloo task template used within the group list -->
+    <Button name="TodolooTaskListTaskTemplate" mixin="TodolooTaskListTaskMixin" registerForClicks="RightButtonUp, LeftButtonUp" virtual="true">
+        <Size y="20" />
+        <Layers>
+            <Layer level="OVERLAY" textureSubLevel="1">
+                <FontString parentKey="Label" inherits="GameFontHighlight_NoShadow" justifyH="LEFT">
+                    <Size y="12" />
+                    <Anchors>
+                        <Anchor point="LEFT" x="30" />
+                        <Anchor point="RIGHT" relativeKey="$parent.DeleteButton" x="-4" />
+                    </Anchors>
+                </FontString>
+            </Layer>
+            <Layer level="OVERLAY" textureSubLevel="2">
+                <Texture parentKey="SelectedOverlay" atlas="Professions_Recipe_Active" useAtlasSize="true" hidden="true">
+                    <Anchors>
+                        <Anchor point="CENTER" x="0" y="-1" />
+                    </Anchors>
+                </Texture>
+            </Layer>
+            <Layer level="HIGHLIGHT">
+                <Texture parentKey="HighlightOverlay" atlas="Professions_Recipe_Hover" useAtlasSize="true" alpha="0.5">
+                    <Anchors>
+                        <Anchor point="CENTER" x="0" y="-1" />
+                    </Anchors>
+                </Texture>
+            </Layer>
+        </Layers>
+        <Scripts>
+            <OnEnter method="OnEnter" />
+            <OnLeave method="OnLeave" />
+        </Scripts>
+    </Button>
+
+    <!-- Todoloo group list template used within the management page frame -->
+    <Frame name="TodolooTaskListTemplate" mixin="TodolooTaskListMixin" virtual="true" hidden="false">
+        <Size x="300" y="505" />
+        <Layers>
+            <Layer level="BACKGROUND">
+                <Texture parentKey="Background" atlas="Professions-background-summarylist" setAllPoints="true" />
+            </Layer>
+            <Layer level="ARTWORK">
+                <FontString parentKey="NoResultsText" inherits="GameFontNormal" text="No results" hidden="true">
+                    <Size x="200" y="0" />
+                    <Anchors>
+                        <Anchor point="TOP" x="0" y="-60" />
+                    </Anchors>
+                </FontString>
+            </Layer>
+        </Layers>
+        <Frames>
+            <Frame parentKey="BackgroundNineSlice" useParentLevel="true" inherits="NineSlicePanelTemplate">
+                <KeyValues>
+                    <KeyValue key="layoutType" value="InsetFrameTemplate" type="string" />
+                </KeyValues>
+                <Anchors>
+                    <Anchor point="TOPLEFT" />
+                    <Anchor point="BOTTOMRIGHT" />
+                </Anchors>
+            </Frame>
+
+            <DropDownToggleButton parentKey="FilterButton" inherits="UIResettableDropdownButtonTemplate" text="FILTER">
+				<Size x="90" y="20"/>
+				<Anchors>
+					<Anchor point="TOPRIGHT" x="-8" y="-8"/>
+				</Anchors>
+			</DropDownToggleButton>
+            
+            <EditBox parentKey="SearchBox" autoFocus="false" inherits="SearchBoxTemplate">
+                <Size y="20"/>
+                <Anchors>
+                    <Anchor point="RIGHT" relativeKey="$parent.FilterButton" relativePoint="LEFT" x="-4" y="0"/>
+                    <Anchor point="TOPLEFT" x="13" y="-8"/>
+                </Anchors>
+            </EditBox>
+
+            <Frame parentKey="ScrollBox" inherits="WowScrollBoxList">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeKey="$parent.SearchBox" relativePoint="BOTTOMLEFT" x="-5" y="-7" />
+                    <Anchor point="BOTTOMRIGHT" x="-20" y="5" />
+                </Anchors>
+            </Frame>
+            <EventFrame parentKey="ScrollBar" inherits="MinimalScrollBar">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeKey="$parent.ScrollBox" relativePoint="TOPRIGHT" x="0" y="0" />
+                    <Anchor point="BOTTOMLEFT" relativeKey="$parent.ScrollBox" relativePoint="BOTTOMRIGHT" x="0" y="0" />
+                </Anchors>
+            </EventFrame>
+        </Frames>
+        <Scripts>
+            <OnLoad method="OnLoad" />
+        </Scripts>
+    </Frame>
+
+</Ui>

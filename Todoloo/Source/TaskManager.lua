@@ -386,3 +386,45 @@ function Todoloo.TaskManager.ResetTask(groupIndex, index, characterFullName)
     characterFullName = characterFullName or Todoloo.Utils.GetCharacterFullName()
     TODOLOO_TASKS[characterFullName].groups[groupIndex].tasks[index].completed = false
 end
+
+-- *****************************************************************************************************
+-- ***** DATA PROVIDER
+-- *****************************************************************************************************
+
+---TODO: Add documentation
+---@param characterFullName string? Full character name in format "player-realm" (defaults to the currently logged in character)
+function Todoloo.TaskManager.GenerateDataProvider(characterFullName)
+    characterFullName = characterFullName or Todoloo.Utils.GetCharacterFullName()
+    local groups = TODOLOO_TASKS[characterFullName].groups
+
+    local dataProvider = CreateTreeDataProvider()
+
+    for _, group in pairs(groups) do
+        local groupInfo = { name = group.name }
+        local groupNode = dataProvider:Insert({ groupInfo = groupInfo })
+
+        for _, task in pairs(group.tasks) do
+            groupNode:Insert({ taskInfo = task })
+        end
+    end
+
+    print("DATAPROVIDER INFO")
+    print(dataProvider:GetSize(true))
+
+    return dataProvider
+end
+
+---@class TaskManagerInfo
+---@field openTaskId integer ID of the current task that should be opened in the task manager
+
+--TODO: What do we need to return from this?
+---@return TaskManagerInfo
+function Todoloo.TaskManager.GetTaskManagerInfo()
+    return {}
+end
+
+--TODO: What do we need to return from this?
+---@param taskManagerInfo TaskManagerInfo
+function Todoloo.TaskManager.SetTaskManagerInfo(taskManagerInfo)
+    taskManagerInfo = taskManagerInfo
+end
