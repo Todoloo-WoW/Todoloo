@@ -9,6 +9,7 @@
 ## Version: @project-version@
 ## X-Curse-Project-ID: 979806
 ## X-Wago-ID: mNwQDBKo
+## X-WoWI-ID: 26696
 
 ## SavedVariables: TODOLOO_CONFIG, TODOLOO_TASKS
 
