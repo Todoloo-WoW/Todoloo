@@ -2,17 +2,9 @@
 -- ***** GROUP LIST
 -- *****************************************************************************************************
 
-TodolooTaskListMixin = CreateFromMixins(CallbackRegistryMixin)
-TodolooTaskListMixin:GenerateCallbackEvents(
-{
-    "OnGroupDeleted",
-    "OnTaskCreated",
-    "OnTaskUpdated",
-    "OnTaskDeleted"
-})
+TodolooTaskListMixin = {}
 
 function TodolooTaskListMixin:OnLoad()
-    CallbackRegistryMixin.OnLoad(self);
 
     -- setup scroll box
     local indent = 10;
@@ -28,14 +20,12 @@ function TodolooTaskListMixin:OnLoad()
             local function Initializer(groupButton, node)
                 groupButton:Initialize(node)
 
-
                 groupButton:SetScript("OnClick", function(button, buttonName)
                     if buttonName == "LeftButton" and IsShiftKeyDown() then
                         node:ToggleCollapsed()
                         button:SetCollapseState(node:IsCollapsed())
                         PlaySound(SOUNDKIT.UI_90_BLACKSMITHING_TREEITEMCLICK);
                     elseif buttonName == "RightButton" then
-                        print("Should open group context menu")
                         ToggleDropDownMenu(1, elementData.groupInfo, self.GroupContextMenu, "cursor")
                     end
                 end)
@@ -148,11 +138,12 @@ function TodolooTaskListMixin:InitializeGroupContextMenu(dropDown, level)
     info.notCheckable = true
     info.text = "Delete"
     info.func = function() 
-        local numTasks = Todoloo.TaskManager.GetNumTasks(groupInfo.id)
+        local numTasks = Todoloo.TaskManager:GetNumTasks(groupInfo.id)
         if numTasks > 0 then
-            StaticPopup_Show("TODLOO_DELETE_GROUP", groupInfo.name, { callback = self.DeleteGroupCallback, groupInfo = groupInfo })
+            -- if the group has nested tasks, we should ask the player for confirmation
+            StaticPopup_Show("TODLOO_DELETE_GROUP", groupInfo.name, nil, { groupInfo = groupInfo })
         else
-            self:DeleteGroup(groupInfo)
+            Todoloo.TaskManager:RemoveGroup(groupInfo.id)
         end
     end
 
@@ -172,21 +163,21 @@ function TodolooTaskListMixin:InitializeTaskContextMenu(dropDown, level)
     info.disabled = false
 
     info.notCheckable = false
-    info.checked = taskInfo.reset == Todoloo.TaskManager.ResetIntervals.Manually
+    info.checked = taskInfo.reset == TODOLOO_RESET_INTERVALS.Manually
     info.text = "Manually"
-    info.func = function() self:SetTaskInterval(taskInfo, Todoloo.TaskManager.ResetIntervals.Manually) end
+    info.func = function() self:SetTaskInterval(taskInfo, TODOLOO_RESET_INTERVALS.Manually) end
     UIDropDownMenu_AddButton(info, level)
 
     info.notCheckable = false
-    info.checked = taskInfo.reset == Todoloo.TaskManager.ResetIntervals.Daily
+    info.checked = taskInfo.reset == TODOLOO_RESET_INTERVALS.Daily
     info.text = "Daily"
-    info.func = function() self:SetTaskInterval(taskInfo, Todoloo.TaskManager.ResetIntervals.Daily) end
+    info.func = function() self:SetTaskInterval(taskInfo, TODOLOO_RESET_INTERVALS.Daily) end
     UIDropDownMenu_AddButton(info, level)
 
     info.notCheckable = false
-    info.checked = taskInfo.reset == Todoloo.TaskManager.ResetIntervals.Weekly
+    info.checked = taskInfo.reset == TODOLOO_RESET_INTERVALS.Weekly
     info.text = "Weekly"
-    info.func = function() self:SetTaskInterval(taskInfo, Todoloo.TaskManager.ResetIntervals.Weekly) end
+    info.func = function() self:SetTaskInterval(taskInfo, TODOLOO_RESET_INTERVALS.Weekly) end
     UIDropDownMenu_AddButton(info, level)
 
     info.isTitle = true
@@ -214,18 +205,12 @@ function TodolooTaskListMixin:SetTaskInterval(taskInfo, resetInterval)
     self:UpdateTask(taskInfo)
 end
 
-function TodolooTaskListMixin:DeleteGroupCallback()
-    EventRegistry:TriggerEvent("TodolooTaskListMixin.Event.OnGroupDeleted", self)
-end
-
 function TodolooTaskListMixin:AddNewTask(groupInfo)
-    local task, id = Todoloo.TaskManager.AddTask(groupInfo.id, "", nil, nil)
-    EventRegistry:TriggerEvent("TodolooTaskListMixin.Event.OnTaskCreated", task, id, groupInfo.id, self)
+    local task, id = Todoloo.TaskManager:AddTask(groupInfo.id, "", nil, nil)
 end
 
 function TodolooTaskListMixin:DeleteTask(taskInfo)
-    Todoloo.TaskManager.RemoveTask(taskInfo.groupId, taskInfo.id)
-    EventRegistry:TriggerEvent("TodolooTaskListMixin.Event.OnTaskDeleted", taskInfo, self)
+    Todoloo.TaskManager:RemoveTask(taskInfo.groupId, taskInfo.id)
 end
 
 function TodolooTaskListMixin:OpenTask(taskInfo, scrollToTask)
@@ -255,25 +240,19 @@ function TodolooTaskListMixin:OpenGroup(groupInfo, scrollToTask)
 end
 
 function TodolooTaskListMixin:UpdateTask(taskInfo)
-    Todoloo.TaskManager.UpdateTask(
+    Todoloo.TaskManager:UpdateTask(
         taskInfo.groupId,
         taskInfo.id,
         taskInfo.name,
         taskInfo.describing,
         taskInfo.reset
     )
-
-    EventRegistry:TriggerEvent("TodolooTaskListMixin.Event.OnTaskUpdated", taskInfo, self)
 end
 
 -- *****************************************************************************************************
 -- ***** GROUP
 -- *****************************************************************************************************
-TodolooTaskListGroupMixin = CreateFromMixins(CallbackRegistryMixin)
-TodolooTaskListGroupMixin:GenerateCallbackEvents(
-{
-    "OnGroupSaved"
-})
+TodolooTaskListGroupMixin = {}
 
 function TodolooTaskListGroupMixin:Initialize(node)
     local elementData = node:GetData()
@@ -316,8 +295,7 @@ function TodolooTaskListGroupMixin:Save()
     end
     
     if isDirty then
-        Todoloo.TaskManager.UpdateGroup(self.groupInfo.id, newName)
-        EventRegistry:TriggerEvent("TodolooTaskListGroupMixin.Event.OnGroupSaved", self.groupInfo, self)
+        Todoloo.TaskManager:UpdateGroup(self.groupInfo.id, newName)
     end
 
     self:SetEditMode(false)
@@ -326,11 +304,7 @@ end
 -- *****************************************************************************************************
 -- ***** TASK
 -- *****************************************************************************************************
-TodolooTaskListTaskMixin = CreateFromMixins(CallbackRegistryMixin)
-TodolooTaskListTaskMixin:GenerateCallbackEvents(
-{
-    "OnTaskSaved"
-})
+TodolooTaskListTaskMixin = {}
 
 function TodolooTaskListTaskMixin:Initialize(node)
     local elementData = node:GetData()
@@ -339,9 +313,9 @@ function TodolooTaskListTaskMixin:Initialize(node)
     self.Name:SetText(self.taskInfo.name)
     self.Label:SetText(self.taskInfo.name)
 
-    local resetInterval = self.taskInfo.reset == Todoloo.TaskManager.ResetIntervals.Manually and "M"
-        or self.taskInfo.reset == Todoloo.TaskManager.ResetIntervals.Daily and "D"
-        or self.taskInfo.reset == Todoloo.TaskManager.ResetIntervals.Weekly and "W"
+    local resetInterval = self.taskInfo.reset == TODOLOO_RESET_INTERVALS.Manually and "M"
+        or self.taskInfo.reset == TODOLOO_RESET_INTERVALS.Daily and "D"
+        or self.taskInfo.reset == TODOLOO_RESET_INTERVALS.Weekly and "W"
 
     self.ResetInterval:SetText(resetInterval)
 end
@@ -383,14 +357,13 @@ function TodolooTaskListTaskMixin:Save()
 
     -- only update if any changes
     if isDirty then
-        Todoloo.TaskManager.UpdateTask(
+        Todoloo.TaskManager:UpdateTask(
             self.taskInfo.groupId,
             self.taskInfo.id,
             self.taskInfo.name,
             self.taskInfo.description,
             self.taskInfo.reset
         )
-        EventRegistry:TriggerEvent("TodolooTaskListTaskMixin.Event.OnTaskSaved", self.taskInfo, self)
     end
 
     self:SetEditMode(false)
@@ -404,9 +377,8 @@ StaticPopupDialogs["TODLOO_DELETE_GROUP"] = {
     text = "Are you sure you want to delete '%s'?",
     button1 = YES,
     button2 = NO,
-    OnAccept = function(self)
-        Todoloo.TaskManager.RemoveGroup(self.data.groupInfo.id)
-        self.data.callback()
+    OnAccept = function(self, data)
+        Todoloo.TaskManager:RemoveGroup(data.groupInfo.id)
     end,
     timout = 0,
     whileDead = 1,

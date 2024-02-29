@@ -2,20 +2,6 @@
 -- ***** MANAGEMENT PAGE
 -- *****************************************************************************************************
 
----Find the first task in the data provider
----@param dataProvider any
----@return any
-local function FindFirstTask(dataProvider)
-    for _, node in dataProvider:EnumerateEntireRange() do
-        local data = node:GetData()
-        local taskInfo = data.taskInfo
-
-        if taskInfo then
-            return taskInfo
-        end
-    end
-end
-
 ---Find task info in the dataprovider by the given task ID
 ---@param dataProvider any
 ---@param taskId integer Task ID (is equal to the task index within the group in Todoloo tasks)
@@ -75,20 +61,13 @@ function TodolooManagementPageMixin:OnLoad()
     
     -- setup button to create new group
     self.CreateGroupButton:SetTextToFit("Create group")
-
-    EventRegistry:RegisterCallback("TodolooTaskListGroupMixin.Event.OnGroupSaved", self.OnGroupSaved, self)
-    EventRegistry:RegisterCallback("TodolooTaskListTaskMixin.Event.OnTaskSaved", self.OnTaskSaved, self)
-    EventRegistry:RegisterCallback("TodolooTaskListMixin.Event.OnGroupDeleted", self.OnGroupDeleted, self)
-    EventRegistry:RegisterCallback("TodolooTaskListMixin.Event.OnTaskDeleted", self.OnTaskDeleted, self)
-    EventRegistry:RegisterCallback("TodolooTaskListMixin.Event.OnTaskCreated", self.OnTaskCreated, self)
-    EventRegistry:RegisterCallback("TodolooTaskListMixin.Event.OnTaskUpdated", self.OnTaskUpdated, self)
 end
 
 function TodolooManagementPageMixin:Initialize(taskManagerInfo)
     self.taskManagerInfo = taskManagerInfo
 
     local searching = self.TaskList.SearchBox:HasText()
-    local dataProvider = Todoloo.TaskManager.GenerateDataProvider()
+    local dataProvider = Todoloo.TaskManager:GenerateDataProvider()
 
     if searching then
         self.TaskList.ScrollBox:SetDataProvider(dataProvider, ScrollBoxConstants.DiscardScrollPosition)
@@ -124,6 +103,16 @@ end
 
 function TodolooManagementPageMixin:OnShow()
     self:SetTitle()
+
+    Todoloo.EventBus:RegisterEvents(self, {
+        Todoloo.Tasks.Events.GROUP_ADDED,
+        Todoloo.Tasks.Events.GROUP_REMOVED,
+        Todoloo.Tasks.Events.GROUP_RESET,
+        Todoloo.Tasks.Events.GROUP_UPDATED,
+        Todoloo.Tasks.Events.TASK_ADDED,
+        Todoloo.Tasks.Events.TASK_REMOVED,
+        Todoloo.Tasks.Events.TASK_UPDATED
+    })
 end
 
 function TodolooManagementPageMixin:SetTitle()
@@ -133,102 +122,28 @@ end
 
 function TodolooManagementPageMixin:CreateButtonGroup_OnClick()
     -- create new blank group
-    local _, groupId = Todoloo.TaskManager.AddGroup("")
-
-    local taskManagerInfo = Todoloo.TaskManager.GetTaskManagerInfo()
-    taskManagerInfo.openGroupId = groupId
-
-    self:Refresh(taskManagerInfo)
+    Todoloo.TaskManager:AddGroup("")
 end
 
 -- ***** EVENT HANDLERS
 
-function TodolooManagementPageMixin:OnGroupSaved(groupInfo, taskList)
-    print("OnGroupSaved")
-    -- TODO: Ensure that it's our task list
-    -- this is not our task list
-    -- print(self.TaskList)
-    -- print(taskList)
-    -- if taskList ~= nil and taskList ~= self.TaskList then
-    --     return
-    -- end
+function TodolooManagementPageMixin:ReceiveEvent(event, ...)
+    local taskManagerInfo = Todoloo.TaskManager:GetTaskManagerInfo()
 
-    local taskManagerInfo = Todoloo.TaskManager.GetTaskManagerInfo()
+    if event == Todoloo.Tasks.Events.GROUP_ADDED then
+        local groupId = ...
+        taskManagerInfo.openGroupId = groupId
 
-    self:Refresh(taskManagerInfo)
+        self:Refresh(taskManagerInfo)
+    elseif event == Todoloo.Tasks.Events.TASK_ADDED then
+        local groupId, taskId = ...
+        taskManagerInfo.openTask = { taskId = taskId, groupId = groupId }
 
-    -- TODO: Fire event that task tracker listenes to
-    if TodolooTrackerFrame and TodolooTrackerFrame:IsVisible() then
-        TodolooTracker_Update()
+        self:Refresh(taskManagerInfo)
+    else
+        self:Refresh(taskManagerInfo)
     end
 end
-
-function TodolooManagementPageMixin:OnGroupDeleted(taskList)
-    print("OnGroupDeleted")
-
-    local taskManagerInfo = Todoloo.TaskManager.GetTaskManagerInfo()
-
-    self:Refresh(taskManagerInfo)
-
-    -- TODO: Fire event that task tracker listenes to
-    if TodolooTrackerFrame and TodolooTrackerFrame:IsVisible() then
-        TodolooTracker_Update()
-    end
-end
-
-function TodolooManagementPageMixin:OnTaskCreated(task, taskId, groupId)
-    print("OnTaskCreated")
-
-    local taskManagerInfo = Todoloo.TaskManager.GetTaskManagerInfo()
-    taskManagerInfo.openTask = { taskId = taskId, groupId = groupId }
-
-    self:Refresh(taskManagerInfo)
-
-    -- TODO: Fire event that task tracker listenes to
-    if TodolooTrackerFrame and TodolooTrackerFrame:IsVisible() then
-        TodolooTracker_Update()
-    end
-end
-
-function TodolooManagementPageMixin:OnTaskUpdated(taskInfo, taskList)
-    print("OnTaskUpdated")
-
-    local taskManagerInfo = Todoloo.TaskManager.GetTaskManagerInfo()
-    
-    self:Refresh(taskManagerInfo)
-
-    -- TODO: Fire event that task tracker listenes to
-    if TodolooTrackerFrame and TodolooTrackerFrame:IsVisible() then
-        TodolooTracker_Update()
-    end
-end
-
-function TodolooManagementPageMixin:OnTaskSaved(taskInfo, taskList)
-    print("OnTaskSaved")
-
-    local taskManagerInfo = Todoloo.TaskManager.GetTaskManagerInfo()
-    
-    self:Refresh(taskManagerInfo)
-
-    -- TODO: Fire event that task tracker listenes to
-    if TodolooTrackerFrame and TodolooTrackerFrame:IsVisible() then
-        TodolooTracker_Update()
-    end
-end
-
-function TodolooManagementPageMixin:OnTaskDeleted(taskInfo, taskList)
-    print("OnTaskDeleted")
-
-    local taskManagerInfo = Todoloo.TaskManager.GetTaskManagerInfo()
-
-    self:Refresh(taskManagerInfo)
-
-    -- TODO: Fire event that task tracker listenes to
-    if TodolooTrackerFrame and TodolooTrackerFrame:IsVisible() then
-        TodolooTracker_Update()
-    end
-end
-
 
 -- ***** HELP
 

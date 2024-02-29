@@ -26,7 +26,7 @@ end
 function TodolooTaskManagerFrameMixin:OnShow()
     PlaySound(SOUNDKIT.UI_PROFESSIONS_WINDOW_OPEN);
 
-    local taskManagerInfo = Todoloo.TaskManager.GetTaskManagerInfo()
+    local taskManagerInfo = Todoloo.TaskManager:GetTaskManagerInfo()
     self:SetTaskManagerInfo(taskManagerInfo)
 end
 

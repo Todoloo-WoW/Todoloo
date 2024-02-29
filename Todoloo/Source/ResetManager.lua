@@ -1,5 +1,5 @@
 -- *****************************************************************************************************
--- ***** RESET FUNCTIONALITY
+-- ***** RESET MANAGER
 -- *****************************************************************************************************
 
 ---Should the task be reset?
@@ -9,10 +9,10 @@
 ---@return boolean # True if the task should reset, false otherwise
 local function ShouldResetTask(task, previousDailyReset, previousWeeklyReset)
     local lastResetPerformed = Todoloo.Config.Get(Todoloo.Config.Options.LAST_RESET_PERFORMED)
-    if task.reset == Todoloo.TaskManager.ResetIntervals.Daily and lastResetPerformed < previousDailyReset then
+    if task.reset == TODOLOO_RESET_INTERVALS.Daily and lastResetPerformed < previousDailyReset then
         -- reset daily task
         return true
-    elseif task.reset == Todoloo.TaskManager.ResetIntervals.Weekly and lastResetPerformed < previousWeeklyReset then
+    elseif task.reset == TODOLOO_RESET_INTERVALS.Weekly and lastResetPerformed < previousWeeklyReset then
         -- reset weekly task
         return true
     end
@@ -30,7 +30,7 @@ local function PerformResetSince(characters, previousDailyReset, previousWeeklyR
         for groupIndex, group in pairs(character.groups) do
             for taskIndex, task in pairs(group.tasks) do
                 if ShouldResetTask(task, previousDailyReset, previousWeeklyReset) then
-                    Todoloo.TaskManager.ResetTask(groupIndex, taskIndex, characterName)
+                    Todoloo.TaskManager:ResetTask(groupIndex, taskIndex, characterName)
                 end
             end
         end
@@ -59,15 +59,15 @@ local function GetPreviousResetTimes()
 end
 
 ---Perform task reset
-function Todoloo.ResetManager.PerformReset()
-    local characters = Todoloo.TaskManager.GetAllCharacters()
+function Todoloo.Reset.ResetManager.PerformReset()
+    local characters = Todoloo.TaskManager:GetAllCharacters()
     local previousDailyReset, previousWeeklyReset = GetPreviousResetTimes()
 
     PerformResetSince(characters, previousDailyReset, previousWeeklyReset)
     Todoloo.Config.Set(Todoloo.Config.Options.LAST_RESET_PERFORMED, GetServerTime())
 
-    -- if the tracker frame is visible, we want to refresh it to show the new tasks
-    if TodolooTrackerFrame and TodolooTrackerFrame:IsVisible() then
-        TodolooTracker_Update()
-    end
+    Todoloo.EventBus
+        :RegisterSource(Todoloo.Reset.ResetManager.PerformReset, "reset_manager")
+        :TriggerEvent(Todoloo.Reset.ResetManager.PerformReset, Todoloo.Reset.Events.RESET_PERFORMED)
+        :UnregisterSource(Todoloo.Reset.ResetManager.PerformReset)
 end

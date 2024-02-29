@@ -38,12 +38,17 @@ function TodolooEventBusMixin:IsSourceRegistered(source)
 end
 
 ---Register multiple events to the given listener
----@param listener any Listener to register
+---@param listener any Listener to register (must contain method 'ReceiveEvent' or func argument)
 ---@param eventNames string[] List of events to register the listener to
-function TodolooEventBusMixin:RegisterEvents(listener, eventNames)
-    if listener.ReceiveEvent == nil then
-        error("Attempted to register and invalid listener. 'ReceiveEvent' method must be defined.")
+---@param func function? Optional alternative function
+function TodolooEventBusMixin:RegisterEvents(listener, eventNames, func)
+    if listener.ReceiveEvent == nil and func == nil then
+        error("Attempted to register and invalid listener. 'ReceiveEvent' of 'fun' method must be defined.")
         return self
+    end
+
+    if listener.ReceiveEvent == nil and func ~= nil then
+        listener.ReceiveEvent = func
     end
 
     for _, eventName in ipairs(eventNames) do
@@ -107,8 +112,8 @@ end
 ---@param source any Event source registered
 ---@param eventName string Name of the event to fire
 ---@param ... any Event data
-function TodolooEventBusMixin:FireEvent(source, eventName, ...)
-    if self.source[source] == nil then
+function TodolooEventBusMixin:TriggerEvent(source, eventName, ...)
+    if self.sources[source] == nil then
         error("Trying to trigger event (" .. eventName .. ") from an unregistered source. All events sources must be registered.")
     end
 

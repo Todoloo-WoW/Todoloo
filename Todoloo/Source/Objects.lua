@@ -1,9 +1,13 @@
 Todoloo = {
-    TaskManager = {},
-    ResetManager = {},
+    Tasks = {
+        TaskManager = {}
+    },
+    Reset = {
+        ResetManager = {}
+    },
     Config = {},
     MinimapIcon = {},
     Debug = {},
     Utils = {},
-    EventBus = {}
+    Events = {}
 }
