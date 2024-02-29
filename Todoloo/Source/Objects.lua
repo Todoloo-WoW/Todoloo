@@ -4,5 +4,6 @@ Todoloo = {
     Config = {},
     MinimapIcon = {},
     Debug = {},
-    Utils = {}
+    Utils = {},
+    EventBus = {}
 }

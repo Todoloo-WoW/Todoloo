@@ -1,8 +1,7 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
 https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/FrameXML/UI_shared.xsd">
 
-    <!-- Todoloo divider template used within the group list -->
-    <!-- TODO: Is this ever used? -->
+    <!-- Todoloo divider template used within the group list (this is not used yet, but here for future features) -->
     <Frame name="TodolooTaskListDividerTemplate" virtual="true">
         <Size y="30"/>
         <Layers>
@@ -32,7 +31,7 @@ https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/FrameXML/UI
     </Frame>
 
     <!-- Todoloo group template used within the group list -->
-    <Button name="TodolooTaskListGroupTemplate" mixin="TodolooTaskListGroupMixin" virtual="true">
+    <Button name="TodolooTaskListGroupTemplate" mixin="TodolooTaskListGroupMixin" registerForClicks="RightButtonUp, LeftButtonUp" virtual="true">
         <Size y="25" />
         <Layers>
             <Layer level="OVERLAY" textureSubLevel="1">
@@ -62,6 +61,9 @@ https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/FrameXML/UI
                 </Texture>
             </Layer>
             <Layer level="ARTWORK">
+                <FontString parentKey="NoName" justifyH="LEFT" justifyV="MIDDLE" inherits="GameFontDisableSmall" setAllPoints="true">
+					<Color r="0.35" g="0.35" b="0.35"/>
+				</FontString>
                 <Texture parentKey="CollapseIcon">
                     <Anchors>
                         <Anchor point="RIGHT" x="-10" y="2" />
@@ -76,10 +78,24 @@ https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/FrameXML/UI
                 </Texture>
             </Layer>
         </Layers>
-        <Scripts>
-            <OnEnter method="OnEnter" />
-            <OnLeave method="OnLeave" />
-        </Scripts>
+        <Frames>
+            <EditBox parentKey="Name" autoFocus="false" hidden="true">
+                <Size y="10" />
+                <Anchors>
+                    <Anchor point="LEFT" x="10" y="2" />
+                    <Anchor point="RIGHT" relativeKey="$parent.CollapseIcon" x="-5" y="0" />
+                </Anchors>
+                <FontString inherits="GameFontNormal_NoShadow" />
+                <Scripts>
+                    <OnEditFocusLost>
+                        self:GetParent():OnEditFocusLost()
+                    </OnEditFocusLost>
+                    <OnEnterPressed>
+                        self:GetParent():OnEditFocusLost()
+                    </OnEnterPressed>
+                </Scripts>
+            </EditBox>
+        </Frames>
     </Button>
 
     <!-- Todoloo task template used within the group list -->
@@ -95,6 +111,19 @@ https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/FrameXML/UI
                     </Anchors>
                 </FontString>
             </Layer>
+            <Layer level="OVERLAY" textureSubLevel="1">
+                <FontString parentKey="ResetInterval" inherits="GameFontDisable" justifyH="CENTER">
+                    <Size x="14" y="12" />
+                    <Anchors>
+                        <Anchor point="RIGHT" x="-10" />
+                    </Anchors>
+                </FontString>
+                <Texture parentKey="ResetIcon" atlas="questlog-questtypeicon-clockyellow" useAtlasSize="true" scale="0.7">
+                    <Anchors>
+                        <Anchor point="RIGHT" relativeKey="$parent.ResetInterval" relativePoint="LEFT" x="-2" />
+                    </Anchors>
+                </Texture>
+            </Layer>
             <Layer level="OVERLAY" textureSubLevel="2">
                 <Texture parentKey="SelectedOverlay" atlas="Professions_Recipe_Active" useAtlasSize="true" hidden="true">
                     <Anchors>
@@ -103,22 +132,42 @@ https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/FrameXML/UI
                 </Texture>
             </Layer>
             <Layer level="HIGHLIGHT">
-                <Texture parentKey="HighlightOverlay" atlas="Professions_Recipe_Hover" useAtlasSize="true" alpha="0.5">
+                <Texture parentKey="HighlightOverlay" atlas="Professions_Recipe_Hover" useAtlasSize="false" alpha="0.5">
                     <Anchors>
-                        <Anchor point="CENTER" x="0" y="-1" />
+                        <Anchor point="TOP" y="-1"/>
+                        <Anchor point="BOTTOM" />
+                        <Anchor point="LEFT" x="-30" />
+                        <Anchor point="RIGHT" />
                     </Anchors>
                 </Texture>
             </Layer>
         </Layers>
-        <Scripts>
-            <OnEnter method="OnEnter" />
-            <OnLeave method="OnLeave" />
-        </Scripts>
+        <Frames>
+            <EditBox parentKey="Name" autoFocus="false" hidden="true">
+                <Size y="10" />
+                <Anchors>
+                    <Anchor point="LEFT" x="30" />
+                    <Anchor point="RIGHT" relativeKey="$parent.ResetInterval" relativePoint="LEFT" x="-5" />
+                </Anchors>
+                <FontString inherits="GameFontHighlight_NoShadow" />
+                <Scripts>
+                    <OnEditFocusLost>
+                        self:GetParent():OnEditFocusLost()
+                    </OnEditFocusLost>
+                    <OnEditFocusGained>
+                        self:GetParent():OnEditFocusGained()
+                    </OnEditFocusGained>
+                    <OnEnterPressed>
+                        self:GetParent():OnEditFocusLost()
+                    </OnEnterPressed>
+                </Scripts>
+            </EditBox>
+        </Frames>
     </Button>
 
     <!-- Todoloo group list template used within the management page frame -->
     <Frame name="TodolooTaskListTemplate" mixin="TodolooTaskListMixin" virtual="true" hidden="false">
-        <Size x="300" y="505" />
+        <Size y="505" />
         <Layers>
             <Layer level="BACKGROUND">
                 <Texture parentKey="Background" atlas="Professions-background-summarylist" setAllPoints="true" />
@@ -142,21 +191,17 @@ https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/FrameXML/UI
                     <Anchor point="BOTTOMRIGHT" />
                 </Anchors>
             </Frame>
-
-            <DropDownToggleButton parentKey="FilterButton" inherits="UIResettableDropdownButtonTemplate" text="FILTER">
-				<Size x="90" y="20"/>
-				<Anchors>
-					<Anchor point="TOPRIGHT" x="-8" y="-8"/>
-				</Anchors>
-			</DropDownToggleButton>
             
             <EditBox parentKey="SearchBox" autoFocus="false" inherits="SearchBoxTemplate">
                 <Size y="20"/>
                 <Anchors>
-                    <Anchor point="RIGHT" relativeKey="$parent.FilterButton" relativePoint="LEFT" x="-4" y="0"/>
+                    <Anchor point="RIGHT" x="-8" />
                     <Anchor point="TOPLEFT" x="13" y="-8"/>
                 </Anchors>
             </EditBox>
+
+            <Frame parentKey="GroupContextMenu" inherits="UIDropDownMenuTemplate" enableMouse="true"></Frame>
+            <Frame parentKey="TaskContextMenu" inherits="UIDropDownMenuTemplate" enableMouse="true"></Frame>
 
             <Frame parentKey="ScrollBox" inherits="WowScrollBoxList">
                 <Anchors>

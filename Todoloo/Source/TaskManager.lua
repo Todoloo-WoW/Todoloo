@@ -241,25 +241,37 @@ end
 ---Add new group
 ---@param name string Name/title of the group
 ---@param characterFullName string? Full character name in format "player-realm" (defaults to the currently logged in character)
+---@return Group # The newly created group
+---@return integer # Group index within character tasks
 function Todoloo.TaskManager.AddGroup(name, characterFullName)
     assert(name)
+
+    name = name or "No name"
 
     characterFullName = characterFullName or Todoloo.Utils.GetCharacterFullName()
     local character = TODOLOO_TASKS[characterFullName]
 
-    table.insert(character.groups, { name = name, tasks = {} })
+    local group = { name = name, tasks = {} }
+
+    table.insert(character.groups, group)
+    
+    local groupIndex = #character.groups
+
+    return group, groupIndex
 end
 
 ---Update group
 ---@param index integer Index of the group within the task table
----@param new_name string New name/title of the group
+---@param newName string New name/title of the group
 ---@param characterFullName string? Full character name in format "player-realm" (defaults to the currently logged in character)
-function Todoloo.TaskManager.UpdateGroup(index, new_name, characterFullName)
+function Todoloo.TaskManager.UpdateGroup(index, newName, characterFullName)
     assert(index)
-    assert(new_name)
+    assert(newName)
+
+    newName = newName or "No name"
 
     characterFullName = characterFullName or Todoloo.Utils.GetCharacterFullName()
-    TODOLOO_TASKS[characterFullName].groups[index].name = new_name
+    TODOLOO_TASKS[characterFullName].groups[index].name = newName
 end
 
 ---Remove group
@@ -309,21 +321,29 @@ end
 ---@param groupIndex integer Index of the group in the task table
 ---@param name string Name/title of the task
 ---@param description string? Optional description of the task
----@param reset reset Reset interval
+---@param reset reset? Reset interval (sets default if none provided)
 ---@param characterFullName string? Full character name in format "player-realm" (defaults to the currently logged in character)
+---@return Task # The newly created task
+---@return integer # Index of the newly created task
 function Todoloo.TaskManager.AddTask(groupIndex, name, description, reset, characterFullName)
     assert(groupIndex)
     assert(name)
 
     characterFullName = characterFullName or Todoloo.Utils.GetCharacterFullName()
     reset = reset or Todoloo.TaskManager.DefaultResetInterval
-    
-    table.insert(TODOLOO_TASKS[characterFullName].groups[groupIndex].tasks, {
+
+    local  task = {
         name = name,
         description = description,
         reset = reset,
         completed = false
-    })
+    }
+    
+    table.insert(TODOLOO_TASKS[characterFullName].groups[groupIndex].tasks, task)
+
+    local index = #TODOLOO_TASKS[characterFullName].groups[groupIndex].tasks
+
+    return task, index
 end
 
 ---Update task
@@ -391,7 +411,7 @@ end
 -- ***** DATA PROVIDER
 -- *****************************************************************************************************
 
----TODO: Add documentation
+---Generate data provider for use in scroll box
 ---@param characterFullName string? Full character name in format "player-realm" (defaults to the currently logged in character)
 function Todoloo.TaskManager.GenerateDataProvider(characterFullName)
     characterFullName = characterFullName or Todoloo.Utils.GetCharacterFullName()
@@ -399,32 +419,44 @@ function Todoloo.TaskManager.GenerateDataProvider(characterFullName)
 
     local dataProvider = CreateTreeDataProvider()
 
-    for _, group in pairs(groups) do
-        local groupInfo = { name = group.name }
+    for groupIndex, group in pairs(groups) do
+        local groupInfo = { id = groupIndex, name = group.name }
         local groupNode = dataProvider:Insert({ groupInfo = groupInfo })
 
-        for _, task in pairs(group.tasks) do
-            groupNode:Insert({ taskInfo = task })
-        end
-    end
+        groupNode:Insert({ topPadding = true, order = -1 })
 
-    print("DATAPROVIDER INFO")
-    print(dataProvider:GetSize(true))
+        for taskIndex, task in pairs(group.tasks) do
+            local taskInfo = {
+                groupId = groupIndex,
+                id = taskIndex,
+                name = task.name,
+                description = task.description,
+                reset = task.reset,
+                completed = task.completed
+            }
+
+            groupNode:Insert({ taskInfo = taskInfo, order = 0 })
+        end
+
+        groupNode:Insert({ bottomPadding = true, order = 1 })
+    end
 
     return dataProvider
 end
 
+-- *****************************************************************************************************
+-- ***** TASK MANAGER INFO
+-- *****************************************************************************************************
+
+---@class OpenTask
+---@field taskId integer Index of the task within its respective group
+---@field groupId integer Index of the tasks respective group within Todoloo tasks
+
 ---@class TaskManagerInfo
----@field openTaskId integer ID of the current task that should be opened in the task manager
+---@field openTask OpenTask? Info on the task that should be opened in the task manager
+---@field openGroupId integer ID of the group that should be opened in the task manager
 
---TODO: What do we need to return from this?
----@return TaskManagerInfo
+---@return TaskManagerInfo # Current task manager info
 function Todoloo.TaskManager.GetTaskManagerInfo()
-    return {}
-end
-
---TODO: What do we need to return from this?
----@param taskManagerInfo TaskManagerInfo
-function Todoloo.TaskManager.SetTaskManagerInfo(taskManagerInfo)
-    taskManagerInfo = taskManagerInfo
+    return { }
 end
