@@ -11,10 +11,9 @@ https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/FrameXML/UI
             </Button>
             
             <Frame parentKey="TaskList" inherits="TodolooTaskListTemplate">
-                <Size x="400" y="553" />
                 <Anchors>
                     <Anchor point="TOPLEFT" x="5" y="-72" />
-                    <Anchor point="RIGHT" x="-5" />
+                    <Anchor point="BOTTOMRIGHT" x="-5" y="8" />
                 </Anchors>
             </Frame>
 
