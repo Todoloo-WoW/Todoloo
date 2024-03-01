@@ -532,5 +532,5 @@ end
 ---TODO: Does this belong in the task manager, and is this even necessary?
 ---@return TaskManagerInfo # Current task manager info
 function TodolooTaskManagerMixin:GetTaskManagerInfo()
-    return self.taskManagerInfo
+    return {}
 end

@@ -51,17 +51,13 @@ end
 TodolooManagementPageMixin = {}
 
 function TodolooManagementPageMixin:OnLoad()
-    -- setup search box
-    self.TaskList.SearchBox:SetScript("OnTextChanged", function(editBox)
-        --TODO: Implement searching
-    end)
-
     -- setup tutorial button
     self.HelpButton:SetScript("OnClick", function() self:ToggleHelp() end)
     
     -- setup button to create new group
     self.CreateGroupButton:SetTextToFit("Create group")
 
+    -- setup search box
     self.TaskList.SearchBox:SetScript("OnTextChanged", function(editBox)
         SearchBoxTemplate_OnTextChanged(editBox)
 
