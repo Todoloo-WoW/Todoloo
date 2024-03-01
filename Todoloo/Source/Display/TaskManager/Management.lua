@@ -124,6 +124,12 @@ function TodolooManagementPageMixin:OnShow()
     self.TaskList.SearchBox:SetText(Todoloo.TaskManager:GetTaskNameFilter())
 end
 
+function TodolooManagementPageMixin:OnHide()
+    if self:IsHelpShown() then
+        HelpPlate_Hide(false)
+    end
+end
+
 function TodolooManagementPageMixin:SetTitle()
     local taskManagementFrame = self:GetParent()
     taskManagementFrame:SetTitle("Todoloo - Task management")
