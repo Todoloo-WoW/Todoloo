@@ -4,6 +4,10 @@
 
 TodolooTaskManagerFrameMixin = {}
 
+function TodolooTaskManagerFrameMixin:OnLoad()
+    self:SetPortraitTextureRaw([[Interface\AddOns\Todoloo\Images\Logo]])
+end
+
 function TodolooTaskManagerFrameMixin:ApplyDesiredWidth()
     local pageWidth = self.ManagementPage:GetDesiredPageWidth()
 
@@ -17,9 +21,6 @@ function TodolooTaskManagerFrameMixin:SetTaskManagerInfo(taskManagerInfo)
 end
 
 function TodolooTaskManagerFrameMixin:Refresh(taskManagerInfo)
-    --TODO: This texture is not working
-    self:SetPortraitToAsset("Interface\\AddOns\\Todoloo\\Images\\Logo")
-
     self.ManagementPage:Refresh(taskManagerInfo)
 end
 
