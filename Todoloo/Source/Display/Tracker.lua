@@ -445,11 +445,11 @@ function TODOLOO_DEFAULT_TRACKER_MODULE:OnTaskClick(task, mouseButton)
         local groupId = group.id
         local id = task.id
 
-        local taskInfo = Todoloo.TaskManager.GetTask(groupId, id)
-        Todoloo.TaskManager.SetTaskCompletion(groupId, id, not taskInfo.completed)
+        local taskInfo = Todoloo.TaskManager:GetTask(groupId, id)
+        Todoloo.TaskManager:SetTaskCompletion(groupId, id, not taskInfo.completed)
 
-        --TODO: Add reason
-        TodolooTracker_Update()
+        --TODO: Update should happen through events - verify
+        --TodolooTracker_Update()
     end
 end
 
@@ -720,12 +720,6 @@ function TodolooTracker_OnUpdate(self)
     end
 end
 
-function TodolooTracker_OnShow(self)
-    UIParentManagedFrameMixin.OnShow(self);
-    --TODO: Set height based on Todoloo config
-    --TodolooTracker_UpdateHeight()
-end
-
 ---Set the opacity of the background based on Todoloo config
 --TODO: Awaiting implementation
 function TodolooTracker_UpdateOpacity()
@@ -890,6 +884,30 @@ end
 ---@param self Frame Group header frame
 function TodolooTrackerGroupHeader_OnLoad(self)
     self:RegisterForClicks("LeftButtonUp", "RightButtonDown")
+end
+
+function TodolooTracker_OnShow(self)
+    UIParentManagedFrameMixin.OnShow(self);
+
+    Todoloo.EventBus:RegisterEvents(self, {
+        Todoloo.Tasks.Events.GROUP_ADDED,
+        Todoloo.Tasks.Events.GROUP_REMOVED,
+        Todoloo.Tasks.Events.GROUP_RESET,
+        Todoloo.Tasks.Events.GROUP_UPDATED,
+        Todoloo.Tasks.Events.TASK_ADDED,
+        Todoloo.Tasks.Events.TASK_COMPLETION_SET,
+        Todoloo.Tasks.Events.TASK_REMOVED,
+        Todoloo.Tasks.Events.TASK_RESET,
+        Todoloo.Tasks.Events.TASK_UPDATED,
+        Todoloo.Reset.Events.RESET_PERFORMED
+    }, TodolooTracker_ReceiveEvent)
+    
+    --TODO: Set height based on Todoloo config
+    --TodolooTracker_UpdateHeight()
+end
+
+function TodolooTracker_ReceiveEvent(event, ...)
+    TodolooTracker_Update()
 end
 
 ---On group header clicked

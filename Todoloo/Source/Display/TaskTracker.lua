@@ -33,7 +33,7 @@ end
 function TODOLOO_TASK_TRACKER_MODULE:BuildGroupInfos()
     local infos = {}
 
-    for index, group in pairs(Todoloo.TaskManager.GetAllGroups()) do
+    for index, group in pairs(Todoloo.TaskManager:GetAllGroups()) do
         if self:ShouldDisplayGroup(group) then
             table.insert(infos, { name = group.name, id = index})
         end
@@ -63,10 +63,10 @@ end
 ---@param useFullHeight boolean
 local function TodolooTaskTracker_DoTasks(self, group, groupCompleted, existingGroup, useFullHeight)
     local completing = false
-    local numTasks = Todoloo.TaskManager.GetNumTasks(group.id)
+    local numTasks = Todoloo.TaskManager:GetNumTasks(group.id)
 
     for taskIndex = 1, numTasks do
-        local taskInfo = Todoloo.TaskManager.GetTask(group.id, taskIndex)
+        local taskInfo = Todoloo.TaskManager:GetTask(group.id, taskIndex)
         -- we're intentionally skipping tasks without a name, as we do not want to show these
         if taskInfo and taskInfo.name ~= "" then
             local task = group.tasks[taskIndex]
@@ -156,7 +156,7 @@ function TODOLOO_TASK_TRACKER_MODULE:UpdateSingle(groupInfo)
 
     local useFullHeight = true -- always use full height
     local existingGroup = self:GetExistingGroup(groupInfo.id)
-    local isComplete = Todoloo.TaskManager.IsGroupComplete(groupInfo.id)
+    local isComplete = Todoloo.TaskManager:IsGroupComplete(groupInfo.id)
     local group = self:GetGroup(groupInfo.id)
 
     self:SetGroupHeader(group, groupInfo.name, groupInfo.id)

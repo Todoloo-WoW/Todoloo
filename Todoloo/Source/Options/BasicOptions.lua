@@ -2,8 +2,7 @@ TodolooConfigBasicOptionsFrameMixin = {}
 
 function TodolooConfigBasicOptionsFrameMixin:OnLoad()
     self:SetParent(SettingsPanel or InterfaceOptionsFrame)
-    self.name = "Basic Options"
-    self.parent = "Todoloo"
+    self.name = "Todoloo"
 
     self.cancel = function()
         self:Cancel()
@@ -19,12 +18,13 @@ function TodolooConfigBasicOptionsFrameMixin:OnLoad()
     self.OnDefault = function() end
     self.OnRefresh = function() end
 
-    if Settings then
-        local category = Settings.GetCategory(self.parent)
-        local subcategory = Settings.RegisterCanvasLayoutSubcategory(category, self, self.name)
-        Settings.RegisterAddOnCategory(subcategory)
+    -- add Todoloo category to addon settings
+    if Settings and SettingsPanel then
+        local category = Settings.RegisterCanvasLayoutCategory(self, self.name)
+        category.ID = self.name
+        Settings.RegisterAddOnCategory(category)
     else
-        InterfaceOptions_AddCategory(self, "Todoloo")
+        InterfaceOptions_AddCategory(self, self.name)
     end
 end
 

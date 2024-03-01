@@ -1,7 +1,8 @@
 local function InitializeBase()
     Todoloo.MinimapIcon.Initialize()
 
-    Todoloo.ToggleView = function()
+    -- toggle task tracker frame
+    Todoloo.ToggleTracker = function()
         --TODO: Show something else than just the task tracker?)
         TodolooTrackerFrame:SetShown(not TodolooTrackerFrame:IsShown())
     end
@@ -10,6 +11,25 @@ local function InitializeBase()
         Todoloo.Debug.Message("Show task tracker")
         TodolooTrackerFrame:Show()
     end
+
+    -- toggle task management frame
+    Todoloo.ToggleTaskManager = function()
+        if TodolooTaskManagerFrame:IsVisible() then
+            HideUIPanel(TodolooTaskManagerFrame)
+        else
+            ShowUIPanel(TodolooTaskManagerFrame)
+        end
+    end
+
+    local attributes = 
+    {
+        area = "left",
+        xoffset = 35,
+        pushable = 1,
+        allowOtherPanels = 1,
+        checkFit = 1
+    }
+    RegisterUIPanel(TodolooTaskManagerFrame, attributes)
 end
 
 local CORE_EVENTS = {

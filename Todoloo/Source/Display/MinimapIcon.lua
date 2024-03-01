@@ -12,14 +12,17 @@ function Todoloo.MinimapIcon.Initialize()
         OnClick = function(clickedFrame, button)
             if button == "RightButton" then
                 Todoloo.Config.Show()
+            elseif IsShiftKeyDown() then
+                Todoloo.ToggleTracker()
             else
-                Todoloo.ToggleView()
+                Todoloo.ToggleTaskManager()
             end
         end,
         OnTooltipShow = function(tip)
             tip:SetText("Todoloo")
-            tip:AddLine("Left-Click: " .. WHITE_FONT_COLOR:WrapTextInColorCode("Toggle task tracker"))
-            tip:AddLine("Right-Click: ".. WHITE_FONT_COLOR:WrapTextInColorCode("Open task manager"))
+            tip:AddLine("Left-Click: " .. WHITE_FONT_COLOR:WrapTextInColorCode("Open task manager"))
+            tip:AddLine("Shift+Left-Click: " .. WHITE_FONT_COLOR:WrapTextInColorCode("Toggle task tracker"))
+            tip:AddLine("Right-Click: ".. WHITE_FONT_COLOR:WrapTextInColorCode("Open settings"))
         end
     })
 

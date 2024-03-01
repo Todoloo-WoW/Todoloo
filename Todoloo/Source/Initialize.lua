@@ -3,10 +3,10 @@ local function InitializeBase()
 end
 
 local function InitializeCharacter()
-    Todoloo.TaskManager.Initialize()
+    Todoloo.TaskManager = CreateAndInitFromMixin(TodolooTaskManagerMixin)
 
     -- reset all relevant tasks
-    Todoloo.ResetManager.PerformReset()
+    Todoloo.Reset.ResetManager.PerformReset()
 end
 
 local CORE_EVENTS = {

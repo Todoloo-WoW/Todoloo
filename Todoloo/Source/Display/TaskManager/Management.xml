@@ -1,0 +1,37 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/FrameXML/UI_shared.xsd">
+
+    <!--Todoloo task manager management tab page-->
+    <Frame name="TodolooManagementPageTemplate" parent="TodolooTaskManagerFrame" mixin="TodolooManagementPageMixin" setAllPoints="true" virtual="true">
+        <Frames>
+            <Button parentKey="HelpButton" inherits="MainHelpPlateButton">
+                <Anchors>
+                    <Anchor point="TOPLEFT" x="39" y="20" />
+                </Anchors>
+            </Button>
+            
+            <Frame parentKey="TaskList" inherits="TodolooTaskListTemplate">
+                <Anchors>
+                    <Anchor point="TOPLEFT" x="5" y="-72" />
+                    <Anchor point="BOTTOMRIGHT" x="-5" y="8" />
+                </Anchors>
+            </Frame>
+
+            <Button parentKey="CreateGroupButton" inherits="UIPanelButtonTemplate" >
+				<Size x="80" y="22"/>
+                <Anchors>
+                    <Anchor point="BOTTOMRIGHT" relativeKey="$parent.TaskList" relativePoint="TOPRIGHT" y="5" />
+                </Anchors>
+                <Scripts>
+                    <OnClick>
+                        self:GetParent():CreateButtonGroup_OnClick()
+                    </OnClick>
+                </Scripts>
+			</Button>
+        </Frames>
+        <Scripts>
+            <OnLoad method="OnLoad" />
+            <OnShow method="OnShow" />
+        </Scripts>
+    </Frame>
+</Ui>

@@ -1,13 +1,13 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
 https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/FrameXML/UI_shared.xsd">
+
+    <Script file="TaskList.lua" />
+    <Include file="TaskList.xml" />
+
+    <Script file="Management.lua" />
+    <Include file="Management.xml" />
+
+    <Script file="TaskManager.lua" />
+    <Include file="TaskManager.xml" />
     
-    <Script file="MinimapIcon.lua" />
-
-    <Include file="Tracker.xml" />
-
-    <Script file="TaskTracker.lua" />
-
-    <Include file="TaskManager/Manifest.xml" />
-    
-    <Script file="Initialize.lua" />
 </Ui>
