@@ -137,6 +137,9 @@ end
 function TodolooTaskManagerMixin:Init()
     Todoloo.EventBus:RegisterSource(self, "task_manager")
 
+    self.taskNameFilter = ""
+    self.taskManagerInfo = {}
+
     local characterFullName = Todoloo.Utils.GetCharacterFullName()
 
     if TODOLOO_TASKS == nil then
@@ -430,12 +433,48 @@ end
 -- ***** DATA PROVIDER
 -- *****************************************************************************************************
 
+local function GetFilteredTasks(groups, searchCriteria)
+    local result = {}
+    
+    for _, group in pairs(groups) do
+        local match = false
+        local resultEntry = {
+            name = group.name,
+            tasks = {}
+        }
+
+        for _, task in pairs(group.tasks) do
+            if string.find(string.lower(task.name), string.lower(searchCriteria)) then
+                table.insert(resultEntry.tasks, task)
+                match = true
+            end
+        end
+
+        if not match then
+            if string.find(string.lower(group.name), string.lower(searchCriteria)) then
+                match = true
+            end
+        end
+
+        if match then
+            table.insert(result, resultEntry)
+        end
+    end
+
+    return result
+end
+
 ---Generate data provider for use in scroll box
 ---TODO: Does this belong in the task manager?
+---@param searching boolean Are we currently searching?
 ---@param characterFullName string? Full character name in format "player-realm" (defaults to the currently logged in character)
-function TodolooTaskManagerMixin:GenerateDataProvider(characterFullName)
+function TodolooTaskManagerMixin:GenerateDataProvider(searching, characterFullName)
     characterFullName = characterFullName or Todoloo.Utils.GetCharacterFullName()
     local groups = TODOLOO_TASKS[characterFullName].groups
+
+    if searching then
+        groups = GetFilteredTasks(groups, self.taskNameFilter)
+    end
 
     local dataProvider = CreateTreeDataProvider()
 
@@ -464,6 +503,20 @@ function TodolooTaskManagerMixin:GenerateDataProvider(characterFullName)
     return dataProvider
 end
 
+function TodolooTaskManagerMixin:GetTaskNameFilter()
+    return self.taskNameFilter
+end
+
+function TodolooTaskManagerMixin:OnTaskListSearchTextChanged(text)
+    if strcmputf8i(self.taskNameFilter, text) == 0 then
+        return
+    end
+
+    self.taskNameFilter = text
+
+    Todoloo.EventBus:TriggerEvent(self, Todoloo.Tasks.Events.TASK_LIST_UPDATE)
+end
+
 -- *****************************************************************************************************
 -- ***** TASK MANAGER INFO
 -- *****************************************************************************************************
@@ -479,5 +532,5 @@ end
 ---TODO: Does this belong in the task manager, and is this even necessary?
 ---@return TaskManagerInfo # Current task manager info
 function TodolooTaskManagerMixin:GetTaskManagerInfo()
-    return { }
+    return self.taskManagerInfo
 end

@@ -61,13 +61,24 @@ function TodolooManagementPageMixin:OnLoad()
     
     -- setup button to create new group
     self.CreateGroupButton:SetTextToFit("Create group")
+
+    self.TaskList.SearchBox:SetScript("OnTextChanged", function(editBox)
+        SearchBoxTemplate_OnTextChanged(editBox)
+
+        local text = editBox:GetText()
+        if editBox ~= self.TaskList.SearchBox then
+            self.TaskList.SearchBox:SetText(text)
+        end
+
+        Todoloo.TaskManager:OnTaskListSearchTextChanged(text)
+    end)
 end
 
 function TodolooManagementPageMixin:Initialize(taskManagerInfo)
     self.taskManagerInfo = taskManagerInfo
 
     local searching = self.TaskList.SearchBox:HasText()
-    local dataProvider = Todoloo.TaskManager:GenerateDataProvider()
+    local dataProvider = Todoloo.TaskManager:GenerateDataProvider(searching)
 
     if searching then
         self.TaskList.ScrollBox:SetDataProvider(dataProvider, ScrollBoxConstants.DiscardScrollPosition)
@@ -102,8 +113,6 @@ function TodolooManagementPageMixin:Refresh(taskManagerInfo)
 end
 
 function TodolooManagementPageMixin:OnShow()
-    self:SetTitle()
-
     Todoloo.EventBus:RegisterEvents(self, {
         Todoloo.Tasks.Events.GROUP_ADDED,
         Todoloo.Tasks.Events.GROUP_REMOVED,
@@ -111,8 +120,12 @@ function TodolooManagementPageMixin:OnShow()
         Todoloo.Tasks.Events.GROUP_UPDATED,
         Todoloo.Tasks.Events.TASK_ADDED,
         Todoloo.Tasks.Events.TASK_REMOVED,
-        Todoloo.Tasks.Events.TASK_UPDATED
+        Todoloo.Tasks.Events.TASK_UPDATED,
+        Todoloo.Tasks.Events.TASK_LIST_UPDATE
     })
+    
+    self:SetTitle()
+    self.TaskList.SearchBox:SetText(Todoloo.TaskManager:GetTaskNameFilter())
 end
 
 function TodolooManagementPageMixin:SetTitle()

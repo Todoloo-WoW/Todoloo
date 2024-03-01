@@ -10,7 +10,10 @@ Todoloo.Tasks.Events = {
     TASK_UPDATED        = "TASK_UPDATED",
     TASK_REMOVED        = "TASK_REMOVED",
     TASK_COMPLETION_SET = "TASK_COMPLETION_SET",
-    TASK_RESET           = "TASK_RESET",
+    TASK_RESET          = "TASK_RESET",
+
+    -- ***** OTHER
+    TASK_LIST_UPDATE = "TASK_LIST_UPDATE" -- fired whenever a search within the taskmanager has begun
 }
 
 Todoloo.Reset.Events = {
