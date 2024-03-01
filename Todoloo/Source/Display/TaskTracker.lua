@@ -110,6 +110,7 @@ local function TodolooTaskTracker_DoTasks(self, group, groupCompleted, existingG
                 else
                     if existingGroup and not task then
                         task = self:AddTask(group, taskIndex, taskInfo.name, TASK_TYPE, useFullHeight)
+                        task.Check:Hide()
                         task.Sheen.Anim:Play()
                         task.Glow.Anim:Play()
                         task.state = TODOLOO_TRACKER_TASK_STATE_ADDING
