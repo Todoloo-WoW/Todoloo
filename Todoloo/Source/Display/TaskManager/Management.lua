@@ -162,13 +162,13 @@ TodolooTaskManagerManagementPage_HelpPlate =
 }
 
 ---Build the help guide
----TODO: Add relevant help guides
 function TodolooManagementPageMixin:UpdateHelp()
-    TodolooTaskManagerManagementPage_HelpPlate.FrameSize = { width = 786, height = 635 }
+    TodolooTaskManagerManagementPage_HelpPlate.FrameSize = { width = 400 , height = 635 }
 
-    -- if self.TaskList:IsShown() then
-    --     table.insert(TodolooTaskManagerManagementPage_HelpPlate, { ButtonPos = { x = 125, y = -44 }, HighLightBox = { x = 0, y = -52, width = 271, height = 30 }, ToolTipDir = "DOWN", ToolTipText = "TEST" })
-    -- end
+    if self.TaskList:IsShown() then
+        table.insert(TodolooTaskManagerManagementPage_HelpPlate, { ButtonPos = { x = 170, y = -44 }, HighLightBox = { x = 0, y = -52, width = 390, height = 30 }, ToolTipDir = "DOWN", ToolTipText = "Tip: Search for a specific task or group to find the item you are looking for more easily." })
+        table.insert(TodolooTaskManagerManagementPage_HelpPlate, { ButtonPos = { x = 365, y = -80 }, HighLightBox = { x = 0, y = -85, width = 390, height = 553-35 }, ToolTipDir = "RIGHT", ToolTipText = "This is your overview of all your current groups and tasks.\n\n[Double-Click] on groups and tasks to change the name.\n\n[Shift]+[Left-Click] on groups to collapse.\n\n[Right-Click] on groups to add tasks and delete.\n\n[Right-Click] on tasks to set reset interval and delete." })
+    end
 end
 
 ---Show the help guide

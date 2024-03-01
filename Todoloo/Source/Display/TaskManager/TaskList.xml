@@ -167,7 +167,6 @@ https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/FrameXML/UI
 
     <!-- Todoloo group list template used within the management page frame -->
     <Frame name="TodolooTaskListTemplate" mixin="TodolooTaskListMixin" virtual="true" hidden="false">
-        <Size y="505" />
         <Layers>
             <Layer level="BACKGROUND">
                 <Texture parentKey="Background" atlas="Professions-background-summarylist" setAllPoints="true" />
