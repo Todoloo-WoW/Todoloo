@@ -112,6 +112,12 @@ https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/FrameXML/UI
                 </FontString>
             </Layer>
             <Layer level="OVERLAY" textureSubLevel="1">
+                <Texture parentKey="Check" atlas="Tracker-Check" useAtlasSize="true" hidden="true" scale="0.8">
+					<Size x="16" y="16"/>
+					<Anchors>
+						<Anchor point="LEFT" x="10" />
+					</Anchors>
+				</Texture>
                 <FontString parentKey="ResetInterval" inherits="GameFontDisable" justifyH="CENTER">
                     <Size x="14" y="12" />
                     <Anchors>

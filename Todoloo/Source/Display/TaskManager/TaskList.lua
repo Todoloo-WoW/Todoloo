@@ -257,7 +257,7 @@ TodolooTaskListGroupMixin = {}
 function TodolooTaskListGroupMixin:Initialize(node)
     local elementData = node:GetData()
     self.groupInfo = elementData.groupInfo
-
+    
     self.Name:SetText(self.groupInfo.name)
     self.Label:SetText(self.groupInfo.name)
 
@@ -310,6 +310,12 @@ function TodolooTaskListTaskMixin:Initialize(node)
     local elementData = node:GetData()
     self.taskInfo = elementData.taskInfo
 
+    if self.taskInfo.completed then
+        self.Check:Show()
+    else
+        self.Check:Hide()
+    end
+    
     self.Name:SetText(self.taskInfo.name)
     self.Label:SetText(self.taskInfo.name)
 
