@@ -337,7 +337,7 @@ https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/FrameXML/UI
 					<Anchor point="BOTTOM"/>
 				</Anchors>
 			</Frame>
-            <Frame name="TodolooTrackerGroupsFrame" parentKey="GroupsFrame" hidden="false">
+            <Frame parentKey="GroupsFrame" hidden="false">
                 <Anchors>
                     <Anchor point="TOPLEFT" />
                     <Anchor point="BOTTOMRIGHT" />
@@ -368,20 +368,6 @@ https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/FrameXML/UI
 					</Layer>
 				</Layers>
 			</Frame>
-			<!--TODO: Add resizing logic-->
-			<!-- <Button parentKey="ResizeButton">
-				<Size x="16" y="16" />
-				<Anchors>
-					<Anchor point="BOTTOMRIGHT" />
-				</Anchors>
-				<NormalTexture atlas="UI-QuestTrackerButton-Collapse-All" />
-				<PushedTexture atlas="UI-QuestTrackerButton-Collapse-All-Pressed" />
-				<HighlightTexture atlas="UI-QuestTrackerButton-Highlight" />
-				<Scripts>
-					<OnMouseDown function="TodolooTracker_ResizeButton_OnMouseDown" />
-					<OnMouseUp function="TodolooTracker_ResizeButton_OnMouseup" />
-				</Scripts>
-			</Button> -->
         </Frames>
 		<Scripts>
 			<OnLoad function="TodolooTracker_OnLoad" inherit="prepend" />

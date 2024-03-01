@@ -3,6 +3,7 @@
 TODOLOO_TRACKER_HEADER_HEIGHT   = 25
 TODOLOO_TRACKER_TASK_WIDTH      = 248
 TODOLOO_TRACKER_HEADER_OFFSET_X = -10
+TODOLOO_TRACKER_MAX_HEIGHT      = 700
 
 -- calculated values
 TODOLOO_TRACKER_DASH_WIDTH = 0
@@ -499,7 +500,6 @@ function TodolooTracker_GetGroupOffset(group)
     return 0, 0
 end
 
----TODO: Add documentation
 ---@param group any
 ---@param anchorGroup any
 ---@param checkFit any
@@ -556,7 +556,7 @@ local function InternalAddGroup(group)
         return false
     end
 
-    local offsetY = AnchorGroup(group, groupsFrame.currentGroup)
+    local offsetY = AnchorGroup(group, groupsFrame.currentGroup, not module.ignoreFit)
     if not offsetY then
         return false
     end
@@ -631,7 +631,7 @@ function TodolooTracker_CanFitGroup(group, header)
         totalHeight = group.height - offsetY
     end
 
-    return (groupsFrame.contentsHeight + totalHeight) <= groupsFrame.maxHeight
+    return (groupsFrame.contentsHeight + totalHeight) <= TODOLOO_TRACKER_MAX_HEIGHT
 end
 
 -- *****************************************************************************************************
@@ -802,7 +802,7 @@ function TodolooTracker_Update(reason, id, subInfo)
         return
     end
 
-    tracker.GroupsFrame.maxHeight = TodolooTrackerFrame.GroupsFrame:GetHeight()
+    tracker.GroupsFrame.maxHeight = TODOLOO_TRACKER_MAX_HEIGHT
     if tracker.GroupsFrame.maxHeight == 0 then
         tracker.isUpdating = false
         return
@@ -846,6 +846,7 @@ function TodolooTracker_Update(reason, id, subInfo)
     
     tracker.currentGroup = nil
     tracker.isUpdating = false
+    tracker:SetHeight(tracker.GroupsFrame.contentsHeight)
 end
 
 ---On main frame being moving
