@@ -29,7 +29,7 @@ function TodolooConfigBasicOptionsFrameMixin:OnLoad()
 end
 
 function TodolooConfigBasicOptionsFrameMixin:ResetTrackerPosition()
-    TodolooTrackerFrame:SetPoint("LEFT", nil, "LEFT", 100, 0)
+    TodolooTrackerFrame:SetPoint("TOPLEFT", nil, "TOPLEFT", 100, -150)
 end
 
 function TodolooConfigBasicOptionsFrameMixin:OnShow()
