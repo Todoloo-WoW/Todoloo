@@ -318,7 +318,7 @@ https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/FrameXML/UI
         Frame resembling Blizzard ObjectiveTrackerFrame.
         This frame is our main tracker frame, which resembles the games objective frame with quests.
     -->
-    <Frame name="TodolooTrackerFrame" inherits="UIParentRightManagedFrameTemplate" movable="true" clampedToScreen="true" frameStrata="LOW">
+    <Frame name="TodolooTrackerFrame" parent="UIParent" movable="true" clampedToScreen="true" frameStrata="LOW">
         <Size x="235" y="500" />
 		<Anchors>
 			<Anchor point="TOPLEFT" x="100" y="-150" />
