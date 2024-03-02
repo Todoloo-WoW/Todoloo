@@ -400,10 +400,12 @@ function TODOLOO_DEFAULT_TRACKER_MODULE:OnTaskEnter(task)
 
     task.isHighlighted = true
     if task.Text then
-        local textColorStyle = task.Text.colorStyle.reverse
-        if textColorStyle then
+        if task.state == TODOLOO_TRACKER_TASK_STATE_COMPLETED or task.state == TODOLOO_TRACKER_TASK_STATE_COMPLETING then
+            local textColorStyle = TODOLOO_TRACKER_COLOR["CompleteHighlight"]
             task.Text:SetTextColor(textColorStyle.r, textColorStyle.g, textColorStyle.b)
-            task.Text.colorStyle = textColorStyle
+        else
+            local textColorStyle = TODOLOO_TRACKER_COLOR["NormalHighlight"]
+            task.Text:SetTextColor(textColorStyle.r, textColorStyle.g, textColorStyle.b)
         end
     end
 end
@@ -418,10 +420,12 @@ function TODOLOO_DEFAULT_TRACKER_MODULE:OnTaskLeave(task)
 
     task.isHighlighted = nil
     if task.Text then
-        local textColorStyle = task.Text.colorStyle.reverse
-        if textColorStyle then
+        if task.state == TODOLOO_TRACKER_TASK_STATE_COMPLETED or task.state == TODOLOO_TRACKER_TASK_STATE_COMPLETING then
+            local textColorStyle = TODOLOO_TRACKER_COLOR["Complete"]
             task.Text:SetTextColor(textColorStyle.r, textColorStyle.g, textColorStyle.b)
-            task.Text.colorStyle = textColorStyle
+        else
+            local textColorStyle = TODOLOO_TRACKER_COLOR["Normal"]
+            task.Text:SetTextColor(textColorStyle.r, textColorStyle.g, textColorStyle.b)
         end
     end
 end
