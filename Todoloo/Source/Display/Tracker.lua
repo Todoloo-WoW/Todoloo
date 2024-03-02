@@ -888,8 +888,6 @@ function TodolooTrackerGroupHeader_OnLoad(self)
 end
 
 function TodolooTracker_OnShow(self)
-    UIParentManagedFrameMixin.OnShow(self);
-
     Todoloo.EventBus:RegisterEvents(self, {
         Todoloo.Tasks.Events.GROUP_ADDED,
         Todoloo.Tasks.Events.GROUP_REMOVED,
@@ -903,7 +901,7 @@ function TodolooTracker_OnShow(self)
         Todoloo.Reset.Events.RESET_PERFORMED
     }, TodolooTracker_ReceiveEvent)
     
-    --TODO: Set height based on Todoloo config
+    --TODO: Set max height based on Todoloo config
     --TodolooTracker_UpdateHeight()
 end
 
