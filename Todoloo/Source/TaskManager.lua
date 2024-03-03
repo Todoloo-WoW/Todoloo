@@ -429,6 +429,38 @@ function TodolooTaskManagerMixin:ResetTask(groupIndex, index, characterFullName)
     Todoloo.EventBus:TriggerEvent(self, Todoloo.Tasks.Events.TASK_RESET, groupIndex, index)
 end
 
+---Move task to new location
+---@param taskId integer ID of the task to move
+---@param groupId integer ID of the group the task is nested under
+---@param newGroupId integer ID of the new group
+---@param newTaskId integer? ID of the new task (defaults to bottom of the new group)
+---@param characterFullName string? Full character name in format "player-realm" (defaults to the currently logged in character)
+function TodolooTaskManagerMixin:MoveTask(taskId, groupId, newGroupId, newTaskId, characterFullName)
+    assert(taskId, "Task ID is required to move a task.")
+    assert(groupId, "Group ID is required to move a task.")
+    assert(newGroupId, "New group ID is required to move a task.")
+
+    characterFullName = characterFullName or Todoloo.Utils.GetCharacterFullName()
+
+    local task = TODOLOO_TASKS[characterFullName].groups[groupId].tasks[taskId]
+    if not task then
+        error("Task not found")
+    end
+    
+    -- remove task at old location
+    table.remove(TODOLOO_TASKS[characterFullName].groups[groupId].tasks, taskId)
+
+    if newTaskId then
+        -- move task relative to another task
+        table.insert(TODOLOO_TASKS[characterFullName].groups[newGroupId].tasks, newTaskId, task)
+    else
+        -- not moving relative to task, just add to the new group
+        table.insert(TODOLOO_TASKS[characterFullName].groups[newGroupId].tasks, task)
+    end
+
+    Todoloo.EventBus:TriggerEvent(self, Todoloo.Tasks.Events.TASK_MOVED, taskId, groupId, newGroupId, newTaskId)
+end
+
 -- *****************************************************************************************************
 -- ***** DATA PROVIDER
 -- *****************************************************************************************************

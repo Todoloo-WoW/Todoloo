@@ -110,14 +110,77 @@ local function SetupScrollBox(self)
 end
 
 local function SetupDragBehavior(self)
-    --TODO: see ScrollBoxDragBehavior in ScrollUtil.lua line 550
-    local function OnNotify(sourceFrame, drag)
-        
+    ---Factory to create the task line indiciator, when dragging between tasks
+    local function TaskLineIndicatorFactory(elementData)
+        return "TodolooScrollBoxDragLineTemplate"
     end
 
-    --self.dragBehaviour = ScrollUtil.AddTreeDragBehavior(self.ScrollBox, cursorFactory, lineFactory, boxFactory, anchoringHandler, dragProperties)
-    self.dragBehavior = ScrollUtil.InitDefaultTreeDragBehavior(self.ScrollBox)
-    --self.dragBehavior:SetNotifyDragSource(OnNotify)
+    ---Factory to create the group line indicator, when dragging between groups
+    local function GroupLineIndicatorFactory(elementData)
+        return "TodolooScrollBoxDragGroupTemplate"
+    end
+
+    ---Callback triggered for the given element being dragged
+    local function NotifyDragSource(sourceFrame, drag)
+        sourceFrame:SetAlpha(drag and .5 or 1)
+        sourceFrame:SetMouseMotionEnabled(not drag)
+    end
+
+    ---Callback trggiered for all elements but the one being dragged
+    local function NotifyDragCandidates(candidateFrame, drag)
+        candidateFrame:SetMouseMotionEnabled(not drag)
+    end
+
+    ---Generates the element that follows the mouse around during dragging
+    local function GenerateCursorFactory()
+        local function CursorFactory(elementData)
+            local view = self.ScrollBox:GetView()
+            local function CursorIntializer(cursorFrame, candidateFrame, elementData)
+                cursorFrame:SetSize(candidateFrame:GetSize())
+
+                local template, initializer = view:GetFactoryDataFromElementData(elementData)
+                initializer(cursorFrame, elementData)
+            end
+
+            local template = view:GetFactoryDataFromElementData(elementData)
+            return template, CursorIntializer
+        end
+
+        return CursorFactory
+    end
+
+    ---Function to correctly place the given indiciator
+    ---@param anchorFrame Frame The line indicator frame
+    ---@param candidateFrame Frame The element our line indiciate should place itself relative to
+    ---@param candidateArea integer Relative point (1 = below, 2 = above, 3 = inside)
+    local function IndicatorAnchorHandler(anchorFrame, candidateFrame, candidateArea)
+        if candidateArea == DragIntersectionArea.Above then
+            anchorFrame:SetPoint("BOTTOMLEFT", candidateFrame, "TOPLEFT", 40, 0);
+            anchorFrame:SetPoint("BOTTOMRIGHT", candidateFrame, "TOPRIGHT", -40, 0);
+        elseif candidateArea == DragIntersectionArea.Below then
+            anchorFrame:SetPoint("TOPLEFT", candidateFrame, "BOTTOMLEFT", 40, 0);
+            anchorFrame:SetPoint("TOPRIGHT", candidateFrame, "BOTTOMRIGHT", -40, 0);
+        elseif candidateArea == DragIntersectionArea.Inside then
+            anchorFrame:SetPoint("TOPLEFT", candidateFrame, "TOPLEFT", 0, 5);
+            anchorFrame:SetPoint("BOTTOMRIGHT", candidateFrame, "BOTTOMRIGHT", 0, 1);
+        end
+    end
+
+    ---@type DragProperties
+    local dragProperties = {
+        notifyDragSource = NotifyDragSource,
+        notifyDragCandidates = NotifyDragCandidates,
+        dragRelativeToCursor = true,
+        reorderable = true
+    }
+
+    self.dragBehavior = Todoloo.ScrollUtil.AddTaskListDragBehavior(
+        self.ScrollBox,
+        GenerateCursorFactory(),
+        TaskLineIndicatorFactory,
+        GroupLineIndicatorFactory,
+        IndicatorAnchorHandler,
+        dragProperties)
 end
 
 function TodolooTaskListMixin:OnLoad()

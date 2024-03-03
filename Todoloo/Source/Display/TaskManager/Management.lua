@@ -117,7 +117,8 @@ function TodolooManagementPageMixin:OnShow()
         Todoloo.Tasks.Events.TASK_ADDED,
         Todoloo.Tasks.Events.TASK_REMOVED,
         Todoloo.Tasks.Events.TASK_UPDATED,
-        Todoloo.Tasks.Events.TASK_LIST_UPDATE
+        Todoloo.Tasks.Events.TASK_LIST_UPDATE,
+        Todoloo.Tasks.Events.TASK_MOVED
     })
     
     self:SetTitle()
