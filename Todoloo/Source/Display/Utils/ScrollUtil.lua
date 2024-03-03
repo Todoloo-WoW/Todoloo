@@ -62,12 +62,12 @@ function Todoloo.ScrollUtil.AddTaskListDragBehavior(scrollBox, cursorFactory, ta
         if containsCursor then
             local cursorHitInsetBottom, cursorHitInsetTop = dragBehavior:GetCursorHitInsets()
 
-            scrollBox:ForEachFrame(function(frame, node)
-                if sourceElementData == node then
+            scrollBox:ForEachFrame(function(frame, elementData)
+                if sourceElementData == elementData then
                     return ScrollBoxConstants.ContinueIteration
                 end
 
-                local parent = node:GetParent()
+                local parent = elementData:GetParent()
                 while parent do
                     if parent == sourceElementData then
                         return ScrollBoxConstants.ContinueIteration
@@ -80,20 +80,20 @@ function Todoloo.ScrollUtil.AddTaskListDragBehavior(scrollBox, cursorFactory, ta
 
                 if area then
                     candidateArea = area
-                    local elementData = node:GetData()
+                    local candidateData = elementData:GetData()
 
-                    if not elementData.groupInfo and not elementData.taskInfo then
+                    if not candidateData.groupInfo and not candidateData.taskInfo then
                         -- we're only interested in tasks and groups - not dividers and padding
                         return
                     end
 
-                    if elementData.groupInfo then
+                    if candidateData.groupInfo then
                         -- if the element we're currently hovering is a group
                         candidateArea = DragIntersectionArea.Inside
                     end
                     
                     candidate = frame
-                    candidateElementData = node
+                    candidateElementData = elementData
 
                     local elementDataIndex = scrollBox:FindFrameElementDataIndex(frame)
                     if elementDataIndex < sourceElementDataIndex then

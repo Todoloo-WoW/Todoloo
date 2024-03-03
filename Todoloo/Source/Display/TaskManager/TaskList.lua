@@ -120,13 +120,13 @@ local function SetupDragBehavior(self)
         return "TodolooScrollBoxDragGroupTemplate"
     end
 
-    ---Callback triggered for the given element being dragged
+    ---Callback for the given element being dragged
     local function NotifyDragSource(sourceFrame, drag)
         sourceFrame:SetAlpha(drag and .5 or 1)
         sourceFrame:SetMouseMotionEnabled(not drag)
     end
 
-    ---Callback trggiered for all elements but the one being dragged
+    ---Callback for all elements but the one being dragged
     local function NotifyDragCandidates(candidateFrame, drag)
         candidateFrame:SetMouseMotionEnabled(not drag)
     end
