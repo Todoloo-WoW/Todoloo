@@ -7,11 +7,6 @@ local function InitializeBase()
         TodolooTrackerFrame:SetShown(not TodolooTrackerFrame:IsShown())
     end
 
-    if Todoloo.Config.Get(Todoloo.Config.Options.SHOW_TASK_TRACKER) then
-        Todoloo.Debug.Message("Show task tracker")
-        TodolooTrackerFrame:Show()
-    end
-
     -- toggle task management frame
     Todoloo.ToggleTaskManager = function()
         if TodolooTaskManagerFrame:IsVisible() then
@@ -32,8 +27,16 @@ local function InitializeBase()
     RegisterUIPanel(TodolooTaskManagerFrame, attributes)
 end
 
+local function InitializeCharacter()
+    if Todoloo.Config.Get(Todoloo.Config.Options.SHOW_TASK_TRACKER) then
+        Todoloo.Debug.Message("Show task tracker")
+        TodolooTrackerFrame:Show()
+    end
+end
+
 local CORE_EVENTS = {
-    "ADDON_LOADED"
+    "ADDON_LOADED",
+    "PLAYER_ENTERING_WORLD"
 }
 local coreFrame = CreateFrame("Frame")
 
@@ -42,5 +45,7 @@ coreFrame:SetScript("OnEvent", function(self, eventName, name)
     if eventName == "ADDON_LOADED" and name == "Todoloo" then
         self:UnregisterEvent("ADDON_LOADED")
         InitializeBase()
+    elseif eventName == "PLAYER_ENTERING_WORLD" then
+        InitializeCharacter()
     end
 end)
