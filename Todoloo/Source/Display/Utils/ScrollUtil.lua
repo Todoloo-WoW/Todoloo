@@ -164,6 +164,69 @@ function Todoloo.ScrollUtil.AddTaskListDragBehavior(scrollBox, cursorFactory, ta
     return dragBehavior;
 end
 
+do
+    local function TaskLineIndicatorFactory(elementData)
+        return "TodolooScrollBoxDragLineTemplate"
+    end
+
+    local function GroupLineIndicatorFactory(elementData)
+        return "TodolooScrollBoxDragGroupTemplate"
+    end
+
+    local function NotifyDragSource(sourceFrame, drag)
+        sourceFrame:SetAlpha(drag and .5 or 1)
+        sourceFrame:SetMouseMotionEnabled(not drag)
+    end
+
+    local function NotifyDragCandidates(candidateFrame, drag)
+        candidateFrame:SetMouseMotionEnabled(not drag)
+    end
+
+    local function GenerateCursorFactory(scrollbar)
+        local function CursorFactory(elementData)
+            local view = scrollbar:GetView()
+            local function CursorIntializer(cursorFrame, candidateFrame, elementData)
+                cursorFrame:SetSize(candidateFrame:GetSize())
+
+                local template, initializer = view:GetFactoryDataFromElementData(elementData)
+                initializer(cursorFrame, elementData)
+            end
+
+            local template = view:GetFactoryDataFromElementData(elementData)
+            return template, CursorIntializer
+        end
+
+        return CursorFactory
+    end
+
+    local function ConfigureDragBehavior(dragBehavior)
+        dragBehavior:SetNotifyDragSource(NotifyDragSource)
+        dragBehavior:SetNotifyDragCandidates(NotifyDragCandidates)
+        dragBehavior:SetDragRelativeToCursor(true)
+    end
+
+    local function IndicatorAnchorHandler(anchorFrame, candidateFrame, candidateArea)
+        if candidateArea == DragIntersectionArea.Above then
+            anchorFrame:SetPoint("BOTTOMLEFT", candidateFrame, "TOPLEFT", 40, 0);
+            anchorFrame:SetPoint("BOTTOMRIGHT", candidateFrame, "TOPRIGHT", -40, 0);
+        elseif candidateArea == DragIntersectionArea.Below then
+            anchorFrame:SetPoint("TOPLEFT", candidateFrame, "BOTTOMLEFT", 40, 0);
+            anchorFrame:SetPoint("TOPRIGHT", candidateFrame, "BOTTOMRIGHT", -40, 0);
+        elseif candidateArea == DragIntersectionArea.Inside then
+            anchorFrame:SetPoint("TOPLEFT", candidateFrame, "TOPLEFT", 0, 5);
+            anchorFrame:SetPoint("BOTTOMRIGHT", candidateFrame, "BOTTOMRIGHT", 0, 1);
+        end
+    end
+
+    function Todoloo.ScrollUtil.InitDefaultTaskListDragBehavior(scrollBox)
+        local dragBehavior = Todoloo.ScrollUtil.AddTaskListDragBehavior(scrollBox, GenerateCursorFactory(scrollBox),
+            TaskLineIndicatorFactory, GroupLineIndicatorFactory, IndicatorAnchorHandler, {})
+
+        ConfigureDragBehavior(dragBehavior)
+        return dragBehavior
+    end
+end
+
 -- *****************************************************************************************************
 -- ***** DOCUMENTATION
 -- *****************************************************************************************************
