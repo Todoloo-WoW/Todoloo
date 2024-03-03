@@ -4,9 +4,7 @@
 
 TodolooTaskListMixin = {}
 
-function TodolooTaskListMixin:OnLoad()
-
-    -- setup scroll box
+local function SetupScrollBox(self)
     local indent = 10;
 	local padLeft = 0;
 	local pad = 5;
@@ -109,6 +107,25 @@ function TodolooTaskListMixin:OnLoad()
 
     self.selectionBehavior = ScrollUtil.AddSelectionBehavior(self.ScrollBox)
     self.selectionBehavior:RegisterCallback(SelectionBehaviorMixin.Event.OnSelectionChanged, OnSelectionChanged, self)
+end
+
+local function SetupDragBehavior(self)
+    --TODO: see ScrollBoxDragBehavior in ScrollUtil.lua line 550
+    local function OnNotify(sourceFrame, drag)
+        
+    end
+
+    --self.dragBehaviour = ScrollUtil.AddTreeDragBehavior(self.ScrollBox, cursorFactory, lineFactory, boxFactory, anchoringHandler, dragProperties)
+    self.dragBehavior = ScrollUtil.InitDefaultTreeDragBehavior(self.ScrollBox)
+    --self.dragBehavior:SetNotifyDragSource(OnNotify)
+end
+
+function TodolooTaskListMixin:OnLoad()
+    -- setup scroll box
+    SetupScrollBox(self)
+
+    -- setup drag behaviour
+    SetupDragBehavior(self)
 
     -- setup context menus
     UIDropDownMenu_SetInitializeFunction(self.GroupContextMenu, GenerateClosure(self.InitializeGroupContextMenu, self))
