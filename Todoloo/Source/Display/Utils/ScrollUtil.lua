@@ -37,12 +37,12 @@ function Todoloo.ScrollUtil.AddTaskListDragBehavior(scrollBox, cursorFactory, ta
     local candidateArea = nil
     local candidateElementData = nil
 
-    local boxTemplate, boxInitializer = groupLineIndicatorFactory(elementData)
-    local cursorBox = dragBehavior:AcquireFromPool(boxTemplate)
+    local groupLineTemplate, groupLineInitializer = groupLineIndicatorFactory(elementData)
+    local cursorBox = dragBehavior:AcquireFromPool(groupLineTemplate)
     cursorBox:SetParent(scrollBox)
     cursorBox:SetFrameStrata("DIALOG")
-    if boxInitializer then
-        boxInitializer(cursorBox)
+    if groupLineInitializer then
+        groupLineInitializer(cursorBox)
     end
 
     ---Function called every frame as we're dragging and element
