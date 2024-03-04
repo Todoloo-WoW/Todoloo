@@ -4,6 +4,7 @@ Todoloo.Tasks.Events = {
     GROUP_UPDATED   = "GROUP_UPDATED",
     GROUP_REMOVED   = "GROUP_REMOVED",
     GROUP_RESET     = "GROUP_RESET",
+    GROUP_MOVED     = "GROUP_MOVED",
 
     -- ***** TASK EVENTS
     TASK_ADDED          = "TASK_ADDED",
@@ -11,6 +12,7 @@ Todoloo.Tasks.Events = {
     TASK_REMOVED        = "TASK_REMOVED",
     TASK_COMPLETION_SET = "TASK_COMPLETION_SET",
     TASK_RESET          = "TASK_RESET",
+    TASK_MOVED          = "TASK_MOVED",
 
     -- ***** OTHER
     TASK_LIST_UPDATE = "TASK_LIST_UPDATE" -- fired whenever a search within the taskmanager has begun

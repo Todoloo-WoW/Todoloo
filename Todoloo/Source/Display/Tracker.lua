@@ -686,6 +686,26 @@ function TodolooTracker_OnLoad(self)
     self:RegisterEvent("PLAYER_ENTERING_WORLD")
 end
 
+function TodolooTracker_OnShow(self)
+    Todoloo.EventBus:RegisterEvents(self, {
+        Todoloo.Tasks.Events.GROUP_ADDED,
+        Todoloo.Tasks.Events.GROUP_REMOVED,
+        Todoloo.Tasks.Events.GROUP_RESET,
+        Todoloo.Tasks.Events.GROUP_UPDATED,
+        Todoloo.Tasks.Events.GROUP_MOVED,
+        Todoloo.Tasks.Events.TASK_ADDED,
+        Todoloo.Tasks.Events.TASK_COMPLETION_SET,
+        Todoloo.Tasks.Events.TASK_REMOVED,
+        Todoloo.Tasks.Events.TASK_RESET,
+        Todoloo.Tasks.Events.TASK_UPDATED,
+        Todoloo.Tasks.Events.TASK_MOVED,
+        Todoloo.Reset.Events.RESET_PERFORMED
+    }, TodolooTracker_ReceiveEvent)
+    
+    --TODO: Set max height based on Todoloo config
+    --TodolooTracker_UpdateHeight()
+end
+
 function TodolooTracker_Initialize(self)
     self.MODULES = { TODOLOO_TASK_TRACKER_MODULE }
     self.MODULES_UI_ORDER = { TODOLOO_TASK_TRACKER_MODULE }
@@ -712,6 +732,11 @@ function TodolooTracker_OnEvent(self, event, ...)
 
         TodolooTracker_Update()
     end
+end
+
+---Event handling (custom Todoloo events)
+function TodolooTracker_ReceiveEvent(event, ...)
+    TodolooTracker_Update()
 end
 
 function TodolooTracker_OnSizeChanged(self)
@@ -889,28 +914,6 @@ end
 ---@param self Frame Group header frame
 function TodolooTrackerGroupHeader_OnLoad(self)
     self:RegisterForClicks("LeftButtonUp", "RightButtonDown")
-end
-
-function TodolooTracker_OnShow(self)
-    Todoloo.EventBus:RegisterEvents(self, {
-        Todoloo.Tasks.Events.GROUP_ADDED,
-        Todoloo.Tasks.Events.GROUP_REMOVED,
-        Todoloo.Tasks.Events.GROUP_RESET,
-        Todoloo.Tasks.Events.GROUP_UPDATED,
-        Todoloo.Tasks.Events.TASK_ADDED,
-        Todoloo.Tasks.Events.TASK_COMPLETION_SET,
-        Todoloo.Tasks.Events.TASK_REMOVED,
-        Todoloo.Tasks.Events.TASK_RESET,
-        Todoloo.Tasks.Events.TASK_UPDATED,
-        Todoloo.Reset.Events.RESET_PERFORMED
-    }, TodolooTracker_ReceiveEvent)
-    
-    --TODO: Set max height based on Todoloo config
-    --TodolooTracker_UpdateHeight()
-end
-
-function TodolooTracker_ReceiveEvent(event, ...)
-    TodolooTracker_Update()
 end
 
 ---On group header clicked
