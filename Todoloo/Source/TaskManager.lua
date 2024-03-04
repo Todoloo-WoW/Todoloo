@@ -307,6 +307,37 @@ function TodolooTaskManagerMixin:ResetGroup(index, characterFullName)
     Todoloo.EventBus:TriggerEvent(self, Todoloo.Tasks.Events.GROUP_RESET, index)
 end
 
+---Move group to new location
+---@param groupId integer ID of the group 
+---@param newGroupId integer ID of the new group
+---@param characterFullName string? Full character name in format "player-realm" (defaults to the currently logged in character)
+function TodolooTaskManagerMixin:MoveGroup(groupId, newGroupId, characterFullName)
+    assert(groupId, "Group ID is required to move a group.")
+    assert(newGroupId, "New group ID is required to move a group.")
+
+    characterFullName = characterFullName or Todoloo.Utils.GetCharacterFullName()
+
+    local group = TODOLOO_TASKS[characterFullName].groups[groupId]
+    if not group then
+        error("Group not found")
+    end
+
+    if newGroupId > #TODOLOO_TASKS[characterFullName].groups then
+        --[[we need to handle the situationwhere the new task ID is greater than the length of the table.
+            In those scenarios, we simply want to move the group to the last spot in the groups table, by settings
+            the new group ID to the length of the groups table.]]--
+        newGroupId = #TODOLOO_TASKS[characterFullName].groups
+    end
+    
+    -- remove task at old location
+    table.remove(TODOLOO_TASKS[characterFullName].groups, groupId)
+    
+    -- insert at new location
+    table.insert(TODOLOO_TASKS[characterFullName].groups, newGroupId, group)
+
+    Todoloo.EventBus:TriggerEvent(self, Todoloo.Tasks.Events.GROUP_MOVED, groupId, newGroupId)
+end
+
 -- *****************************************************************************************************
 -- ***** TASKS
 -- *****************************************************************************************************
@@ -445,6 +476,16 @@ function TodolooTaskManagerMixin:MoveTask(taskId, groupId, newGroupId, newTaskId
     local task = TODOLOO_TASKS[characterFullName].groups[groupId].tasks[taskId]
     if not task then
         error("Task not found")
+    end
+
+    if groupId == newGroupId then
+        --[[if we're moving the task within the same group, we need to handle the situation
+            where the new task ID is greater than the length of the task table. In those scenarios,
+            we simply want to move the task to the last spot in the task table, by settings
+            the new task ID to the length of the table.]]--
+        if newTaskId > #TODOLOO_TASKS[characterFullName].groups[newGroupId].tasks then
+            newTaskId = #TODOLOO_TASKS[characterFullName].groups[newGroupId].tasks
+        end
     end
     
     -- remove task at old location

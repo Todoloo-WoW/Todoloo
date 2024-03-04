@@ -4,6 +4,14 @@
 
 Todoloo.ScrollUtil = {}
 
+---@enum candidateType Candidate types
+Todoloo.ScrollUtil.CandidateType = {
+    ---Task element
+    Task    = 1,
+    ---Group element
+    Group   = 2
+}
+
 local function GetCursorIntersectPercentage(frame, cy, cursorHitInsetBottom, cursorHitInsetTop)
 	local bottom = frame:GetBottom() + cursorHitInsetBottom;
 	local height = frame:GetHeight() - (cursorHitInsetBottom - cursorHitInsetTop);
@@ -36,6 +44,7 @@ function Todoloo.ScrollUtil.AddTaskListDragBehavior(scrollBox, cursorFactory, ta
     local dragBehavior = CreateScrollBoxDragBehavior(scrollBox)
     local candidateArea = nil
     local candidateElementData = nil
+    local candidateType = nil
 
     local groupLineTemplate, groupLineInitializer = groupLineIndicatorFactory(elementData)
     local cursorBox = dragBehavior:AcquireFromPool(groupLineTemplate)
@@ -52,9 +61,16 @@ function Todoloo.ScrollUtil.AddTaskListDragBehavior(scrollBox, cursorFactory, ta
             return
         end
 
+        local sourceData = sourceElementData:GetData()
+        if sourceData.groupInfo then
+            -- if we're moving a group we want to make sure that our groups are collapsed
+            dragBehavior.scrollBox:GetView():GetDataProvider():SetAllCollapsed(true)
+        end
+
         local candidate = nil
         candidateArea = nil
         candidateElementData = nil
+        candidateType = nil
 
         cursorBox:Hide()
 
@@ -75,6 +91,7 @@ function Todoloo.ScrollUtil.AddTaskListDragBehavior(scrollBox, cursorFactory, ta
                     parent = parent:GetParent()
                 end
 
+                candidateType = Todoloo.ScrollUtil.CandidateType.Task
                 local percentage = GetCursorIntersectPercentage(frame, cy, cursorHitInsetBottom, cursorHitInsetTop)
                 local area = GetTreeCursorIntersectionArea(percentage)
 
@@ -89,7 +106,10 @@ function Todoloo.ScrollUtil.AddTaskListDragBehavior(scrollBox, cursorFactory, ta
 
                     if candidateData.groupInfo then
                         -- if the element we're currently hovering is a group
-                        candidateArea = DragIntersectionArea.Inside
+                        candidateType = Todoloo.ScrollUtil.CandidateType.Group
+                        if sourceData.taskInfo then
+                            candidateArea = DragIntersectionArea.Inside
+                        end
                     end
                     
                     candidate = frame
@@ -104,25 +124,39 @@ function Todoloo.ScrollUtil.AddTaskListDragBehavior(scrollBox, cursorFactory, ta
 
             if candidate then
                 local isInside = candidateArea == DragIntersectionArea.Inside
-                local candidateFrame = isInside and cursorBox or cursorLine
-                --local candidateFrame = cursorLine
-                candidateFrame:Show()
-                candidateFrame:ClearAllPoints()
-                indicatorAnchorHandler(candidateFrame, candidate, candidateArea)
+                local indicatorFrame = isInside and cursorBox or cursorLine
+                indicatorFrame:Show()
+                indicatorFrame:ClearAllPoints()
+                indicatorAnchorHandler(indicatorFrame, candidate, candidateType, candidateArea)
             end
         end
     end
 
     ---Function called when we stop dragging and it's time to reorder the tasks
     local function OnDragStop(sourceElementData)
+        local sourceData = sourceElementData:GetData()
         if not candidateElementData or not candidateArea then
+            if sourceData.groupInfo then
+                -- if we're moving a group we want to make sure that our groups are no longer collapsed
+                dragBehavior.scrollBox:GetView():GetDataProvider():SetAllCollapsed(false)
+            end
+
             return
         end
 
         local sourceData = sourceElementData:GetData()
         local candidateData = candidateElementData:GetData()
-        if sourceData.groupInfo then
+
+        if sourceData.groupInfo and candidateData.groupInfo then
             -- if we're moving a group
+            local sourceId = sourceData.groupInfo.id
+            local newGroupId = candidateData.groupInfo.id
+            if candidateArea == DragIntersectionArea.Below then
+                newGroupId = candidateData.groupInfo.id + 1
+            end
+
+            PlaySound(SOUNDKIT.UI_90_BLACKSMITHING_TREEITEMCLICK)
+            Todoloo.TaskManager:MoveGroup(sourceId, newGroupId)
         elseif sourceData.taskInfo then
             -- if we're moving a task
             local sourceId = sourceData.taskInfo.id
@@ -135,6 +169,7 @@ function Todoloo.ScrollUtil.AddTaskListDragBehavior(scrollBox, cursorFactory, ta
                     return
                 end
 
+                PlaySound(SOUNDKIT.UI_90_BLACKSMITHING_TREEITEMCLICK)
                 Todoloo.TaskManager:MoveTask(sourceId, sourceGroupId, candidateData.groupInfo.id)
             elseif candidateData.taskInfo and candidateData.taskInfo.groupId ~= sourceData.taskInfo.groupId then
                 -- moving to new group (move relative to task)
@@ -145,11 +180,20 @@ function Todoloo.ScrollUtil.AddTaskListDragBehavior(scrollBox, cursorFactory, ta
                     offset = 1
                 end
 
+                PlaySound(SOUNDKIT.UI_90_BLACKSMITHING_TREEITEMCLICK)
                 local newTaskId = candidateData.taskInfo.id + offset
                 Todoloo.TaskManager:MoveTask(sourceId, sourceGroupId, candidateData.taskInfo.groupId, newTaskId)
             else
                 -- moving within the same group but relative to another task
-                local newTaskId = candidateData.taskInfo.id
+                local offset
+                if candidateArea == DragIntersectionArea.Above then
+                    offset = 0
+                elseif candidateArea == DragIntersectionArea.Below then
+                    offset = 1
+                end
+
+                PlaySound(SOUNDKIT.UI_90_BLACKSMITHING_TREEITEMCLICK)
+                local newTaskId = candidateData.taskInfo.id + offset
                 Todoloo.TaskManager:MoveTask(sourceId, sourceGroupId, sourceGroupId, newTaskId)
             end
         end
@@ -158,6 +202,7 @@ function Todoloo.ScrollUtil.AddTaskListDragBehavior(scrollBox, cursorFactory, ta
 
         candidateArea = nil
         candidateElementData = nil
+        candidateType = nil
     end
 
     dragBehavior:Register(cursorFactory, taskLineIndicatorFactory, OnDragStop, OnDragUpdate, dragProperties)
@@ -205,16 +250,28 @@ do
         dragBehavior:SetDragRelativeToCursor(true)
     end
 
-    local function IndicatorAnchorHandler(anchorFrame, candidateFrame, candidateArea)
-        if candidateArea == DragIntersectionArea.Above then
-            anchorFrame:SetPoint("BOTTOMLEFT", candidateFrame, "TOPLEFT", 40, 0);
-            anchorFrame:SetPoint("BOTTOMRIGHT", candidateFrame, "TOPRIGHT", -40, 0);
-        elseif candidateArea == DragIntersectionArea.Below then
-            anchorFrame:SetPoint("TOPLEFT", candidateFrame, "BOTTOMLEFT", 40, 0);
-            anchorFrame:SetPoint("TOPRIGHT", candidateFrame, "BOTTOMRIGHT", -40, 0);
-        elseif candidateArea == DragIntersectionArea.Inside then
-            anchorFrame:SetPoint("TOPLEFT", candidateFrame, "TOPLEFT", 0, 5);
-            anchorFrame:SetPoint("BOTTOMRIGHT", candidateFrame, "BOTTOMRIGHT", 0, 1);
+    local function IndicatorAnchorHandler(indiciatorFrame, candidateFrame, candidateType, candidateArea)
+        if candidateType == Todoloo.ScrollUtil.CandidateType.Task then
+            -- if our candidate is a task element
+            if candidateArea == DragIntersectionArea.Above then
+                indiciatorFrame:SetPoint("BOTTOMLEFT", candidateFrame, "TOPLEFT", 40, 0);
+                indiciatorFrame:SetPoint("BOTTOMRIGHT", candidateFrame, "TOPRIGHT", -40, 0);
+            elseif candidateArea == DragIntersectionArea.Below then
+                indiciatorFrame:SetPoint("TOPLEFT", candidateFrame, "BOTTOMLEFT", 40, 0);
+                indiciatorFrame:SetPoint("TOPRIGHT", candidateFrame, "BOTTOMRIGHT", -40, 0);
+            elseif candidateArea == DragIntersectionArea.Inside then
+                indiciatorFrame:SetPoint("TOPLEFT", candidateFrame, "TOPLEFT", 0, 5);
+                indiciatorFrame:SetPoint("BOTTOMRIGHT", candidateFrame, "BOTTOMRIGHT", 0, 1);
+            end
+        elseif candidateType == Todoloo.ScrollUtil.CandidateType.Group then
+            -- if our candidate is group element
+            if candidateArea == DragIntersectionArea.Above then
+                indiciatorFrame:SetPoint("BOTTOMLEFT", candidateFrame, "TOPLEFT", 40, 0);
+                indiciatorFrame:SetPoint("BOTTOMRIGHT", candidateFrame, "TOPRIGHT", -40, 0);
+            elseif candidateArea == DragIntersectionArea.Below then
+                indiciatorFrame:SetPoint("TOPLEFT", candidateFrame, "BOTTOMLEFT", 40, 0);
+                indiciatorFrame:SetPoint("TOPRIGHT", candidateFrame, "BOTTOMRIGHT", -40, 0);
+            end
         end
     end
 

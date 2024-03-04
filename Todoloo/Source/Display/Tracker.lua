@@ -692,6 +692,7 @@ function TodolooTracker_OnShow(self)
         Todoloo.Tasks.Events.GROUP_REMOVED,
         Todoloo.Tasks.Events.GROUP_RESET,
         Todoloo.Tasks.Events.GROUP_UPDATED,
+        Todoloo.Tasks.Events.GROUP_MOVED,
         Todoloo.Tasks.Events.TASK_ADDED,
         Todoloo.Tasks.Events.TASK_COMPLETION_SET,
         Todoloo.Tasks.Events.TASK_REMOVED,

@@ -4,6 +4,7 @@ Todoloo.Tasks.Events = {
     GROUP_UPDATED   = "GROUP_UPDATED",
     GROUP_REMOVED   = "GROUP_REMOVED",
     GROUP_RESET     = "GROUP_RESET",
+    GROUP_MOVED     = "GROUP_MOVED",
 
     -- ***** TASK EVENTS
     TASK_ADDED          = "TASK_ADDED",
