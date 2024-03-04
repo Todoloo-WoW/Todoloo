@@ -119,7 +119,8 @@ function TodolooManagementPageMixin:OnShow()
         Todoloo.Tasks.Events.TASK_REMOVED,
         Todoloo.Tasks.Events.TASK_UPDATED,
         Todoloo.Tasks.Events.TASK_LIST_UPDATE,
-        Todoloo.Tasks.Events.TASK_MOVED
+        Todoloo.Tasks.Events.TASK_MOVED,
+        Todoloo.Tasks.Events.TASK_COMPLETION_SET
     })
     
     self:SetTitle()
@@ -181,7 +182,7 @@ function TodolooManagementPageMixin:UpdateHelp()
 
     if self.TaskList:IsShown() then
         table.insert(TodolooTaskManagerManagementPage_HelpPlate, { ButtonPos = { x = 170, y = -44 }, HighLightBox = { x = 0, y = -52, width = 390, height = 30 }, ToolTipDir = "DOWN", ToolTipText = "Tip: Search for a specific task or group to find the item you are looking for more easily." })
-        table.insert(TodolooTaskManagerManagementPage_HelpPlate, { ButtonPos = { x = 365, y = -80 }, HighLightBox = { x = 0, y = -85, width = 390, height = 545 }, ToolTipDir = "RIGHT", ToolTipText = "This is your overview of all your current groups and tasks.\n\n[Double-Click] on groups and tasks to change the name.\n\n[Shift]+[Left-Click] on groups to collapse.\n\n[Right-Click] on groups to add tasks and delete.\n\n[Right-Click] on tasks to set reset interval and delete." })
+        table.insert(TodolooTaskManagerManagementPage_HelpPlate, { ButtonPos = { x = 365, y = -80 }, HighLightBox = { x = 0, y = -85, width = 390, height = 545 }, ToolTipDir = "RIGHT", ToolTipText = "This is your overview of all your current groups and tasks.\n\n[Double-Click] on groups and tasks to change the name.\n\n[Shift]+[Left-Click] on groups to collapse.\n\n[Right-Click] on groups to add tasks and delete.\n\n[Shift]+[Left-Click] on tasks to toggle completion.\n\n[Right-Click] on tasks to set reset interval and delete." })
     end
 end
 

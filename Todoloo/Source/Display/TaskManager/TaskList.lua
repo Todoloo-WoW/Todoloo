@@ -45,7 +45,9 @@ local function SetupScrollBox(self)
                 taskButton:SetScript("OnClick", function(button, buttonName, down)
                     if buttonName == "RightButton" then
                         ToggleDropDownMenu(1, elementData.taskInfo, self.TaskContextMenu, "cursor")
-                    end                    
+                    elseif buttonName == "LeftButton" and IsShiftKeyDown() then
+                        taskButton:ToggleCompletion()
+                    end
                 end)
 
                 taskButton:SetScript("OnDoubleClick", function(button, buttonName)
@@ -320,15 +322,17 @@ TodolooTaskListTaskMixin = {}
 function TodolooTaskListTaskMixin:Initialize(node)
     local elementData = node:GetData()
     self.taskInfo = elementData.taskInfo
-
-    if self.taskInfo.completed then
-        self.Check:Show()
-    else
-        self.Check:Hide()
-    end
     
     self.Name:SetText(self.taskInfo.name)
     self.Label:SetText(self.taskInfo.name)
+
+    if self.taskInfo.completed then
+        self.Label:SetVertexColor(DISABLED_FONT_COLOR:GetRGB())
+        self.Check:Show()
+    else
+        self.Label:SetVertexColor(PROFESSION_RECIPE_COLOR:GetRGB())
+        self.Check:Hide()
+    end
 
     local resetInterval = self.taskInfo.reset == TODOLOO_RESET_INTERVALS.Manually and "M"
         or self.taskInfo.reset == TODOLOO_RESET_INTERVALS.Daily and "D"
@@ -361,6 +365,10 @@ function TodolooTaskListTaskMixin:SetEditMode(enable)
         self.HighlightOverlay:Show()
         self.Name:Hide()
     end
+end
+
+function TodolooTaskListTaskMixin:ToggleCompletion()
+    Todoloo.TaskManager:SetTaskCompletion(self.taskInfo.groupId, self.taskInfo.id, not self.taskInfo.completed)
 end
 
 function TodolooTaskListTaskMixin:Save()
