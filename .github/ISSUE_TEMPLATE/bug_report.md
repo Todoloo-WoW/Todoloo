@@ -7,11 +7,14 @@ assignees: ''
 
 ---
 
-**Describe the bug**
+**Version**  
+_What version of Todoloo do you have installed?._
+
+**Describe the bug**  
 _A clear and concise description of what the bug is._
 
-**To Reproduce**
+**To Reproduce**  
 _Include the steps to reproduce the behavior._
 
-**Screenshots**
-If applicable, add screenshots to help explain your problem.
+**Screenshots**  
+_If applicable, add screenshots to help explain your problem._

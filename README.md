@@ -5,17 +5,26 @@ Todoloo is your friendly in-game task management assistant, making sure you've n
 > You can follow the development on [Todoloo's GitHub](https://github.com/Todoloo-WoW/Todoloo).*
 
 ## ✨ Key features
-* Create character specific tasks that automatically reset every day/week, or manually
+* Create character specific tasks that automatically reset daily, weekly, or manually
 * Organize your tasks in custom made groups
-* Blizzard styled task manager to create, update, and delete groups and tasks
+* Blizzard styled task manager to create, update, delete and reorganize groups and tasks
 * Blizzard styled task tracker to visualize your tasks
 * Hide completed tasks and groups from the task tracker
 
-## ❓ How to
+## ❓ Getting started
+### Task Tracker
+* `Shift` + `Left-Click` on tasks in the task tracker to toggle completion
+* Click and drag the task tracker around, to place the it as you see fit
+* Toggle whether you want to see completed tasks and/or completed groups, in Todoloo settings (_`Right-Click` on the minimap icon, or via the options_)
+
+### Task Manager
+* Use the in-game help guide by clicking on the info icon in the task manager
 * Add groups and tasks in the task manager, by `Left-Click` on the minimap icon
-* Choose whether the task should reset daily, weekly, or manually by `Shift`+`Left-Click` on the task in the task tracker
-* `Shift`+`Left-Click` the minimap icon to show the Blizzard styled task tracker, or by enabling the task tracker in the basic settings through the addon settings
-* Rince-repeat
+* Drag and drop groups to reorder as you see fit
+* Drag and drop tasks to reorder within the same group, or move between groups
+* `Shift` + `Left-Click` on tasks to toggle task completion
+* `Right-Click` on tasks to set reset interval or to delete the task
+* `Right-Click` on groups to add new tasks or delete the group
 
 ## 📣 Feedback
 ### Bug
