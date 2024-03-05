@@ -67,12 +67,21 @@
                 </Anchors>
             </Frame>
 
+            <Frame inherits="TodolooConfigCheckbox" parentKey="ShowGroupProgressText">
+                <KeyValues>
+                    <KeyValue key="labelText" value="Show group progress text" />
+                </KeyValues>
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeKey="$parent.ShowCompletedTasks" relativePoint="BOTTOMLEFT" />
+                </Anchors>
+            </Frame>
+
             <Frame inherits="TodolooSectionHeader" parentKey="MinimapIconHeader">
                 <KeyValues>
                     <KeyValue key="headerText" value="Minimap Icon" />
                 </KeyValues>
                 <Anchors>
-                    <Anchor point="TOPLEFT" relativeKey="$parent.ShowCompletedTasks" relativePoint="BOTTOMLEFT" />
+                    <Anchor point="TOPLEFT" relativeKey="$parent.ShowGroupProgressText" relativePoint="BOTTOMLEFT" />
                 </Anchors>
             </Frame>
 

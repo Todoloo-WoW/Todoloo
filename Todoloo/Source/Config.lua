@@ -10,6 +10,7 @@ Todoloo.Config.Options = {
 
     -- ***** BASIC SETTINGS
     MINIMAP_ICON = "minimap_icon",
+    SHOW_GROUP_PROGRESS_TEXT = "show_group_progress_text",
 
     -- ***** ADVANCED SETTINGS
     DEBUG = "debug",
@@ -28,6 +29,7 @@ Todoloo.Config.Defaults = {
     [Todoloo.Config.Options.TASK_TRACKER_HEIGHT] = "500",
 
     [Todoloo.Config.Options.MINIMAP_ICON] = { hide = false },
+    [Todoloo.Config.Options.SHOW_GROUP_PROGRESS_TEXT] = false,
 
     [Todoloo.Config.Options.DEBUG] = false,
 
