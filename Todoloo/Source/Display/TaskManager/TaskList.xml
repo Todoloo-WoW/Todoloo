@@ -109,15 +109,10 @@ https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/FrameXML/UI
 						<Anchor point="LEFT" x="10" />
 					</Anchors>
 				</Texture>
-                <FontString parentKey="ResetInterval" inherits="GameFontDisable" justifyH="CENTER">
-                    <Size x="14" y="12" />
+                <Texture parentKey="ResetIcon" alpha="0.8">
+                    <Size x="14" y="14" />
                     <Anchors>
                         <Anchor point="RIGHT" x="-10" />
-                    </Anchors>
-                </FontString>
-                <Texture parentKey="ResetIcon" atlas="questlog-questtypeicon-clockyellow" useAtlasSize="true" scale="0.7">
-                    <Anchors>
-                        <Anchor point="RIGHT" relativeKey="$parent.ResetInterval" relativePoint="LEFT" x="-2" />
                     </Anchors>
                 </Texture>
             </Layer>
