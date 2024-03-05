@@ -102,35 +102,30 @@ https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/FrameXML/UI
     <Button name="TodolooTaskListTaskTemplate" mixin="TodolooTaskListTaskMixin" registerForClicks="RightButtonUp, LeftButtonUp" virtual="true">
         <Size y="20" />
         <Layers>
-            <Layer level="OVERLAY" textureSubLevel="1">
-                <FontString parentKey="Label" inherits="GameFontHighlight_NoShadow" justifyH="LEFT">
-                    <Size y="12" />
-                    <Anchors>
-                        <Anchor point="LEFT" x="30" />
-                        <Anchor point="RIGHT" relativeKey="$parent.DeleteButton" x="-4" />
-                    </Anchors>
-                </FontString>
-            </Layer>
-            <Layer level="OVERLAY" textureSubLevel="1">
+            <Layer level="OVERLAY" textureSubLevel="2">
                 <Texture parentKey="Check" atlas="Tracker-Check" useAtlasSize="true" hidden="true" scale="0.8">
 					<Size x="16" y="16"/>
 					<Anchors>
 						<Anchor point="LEFT" x="10" />
 					</Anchors>
 				</Texture>
-                <FontString parentKey="ResetInterval" inherits="GameFontDisable" justifyH="CENTER">
-                    <Size x="14" y="12" />
+                <Texture parentKey="ResetIcon" alpha="0.8">
+                    <Size x="14" y="14" />
                     <Anchors>
                         <Anchor point="RIGHT" x="-10" />
                     </Anchors>
-                </FontString>
-                <Texture parentKey="ResetIcon" atlas="questlog-questtypeicon-clockyellow" useAtlasSize="true" scale="0.7">
-                    <Anchors>
-                        <Anchor point="RIGHT" relativeKey="$parent.ResetInterval" relativePoint="LEFT" x="-2" />
-                    </Anchors>
                 </Texture>
             </Layer>
-            <Layer level="OVERLAY" textureSubLevel="2">
+            <Layer level="OVERLAY" textureSubLevel="1">
+                <FontString parentKey="Label" inherits="GameFontHighlight_NoShadow" justifyH="LEFT">
+                    <Size y="12" />
+                    <Anchors>
+                        <Anchor point="LEFT" x="30" />
+                        <Anchor point="RIGHT" relativeKey="$parent.ResetIcon" x="-10" />
+                    </Anchors>
+                </FontString>
+            </Layer>
+            <Layer level="OVERLAY" textureSubLevel="3">
                 <Texture parentKey="SelectedOverlay" atlas="Professions_Recipe_Active" useAtlasSize="true" hidden="true">
                     <Anchors>
                         <Anchor point="CENTER" x="0" y="-1" />
@@ -153,7 +148,7 @@ https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/FrameXML/UI
                 <Size y="10" />
                 <Anchors>
                     <Anchor point="LEFT" x="30" />
-                    <Anchor point="RIGHT" relativeKey="$parent.ResetInterval" relativePoint="LEFT" x="-5" />
+                    <Anchor point="RIGHT" relativeKey="$parent.ResetIcon" relativePoint="LEFT" x="-10" />
                 </Anchors>
                 <FontString inherits="GameFontHighlight_NoShadow" />
                 <Scripts>

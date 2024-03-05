@@ -334,11 +334,21 @@ function TodolooTaskListTaskMixin:Initialize(node)
         self.Check:Hide()
     end
 
-    local resetInterval = self.taskInfo.reset == TODOLOO_RESET_INTERVALS.Manually and "M"
-        or self.taskInfo.reset == TODOLOO_RESET_INTERVALS.Daily and "D"
-        or self.taskInfo.reset == TODOLOO_RESET_INTERVALS.Weekly and "W"
+    self:SetResetInterval()
+end
 
-    self.ResetInterval:SetText(resetInterval)
+function TodolooTaskListTaskMixin:SetResetInterval()
+    if self.taskInfo.reset == TODOLOO_RESET_INTERVALS.Manually then
+        -- set our custom greyed out quest icon
+        self.ResetIcon:SetTexture("Interface/AddOns/Todoloo/Images/questlog-questtypeicon-disabled")
+        self.ResetIcon:SetSize(14, 14)
+        self.ResetIcon:SetTexCoord(0, 0.575, 0, 0.575)
+    else
+        local atlas = self.taskInfo.reset == TODOLOO_RESET_INTERVALS.Daily and "questlog-questtypeicon-daily"
+        or self.taskInfo.reset == TODOLOO_RESET_INTERVALS.Weekly and "questlog-questtypeicon-weekly"
+
+        self.ResetIcon:SetAtlas(atlas, false, "LINEAR", true)
+    end
 end
 
 function TodolooTaskListTaskMixin:SetSelected(selected)
