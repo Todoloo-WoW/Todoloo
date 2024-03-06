@@ -119,9 +119,9 @@ https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/FrameXML/UI
         <Layers>
             <Layer level="ARTWORK">
                 <FontString parentKey="HeaderText" inherits="ObjectiveFont">
-                    <Size x="192" y="0" />
+					<Size x="192" y="0" />
                     <Anchors>
-                        <Anchor point="TOPLEFT"/>
+						<Anchor point="TOPLEFT"/>
                     </Anchors>
                     <Color r="0.75" g="0.61" b="0" />
                 </FontString>

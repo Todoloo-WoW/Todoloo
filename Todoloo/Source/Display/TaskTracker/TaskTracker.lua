@@ -7,6 +7,8 @@ TODOLOO_TASK_TRACKER_MODULE:SetHeader(TodolooTrackerFrame.GroupsFrame.TaskHeader
 ---@class GroupInfo
 ---@field name string Name of the group
 ---@field id integer Index of the group
+---@field numTasks integer The total number of tasks in the group
+---@field numCompletedTasks integer The total number of completed tasks in the group
 
 local TASK_TYPE = { template = "TodolooTrackerTaskTemplate", freeTasks = {} }
 
@@ -18,12 +20,22 @@ local TASK_TYPE = { template = "TodolooTrackerTaskTemplate", freeTasks = {} }
 ---@param group Frame Group frame
 ---@param text string String value to set
 ---@param id integer Group ID
-function TODOLOO_TASK_TRACKER_MODULE:SetGroupHeader(group, text, id)
+---@param showGroupProgress boolean Should we show group progress?
+---@param numTasks integer The total number of tasks in the group
+---@param numCompletedTasks integer The total number of completed tasks in the group
+function TODOLOO_TASK_TRACKER_MODULE:SetGroupHeader(group, text, id, showGroupProgress, numTasks, numCompletedTasks)
     group.rightButton = nil
     group.lineWidth = TODOLOO_TRACKER_TEXT_WIDTH
 
     -- set text
     group.HeaderText:SetWidth(group.lineWidth)
+
+    if showGroupProgress then
+        -- set group progress
+        local groupProgressText = " (" .. numCompletedTasks .. "/" .. numTasks .. ")"
+        text = text .. groupProgressText
+    end
+
     local height = self:SetStringText(group.HeaderText, text, nil, TODOLOO_TRACKER_COLOR["Header"])
     group.height = height
 end
@@ -35,7 +47,14 @@ function TODOLOO_TASK_TRACKER_MODULE:BuildGroupInfos()
 
     for index, group in pairs(Todoloo.TaskManager:GetAllGroups()) do
         if self:ShouldDisplayGroup(group) then
-            table.insert(infos, { name = group.name, id = index})
+            local numCompletedTasks = 0
+            for _, task in ipairs(group.tasks) do
+                if task.completed then
+                    numCompletedTasks = numCompletedTasks + 1
+                end
+            end
+
+            table.insert(infos, { name = group.name, id = index, numTasks = #group.tasks, numCompletedTasks = numCompletedTasks})
         end
     end
 
@@ -159,8 +178,9 @@ function TODOLOO_TASK_TRACKER_MODULE:UpdateSingle(groupInfo)
     local existingGroup = self:GetExistingGroup(groupInfo.id)
     local isComplete = Todoloo.TaskManager:IsGroupComplete(groupInfo.id)
     local group = self:GetGroup(groupInfo.id)
+    local showGroupProgress = Todoloo.Config.Get(Todoloo.Config.Options.SHOW_GROUP_PROGRESS_TEXT)
 
-    self:SetGroupHeader(group, groupInfo.name, groupInfo.id)
+    self:SetGroupHeader(group, groupInfo.name, groupInfo.id, showGroupProgress, groupInfo.numTasks, groupInfo.numCompletedTasks)
 
     if isComplete and not Todoloo.Config.Get(Todoloo.Config.Options.SHOW_COMPLETED_TASKS) then
         local groupCompleting = TodolooTaskTracker_DoTasks(self, group, isComplete, existingGroup, useFullHeight)
