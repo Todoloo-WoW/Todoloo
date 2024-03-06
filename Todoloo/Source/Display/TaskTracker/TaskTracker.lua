@@ -26,10 +26,10 @@ local TASK_TYPE = { template = "TodolooTrackerTaskTemplate", freeTasks = {} }
 function TODOLOO_TASK_TRACKER_MODULE:SetGroupHeader(group, text, id, showGroupProgress, numTasks, numCompletedTasks)
     group.rightButton = nil
     group.lineWidth = TODOLOO_TRACKER_TEXT_WIDTH
-    
+
     -- set text
     group.HeaderText:SetWidth(group.lineWidth)
-    
+
     if showGroupProgress then
         -- set group progress
         local groupProgressText = " (" .. numCompletedTasks .. "/" .. numTasks .. ")"

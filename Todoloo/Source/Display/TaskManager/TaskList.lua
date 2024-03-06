@@ -270,9 +270,18 @@ TodolooTaskListGroupMixin = {}
 function TodolooTaskListGroupMixin:Initialize(node)
     local elementData = node:GetData()
     self.groupInfo = elementData.groupInfo
-    
+
+    local labelText = self.groupInfo.name
+    if Todoloo.Config.Get(Todoloo.Config.Options.SHOW_GROUP_PROGRESS_TEXT) then
+        -- set group progress
+        local numCompletedTasks = Todoloo.TaskManager:GetNumCompletedTasks(self.groupInfo.id)
+        local numTasks = Todoloo.TaskManager:GetNumTasks(self.groupInfo.id)
+        local groupProgressText = " (" .. numCompletedTasks .. "/" .. numTasks .. ")"
+        labelText = labelText .. groupProgressText
+    end
+
     self.Name:SetText(self.groupInfo.name)
-    self.Label:SetText(self.groupInfo.name)
+    self.Label:SetText(labelText)
 
     self:SetCollapseState(node:IsCollapsed())
 end
