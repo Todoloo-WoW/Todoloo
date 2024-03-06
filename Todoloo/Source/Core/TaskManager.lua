@@ -225,6 +225,27 @@ function TodolooTaskManagerMixin:GetNumTasks(index, characterFullName)
     return #group.tasks
 end
 
+---Get the total number of completed tasks for a given group
+---@param index integer Index of the group within the task table
+---@param characterFullName string? Full character name in format "player-realm" (defaults to the currently logged in character)
+---@return integer # Total number of completed tasks
+function TodolooTaskManagerMixin:GetNumCompletedTasks(index, characterFullName)
+    assert(index)
+
+    characterFullName = characterFullName or Todoloo.Utils.GetCharacterFullName()
+
+    local group = TODOLOO_TASKS[characterFullName].groups[index]
+
+    local numCompletedTasks = 0
+    for _, task in ipairs(group.tasks) do
+        if task.completed then
+            numCompletedTasks = numCompletedTasks + 1
+        end
+    end
+
+    return numCompletedTasks
+end
+
 ---Are all tasks in this group complete?
 ---@param index integer Index of the group within the task table
 ---@param characterFullName string? Full character name in format "player-realm" (defaults to the currently logged in character)
