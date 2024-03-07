@@ -1,7 +1,5 @@
 Todoloo = {
-    Tasks = {
-        TaskManager = {}
-    },
+    Tasks = {},
     Reset = {
         ResetManager = {}
     },

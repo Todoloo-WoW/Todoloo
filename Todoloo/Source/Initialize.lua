@@ -1,8 +1,12 @@
+---Initialize on ADDON_LOADED event.
 local function InitializeBase()
     Todoloo.Config.Initialize()
 end
 
+---Initialize on PLAYER_ENTERING_WORLD event.
+---Initialize all thing that require access to the character.
 local function InitializeCharacter()
+    -- create task manager
     Todoloo.TaskManager = CreateAndInitFromMixin(TodolooTaskManagerMixin)
 
     -- reset all relevant tasks

@@ -1,7 +1,6 @@
 --TODO Clean up file
 
 TODOLOO_TASK_TRACKER_MODULE = TodolooTracker_GetModuleInfoTable("TODOLOO_TASK_TRACKER_MODULE")
-
 TODOLOO_TASK_TRACKER_MODULE:SetHeader(TodolooTrackerFrame.GroupsFrame.TaskHeader, "Todoloo's")
 
 ---@class GroupInfo
@@ -84,16 +83,26 @@ local function TodolooTaskTracker_DoTasks(self, group, groupCompleted, existingG
     local completing = false
     local numTasks = Todoloo.TaskManager:GetNumTasks(group.id)
 
-    for taskIndex = 1, numTasks do
-        local taskInfo = Todoloo.TaskManager:GetTask(group.id, taskIndex)
+    local tasks = Todoloo.TaskManager:GetGroupTasks(group.id)
+    local iterTasks = {}
+    for index, task in ipairs(tasks) do
+        task["id"] = index
+        table.insert(iterTasks, task)
+    end
+
+    if Todoloo.Config.Get(Todoloo.Config.Options.ORDER_BY_COMPLETION) then
+        table.sort(iterTasks, function(first, second) return not first.completed and second.completed end)
+    end
+
+    for _, taskInfo in pairs(iterTasks) do
         -- we're intentionally skipping tasks without a name, as we do not want to show these
         if taskInfo and taskInfo.name ~= "" then
-            local task = group.tasks[taskIndex]
+            local task = group.tasks[taskInfo.id]
             -- if the entire group is completed
             if groupCompleted then
-                -- only process existing tasks
                 if task then
-                    task = self:AddTask(group, taskIndex, taskInfo.name, TASK_TYPE, useFullHeight, TODOLOO_TRACKER_DASH_STYLE_HIDE, TODOLOO_TRACKER_COLOR["Complete"])
+                    -- process existing tasks
+                    task = self:AddTask(group, taskInfo.id, taskInfo.name, TASK_TYPE, useFullHeight, TODOLOO_TRACKER_DASH_STYLE_HIDE, TODOLOO_TRACKER_COLOR["Complete"])
                     if not task.state or  task.state == TODOLOO_TRACKER_TASK_STATE_PRESENT then
                         -- this task has not yet been market as completed
                         task.group = group
@@ -104,7 +113,8 @@ local function TodolooTaskTracker_DoTasks(self, group, groupCompleted, existingG
                         task.state = TODOLOO_TRACKER_TASK_STATE_COMPLETING
                     end
                 elseif Todoloo.Config.Get(Todoloo.Config.Options.SHOW_COMPLETED_TASKS) then
-                    task = self:AddTask(group, taskIndex, taskInfo.name, TASK_TYPE, useFullHeight, TODOLOO_TRACKER_DASH_STYLE_HIDE, TODOLOO_TRACKER_COLOR["Complete"])
+                    -- if the player want to display completed tasks, add those which are not yet displayed
+                    task = self:AddTask(group, taskInfo.id, taskInfo.name, TASK_TYPE, useFullHeight, TODOLOO_TRACKER_DASH_STYLE_HIDE, TODOLOO_TRACKER_COLOR["Complete"])
                     task.Check:Show()
                     task.state = TODOLOO_TRACKER_TASK_STATE_COMPLETED
                 end
@@ -112,8 +122,9 @@ local function TodolooTaskTracker_DoTasks(self, group, groupCompleted, existingG
                 -- if the task is completed
                 if taskInfo.completed then
                     if task then
-                        task = self:AddTask(group, taskIndex, taskInfo.name, TASK_TYPE, useFullHeight, TODOLOO_TRACKER_DASH_STYLE_HIDE, TODOLOO_TRACKER_COLOR["Complete"])
+                        task = self:AddTask(group, taskInfo.id, taskInfo.name, TASK_TYPE, useFullHeight, TODOLOO_TRACKER_DASH_STYLE_HIDE, TODOLOO_TRACKER_COLOR["Complete"])
                         if not task.state or task.state == TODOLOO_TRACKER_TASK_STATE_PRESENT then
+                            -- task is shown in the task tracker - begin completion animation
                             task.group = group
                             task.Check:Show()
                             task.Sheen.Anim:Play()
@@ -122,23 +133,27 @@ local function TodolooTaskTracker_DoTasks(self, group, groupCompleted, existingG
                             task.state = TODOLOO_TRACKER_TASK_STATE_COMPLETING
                         end
                     elseif Todoloo.Config.Get(Todoloo.Config.Options.SHOW_COMPLETED_TASKS) then
-                        task = self:AddTask(group, taskIndex, taskInfo.name, TASK_TYPE, useFullHeight, TODOLOO_TRACKER_DASH_STYLE_HIDE, TODOLOO_TRACKER_COLOR["Complete"])
+                        -- task is not shown in the task tracker - add it without animation
+                        task = self:AddTask(group, taskInfo.id, taskInfo.name, TASK_TYPE, useFullHeight, TODOLOO_TRACKER_DASH_STYLE_HIDE, TODOLOO_TRACKER_COLOR["Complete"])
                         task.Check:Show()
                         task.state = TODOLOO_TRACKER_TASK_STATE_COMPLETED
                     end
                 else
                     if existingGroup and not task then
-                        task = self:AddTask(group, taskIndex, taskInfo.name, TASK_TYPE, useFullHeight)
+                        -- task it nos shown in the task tracker - add it and begin adding animation
+                        task = self:AddTask(group, taskInfo.id, taskInfo.name, TASK_TYPE, useFullHeight)
                         task.Check:Hide()
                         task.Sheen.Anim:Play()
                         task.Glow.Anim:Play()
                         task.state = TODOLOO_TRACKER_TASK_STATE_ADDING
                     elseif task then
-                        task = self:AddTask(group, taskIndex, taskInfo.name, TASK_TYPE, useFullHeight)
+                        -- task is already shown - add the task
+                        task = self:AddTask(group, taskInfo.id, taskInfo.name, TASK_TYPE, useFullHeight)
                         task.Check:Hide()
                         task.state = TODOLOO_TRACKER_TASK_STATE_PRESENT
                     else
-                        task = self:AddTask(group, taskIndex, taskInfo.name, nil, useFullHeight)
+                        -- group not existing - add the task
+                        task = self:AddTask(group, taskInfo.id, taskInfo.name, nil, useFullHeight)
                     end
                 end
             end
