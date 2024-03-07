@@ -452,9 +452,6 @@ function TODOLOO_DEFAULT_TRACKER_MODULE:OnTaskClick(task, mouseButton)
 
         local taskInfo = Todoloo.TaskManager:GetTask(groupId, id)
         Todoloo.TaskManager:SetTaskCompletion(groupId, id, not taskInfo.completed)
-
-        --TODO: Update should happen through events - verify
-        --TodolooTracker_Update()
     end
 end
 

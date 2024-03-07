@@ -67,12 +67,21 @@
                 </Anchors>
             </Frame>
 
+            <Frame inherits="TodolooConfigCheckbox" parentKey="OrderByCompletion">
+                <KeyValues>
+                    <KeyValue key="labelText" value="Move completed tasks to bottom of groups" />
+                </KeyValues>
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeKey="$parent.ShowCompletedTasks" relativePoint="BOTTOMLEFT" />
+                </Anchors>
+            </Frame>
+
             <Frame inherits="TodolooConfigCheckbox" parentKey="ShowGroupProgressText">
                 <KeyValues>
                     <KeyValue key="labelText" value="Show group progress text" />
                 </KeyValues>
                 <Anchors>
-                    <Anchor point="TOPLEFT" relativeKey="$parent.ShowCompletedTasks" relativePoint="BOTTOMLEFT" />
+                    <Anchor point="TOPLEFT" relativeKey="$parent.OrderByCompletion" relativePoint="BOTTOMLEFT" />
                 </Anchors>
             </Frame>
 

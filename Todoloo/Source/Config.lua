@@ -7,6 +7,7 @@ Todoloo.Config.Options = {
     SHOW_COMPLETED_TASKS = "show_completed_tasks",
     TASK_TRACKER_WIDTH = "task_tracker_width",
     TASK_TRACKER_HEIGHT = "task_tracker_height",
+    ORDER_BY_COMPLETION = "order_by_completion",
 
     -- ***** BASIC SETTINGS
     MINIMAP_ICON = "minimap_icon",
@@ -27,6 +28,7 @@ Todoloo.Config.Defaults = {
     [Todoloo.Config.Options.SHOW_COMPLETED_TASKS] = false,
     [Todoloo.Config.Options.TASK_TRACKER_WIDTH] = "235",
     [Todoloo.Config.Options.TASK_TRACKER_HEIGHT] = "500",
+    [Todoloo.Config.Options.ORDER_BY_COMPLETION] = false,
 
     [Todoloo.Config.Options.MINIMAP_ICON] = { hide = false },
     [Todoloo.Config.Options.SHOW_GROUP_PROGRESS_TEXT] = false,

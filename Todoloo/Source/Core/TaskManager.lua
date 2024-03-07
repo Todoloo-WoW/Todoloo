@@ -382,6 +382,17 @@ function TodolooTaskManagerMixin:GetTask(groupIndex, index, characterFullName)
     return TODOLOO_TASKS[characterFullName].groups[groupIndex].tasks[index]
 end
 
+---Get tasks for a specific group
+---@param groupIndex integer Index of the group within the task table
+---@param characterFullName string? Full character name in format "player-realm" (defaults to the currently logged in character)
+---@return Task[] # All tasks within the given group
+function TodolooTaskManagerMixin:GetGroupTasks(groupIndex, characterFullName)
+    assert(groupIndex)
+
+    characterFullName = characterFullName or Todoloo.Utils.GetCharacterFullName()
+    return TODOLOO_TASKS[characterFullName].groups[groupIndex].tasks
+end
+
 ---Add new task to group
 ---@param groupIndex integer Index of the group in the task table
 ---@param name string Name/title of the task
