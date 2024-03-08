@@ -120,7 +120,8 @@ function TodolooManagementPageMixin:OnShow()
         Todoloo.Tasks.Events.TASK_UPDATED,
         Todoloo.Tasks.Events.TASK_LIST_UPDATE,
         Todoloo.Tasks.Events.TASK_MOVED,
-        Todoloo.Tasks.Events.TASK_COMPLETION_SET
+        Todoloo.Tasks.Events.TASK_COMPLETION_SET,
+        Todoloo.Tasks.Events.TASK_RESET,
     })
     
     self:SetTitle()

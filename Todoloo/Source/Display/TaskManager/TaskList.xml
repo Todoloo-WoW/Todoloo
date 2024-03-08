@@ -34,14 +34,6 @@ https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/FrameXML/UI
     <Button name="TodolooTaskListGroupTemplate" mixin="TodolooTaskListGroupMixin" registerForClicks="RightButtonUp, LeftButtonUp" virtual="true">
         <Size y="25" />
         <Layers>
-            <Layer level="OVERLAY" textureSubLevel="1">
-                <FontString parentKey="Label" inherits="GameFontNormal_NoShadow" justifyH="LEFT">
-                    <Size y="10" />
-                    <Anchors>
-                        <Anchor point="LEFT" x="10" y="2" />
-                    </Anchors>
-                </FontString>
-            </Layer>
             <Layer level="BACKGROUND">
                 <Texture parentKey="LeftPiece" atlas="Professions-recipe-header-left" useAtlasSize="true">
                     <Anchors>
@@ -77,13 +69,28 @@ https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/FrameXML/UI
                     </Anchors>
                 </Texture>
             </Layer>
+            <Layer level="OVERLAY">
+                <Texture parentKey="ResetIcon" alpha="0.8">
+                    <Size x="14" y="14" />
+                    <Anchors>
+                        <Anchor point="RIGHT" relativeKey="$parent.CollapseIcon" relativePoint="LEFT" x="-10" />
+                    </Anchors>
+                </Texture>
+                <FontString parentKey="Label" inherits="GameFontNormal_NoShadow" justifyH="LEFT">
+                    <Size y="10" />
+                    <Anchors>
+                        <Anchor point="LEFT" x="10" y="2" />
+                        <Anchor point="RIGHT" relativeKey="$parent.ResetIcon" relativePoint="LEFT" x="-5" y="0" />
+                    </Anchors>
+                </FontString>
+            </Layer>
         </Layers>
         <Frames>
             <EditBox parentKey="Name" autoFocus="false" hidden="true">
                 <Size y="10" />
                 <Anchors>
                     <Anchor point="LEFT" x="10" y="2" />
-                    <Anchor point="RIGHT" relativeKey="$parent.CollapseIcon" x="-5" y="0" />
+                    <Anchor point="RIGHT" relativeKey="$parent.ResetIcon" x="-5" y="0" />
                 </Anchors>
                 <FontString inherits="GameFontNormal_NoShadow" />
                 <Scripts>
@@ -112,7 +119,7 @@ https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/FrameXML/UI
                 <Texture parentKey="ResetIcon" alpha="0.8">
                     <Size x="14" y="14" />
                     <Anchors>
-                        <Anchor point="RIGHT" x="-10" />
+                        <Anchor point="RIGHT" x="-31" />
                     </Anchors>
                 </Texture>
             </Layer>

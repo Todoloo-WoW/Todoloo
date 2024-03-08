@@ -4,6 +4,6 @@ end
 
 function Todoloo.Debug.Message(message, ...)
     if Todoloo.Debug.IsActive() then
-        print(GREEN_FONT_COLOR:WrapTextInColorCode("[td] ") .. message , ...)
+        print(GREEN_FONT_COLOR:WrapTextInColorCode("[tdl] ") .. message, ...)
     end
 end
