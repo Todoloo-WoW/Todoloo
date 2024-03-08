@@ -823,7 +823,6 @@ function TodolooTracker_Update(reason, id, subInfo)
 
     -- we can't update before we've initialized
     if not tracker.initialized then
-        Todoloo.Debug.Message("Tracker not initialized - aborting")
         tracker.isUpdating = false
         return
     end

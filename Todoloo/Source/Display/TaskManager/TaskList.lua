@@ -137,6 +137,38 @@ function TodolooTaskListMixin:InitializeGroupContextMenu(dropDown, level)
 
     info.isTitle = true
     info.notCheckable = true
+    info.text = "Reset interval"
+    UIDropDownMenu_AddButton(info, level)
+
+    info.isTitle = false
+    info.disabled = false
+
+    info.notCheckable = false
+    info.checked = groupInfo.reset == nil
+    info.text = "None"
+    info.func = function() self:SetGroupInterval(groupInfo, nil) end
+    UIDropDownMenu_AddButton(info, level)
+
+    info.notCheckable = false
+    info.checked = groupInfo.reset == TODOLOO_RESET_INTERVALS.Manually
+    info.text = "Manually"
+    info.func = function() self:SetGroupInterval(groupInfo, TODOLOO_RESET_INTERVALS.Manually) end
+    UIDropDownMenu_AddButton(info, level)
+
+    info.notCheckable = false
+    info.checked = groupInfo.reset == TODOLOO_RESET_INTERVALS.Daily
+    info.text = "Daily"
+    info.func = function() self:SetGroupInterval(groupInfo, TODOLOO_RESET_INTERVALS.Daily) end
+    UIDropDownMenu_AddButton(info, level)
+
+    info.notCheckable = false
+    info.checked = groupInfo.reset == TODOLOO_RESET_INTERVALS.Weekly
+    info.text = "Weekly"
+    info.func = function() self:SetGroupInterval(groupInfo, TODOLOO_RESET_INTERVALS.Weekly) end
+    UIDropDownMenu_AddButton(info, level)
+
+    info.isTitle = true
+    info.notCheckable = true
     info.text = "Group actions"
     UIDropDownMenu_AddButton(info, level)
     
@@ -165,6 +197,7 @@ end
 
 function TodolooTaskListMixin:InitializeTaskContextMenu(dropDown, level)
     local taskInfo = UIDROPDOWNMENU_MENU_VALUE
+    local groupInfo = Todoloo.TaskManager:GetGroup(taskInfo.groupId)
     local info = UIDropDownMenu_CreateInfo()
 
     info.isTitle = true
@@ -175,23 +208,31 @@ function TodolooTaskListMixin:InitializeTaskContextMenu(dropDown, level)
     info.isTitle = false
     info.disabled = false
 
-    info.notCheckable = false
-    info.checked = taskInfo.reset == TODOLOO_RESET_INTERVALS.Manually
-    info.text = "Manually"
-    info.func = function() self:SetTaskInterval(taskInfo, TODOLOO_RESET_INTERVALS.Manually) end
-    UIDropDownMenu_AddButton(info, level)
+    if groupInfo.reset ~= nil then
+        -- if there's a reset interval on the group
+        info.text = "Reset interval is controlled by the parent group"
+        info.disabled = true
+        UIDropDownMenu_AddButton(info, level)
+    else
+        -- if there's not reset interval on the group
+        info.notCheckable = false
+        info.checked = taskInfo.reset == TODOLOO_RESET_INTERVALS.Manually
+        info.text = "Manually"
+        info.func = function() self:SetTaskInterval(taskInfo, TODOLOO_RESET_INTERVALS.Manually) end
+        UIDropDownMenu_AddButton(info, level)
 
-    info.notCheckable = false
-    info.checked = taskInfo.reset == TODOLOO_RESET_INTERVALS.Daily
-    info.text = "Daily"
-    info.func = function() self:SetTaskInterval(taskInfo, TODOLOO_RESET_INTERVALS.Daily) end
-    UIDropDownMenu_AddButton(info, level)
+        info.notCheckable = false
+        info.checked = taskInfo.reset == TODOLOO_RESET_INTERVALS.Daily
+        info.text = "Daily"
+        info.func = function() self:SetTaskInterval(taskInfo, TODOLOO_RESET_INTERVALS.Daily) end
+        UIDropDownMenu_AddButton(info, level)
 
-    info.notCheckable = false
-    info.checked = taskInfo.reset == TODOLOO_RESET_INTERVALS.Weekly
-    info.text = "Weekly"
-    info.func = function() self:SetTaskInterval(taskInfo, TODOLOO_RESET_INTERVALS.Weekly) end
-    UIDropDownMenu_AddButton(info, level)
+        info.notCheckable = false
+        info.checked = taskInfo.reset == TODOLOO_RESET_INTERVALS.Weekly
+        info.text = "Weekly"
+        info.func = function() self:SetTaskInterval(taskInfo, TODOLOO_RESET_INTERVALS.Weekly) end
+        UIDropDownMenu_AddButton(info, level)
+    end
 
     info.isTitle = true
     info.notCheckable = true
@@ -208,9 +249,19 @@ function TodolooTaskListMixin:InitializeTaskContextMenu(dropDown, level)
     UIDropDownMenu_AddButton(info, level)
 end
 
+function TodolooTaskListMixin:SetGroupInterval(groupInfo, resetInterval)
+    if groupInfo.reset == resetInterval then
+        -- reset interval already set to the given value
+        return
+    end
+
+    groupInfo.reset = resetInterval
+    self:UpdateGroup(groupInfo)
+end
+
 function TodolooTaskListMixin:SetTaskInterval(taskInfo, resetInterval)
-    -- reset interval already set to the given value
     if taskInfo.reset == resetInterval then
+        -- reset interval already set to the given value
         return
     end
 
@@ -252,6 +303,14 @@ function TodolooTaskListMixin:OpenGroup(groupInfo, scrollToTask)
     return elementData
 end
 
+function TodolooTaskListMixin:UpdateGroup(groupInfo)
+    Todoloo.TaskManager:UpdateGroup(
+        groupInfo.id,
+        groupInfo.name,
+        groupInfo.reset
+    )
+end
+
 function TodolooTaskListMixin:UpdateTask(taskInfo)
     Todoloo.TaskManager:UpdateTask(
         taskInfo.groupId,
@@ -284,6 +343,27 @@ function TodolooTaskListGroupMixin:Initialize(node)
     self.Label:SetText(labelText)
 
     self:SetCollapseState(node:IsCollapsed())
+    self:SetResetInterval()
+end
+
+function TodolooTaskListGroupMixin:SetResetInterval()
+    if self.groupInfo.reset == TODOLOO_RESET_INTERVALS.Manually then
+        -- set our custom greyed out quest icon
+        self.ResetIcon:SetTexture("Interface/AddOns/Todoloo/Images/questlog-questtypeicon-disabled")
+        self.ResetIcon:SetSize(14, 14)
+        self.ResetIcon:SetTexCoord(0, 0.575, 0, 0.575)
+        self.ResetIcon:Show()
+    elseif self.groupInfo.reset ~= nil then
+        local atlas = self.groupInfo.reset == TODOLOO_RESET_INTERVALS.Daily and "questlog-questtypeicon-daily"
+        or self.groupInfo.reset == TODOLOO_RESET_INTERVALS.Weekly and "questlog-questtypeicon-weekly"
+
+        self.ResetIcon:SetAtlas(atlas, false, "LINEAR", true)
+        self.ResetIcon:SetSize(14, 14)
+        self.ResetIcon:Show()
+    else
+        self.ResetIcon:SetWidth(1)
+        self.ResetIcon:Hide()
+    end
 end
 
 function TodolooTaskListGroupMixin:SetCollapseState(collapsed)
@@ -317,7 +397,7 @@ function TodolooTaskListGroupMixin:Save()
     end
     
     if isDirty then
-        Todoloo.TaskManager:UpdateGroup(self.groupInfo.id, newName)
+        Todoloo.TaskManager:UpdateGroup(self.groupInfo.id, newName, self.groupInfo.reset)
     end
 
     self:SetEditMode(false)
@@ -352,11 +432,15 @@ function TodolooTaskListTaskMixin:SetResetInterval()
         self.ResetIcon:SetTexture("Interface/AddOns/Todoloo/Images/questlog-questtypeicon-disabled")
         self.ResetIcon:SetSize(14, 14)
         self.ResetIcon:SetTexCoord(0, 0.575, 0, 0.575)
-    else
+        self.ResetIcon:Show()
+    elseif self.taskInfo.reset ~= nil then
         local atlas = self.taskInfo.reset == TODOLOO_RESET_INTERVALS.Daily and "questlog-questtypeicon-daily"
         or self.taskInfo.reset == TODOLOO_RESET_INTERVALS.Weekly and "questlog-questtypeicon-weekly"
 
         self.ResetIcon:SetAtlas(atlas, false, "LINEAR", true)
+        self.ResetIcon:Show()
+    else
+        self.ResetIcon:Hide()
     end
 end
 

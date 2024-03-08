@@ -191,6 +191,7 @@ end
 ---@class Group
 ---@field name string Name of the group
 ---@field tasks Task[] Array of tasks nested under the group
+---@field reset reset? Reset interval for the group
 
 ---Get all groups
 ---@param characterFullName string? Full character name in format "player-realm" (defaults to the currently logged in character)
@@ -278,7 +279,7 @@ function TodolooTaskManagerMixin:AddGroup(name, characterFullName)
     characterFullName = characterFullName or Todoloo.Utils.GetCharacterFullName()
     local character = TODOLOO_TASKS[characterFullName]
 
-    local group = { name = name, tasks = {} }
+    local group = { name = name, tasks = {}, reset = nil }
 
     table.insert(character.groups, group)
 
@@ -291,15 +292,31 @@ end
 ---Update group
 ---@param index integer Index of the group within the task table
 ---@param newName string New name/title of the group
+---@param resetInterval reset? New reset interval for the group
 ---@param characterFullName string? Full character name in format "player-realm" (defaults to the currently logged in character)
-function TodolooTaskManagerMixin:UpdateGroup(index, newName, characterFullName)
+function TodolooTaskManagerMixin:UpdateGroup(index, newName, resetInterval, characterFullName)
     assert(index)
     assert(newName)
 
-    newName = newName or "No name"
-
     characterFullName = characterFullName or Todoloo.Utils.GetCharacterFullName()
-    TODOLOO_TASKS[characterFullName].groups[index].name = newName
+
+    local group = TODOLOO_TASKS[characterFullName].groups[index]
+
+    newName = newName or "No name"
+    if resetInterval == nil and group.reset ~= nil then
+        -- if the group reset is being removed, set the reset interval on the nested tasks
+        for _, task in ipairs(group.tasks) do
+            task.reset = group.reset
+        end
+    else
+        -- if group reset is being set, remove reset interval from tasks
+        for _, task in ipairs(group.tasks) do
+            task.reset = nil
+        end
+    end
+
+    group.name = newName
+    group.reset = resetInterval
 
     Todoloo.EventBus:TriggerEvent(self, Todoloo.Tasks.Events.GROUP_UPDATED, index)
 end
@@ -316,14 +333,19 @@ function TodolooTaskManagerMixin:RemoveGroup(index, characterFullName)
     Todoloo.EventBus:TriggerEvent(self, Todoloo.Tasks.Events.GROUP_REMOVED, index)
 end
 
----Reset group, removing all tasks
+---Reset completion state on group tasks
+---TODO: Test functionality
 ---@param index integer Index of the group within the task table
 ---@param characterFullName string? Full character name in format "player-realm" (defaults to the currently logged in character)
 function TodolooTaskManagerMixin:ResetGroup(index, characterFullName)
     assert(index)
 
     characterFullName = characterFullName or Todoloo.Utils.GetCharacterFullName()
-    TODOLOO_TASKS[characterFullName].groups[index].tasks = {}
+    local tasks = TODOLOO_TASKS[characterFullName].groups[index].tasks
+
+    for _, task in ipairs(tasks) do
+        task.completed = false
+    end
 
     Todoloo.EventBus:TriggerEvent(self, Todoloo.Tasks.Events.GROUP_RESET, index)
 end
@@ -397,7 +419,7 @@ end
 ---@param groupIndex integer Index of the group in the task table
 ---@param name string Name/title of the task
 ---@param description string? Optional description of the task
----@param reset reset? Reset interval (sets default if none provided)
+---@param reset reset? Reset interval (if the task group has a reset interval defined, this value is ignored. If not, and the value is not provided, the default reset interval will be set)
 ---@param characterFullName string? Full character name in format "player-realm" (defaults to the currently logged in character)
 ---@return Task # The newly created task
 ---@return integer # Index of the newly created task
@@ -406,7 +428,15 @@ function TodolooTaskManagerMixin:AddTask(groupIndex, name, description, reset, c
     assert(name)
 
     characterFullName = characterFullName or Todoloo.Utils.GetCharacterFullName()
-    reset = reset or TODOLOO_DEFAULT_RESET_INTERVAL
+    local group = TODOLOO_TASKS[characterFullName].groups[groupIndex]
+
+    if group.reset ~= nil then
+        -- if there's a reset interval defined on the group
+        reset = nil
+    else
+        -- set to given reset interval or default
+        reset = reset or TODOLOO_DEFAULT_RESET_INTERVAL
+    end
 
     local  task = {
         name = name,
@@ -428,15 +458,23 @@ end
 ---@param index integer Index of the task within the group
 ---@param name string New name for the task
 ---@param description string? New description for the task
----@param reset reset New reset interval for the task
+---@param reset reset? New reset interval for the task (if the task group has a reset interval defined, this value is ignored)
 ---@param characterFullName string? Full character name in format "player-realm" (defaults to the currently logged in character)
 function TodolooTaskManagerMixin:UpdateTask(groupIndex, index, name, description, reset, characterFullName)
     assert(groupIndex)
     assert(index)
     assert(name)
-    assert(reset)
 
     characterFullName = characterFullName or Todoloo.Utils.GetCharacterFullName()
+
+    local group = TODOLOO_TASKS[characterFullName].groups[groupIndex]
+    if group.reset ~= nil then
+        -- if there's a reset interval defined on the group
+        reset = nil
+    else
+        -- if there's no reset interval set on the group, a reset interval for the task is required
+        assert(reset)
+    end
 
     local completed = TODOLOO_TASKS[characterFullName].groups[groupIndex].tasks[index].completed
     TODOLOO_TASKS[characterFullName].groups[groupIndex].tasks[index] = {
@@ -518,6 +556,19 @@ function TodolooTaskManagerMixin:MoveTask(taskId, groupId, newGroupId, newTaskId
         if newTaskId > #TODOLOO_TASKS[characterFullName].groups[newGroupId].tasks then
             newTaskId = #TODOLOO_TASKS[characterFullName].groups[newGroupId].tasks
         end
+    else
+        --[[if we're moving the task between groups, we need to set reset interval on the task,
+            in the scenario where the old group had a reset interval, but the new one does not.
+            We're basically setting the old group's reset interval specifically on the task.]]--
+        local oldGroup = TODOLOO_TASKS[characterFullName].groups[groupId]
+        local newGroup = TODOLOO_TASKS[characterFullName].groups[newGroupId]
+        if newGroup.reset ~= nil then
+            -- if a reset interval is defined on the new group, remove the tasks own reset interval
+            task.reset = nil
+        elseif oldGroup.reset ~= nil and newGroup.reset == nil then
+            -- if the new group has no reset interval defined, set reset on the task to be equal to the old group's reset interval
+            task.reset = oldGroup.reset
+        end
     end
     
     -- remove task at old location
@@ -584,7 +635,7 @@ function TodolooTaskManagerMixin:GenerateDataProvider(searching, characterFullNa
     local dataProvider = CreateTreeDataProvider()
 
     for groupIndex, group in pairs(groups) do
-        local groupInfo = { id = groupIndex, name = group.name }
+        local groupInfo = { id = groupIndex, name = group.name, reset = group.reset }
         local groupNode = dataProvider:Insert({ groupInfo = groupInfo })
 
         groupNode:Insert({ topPadding = true, order = -1 })
