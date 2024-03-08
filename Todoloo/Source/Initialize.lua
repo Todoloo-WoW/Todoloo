@@ -9,7 +9,7 @@ local function InitializeCharacter()
     -- create task manager
     Todoloo.TaskManager = CreateAndInitFromMixin(TodolooTaskManagerMixin)
 
-    -- reset all relevant tasks
+    -- reset all relevant groups and tasks
     Todoloo.Reset.ResetManager.PerformReset()
 end
 
