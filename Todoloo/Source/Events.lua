@@ -1,3 +1,5 @@
+local _, Todoloo = ...
+
 Todoloo.Tasks.Events = {
     -- ***** GROUP EVENTS
     GROUP_ADDED     = "GROUP_ADDED",
@@ -15,7 +17,8 @@ Todoloo.Tasks.Events = {
     TASK_MOVED          = "TASK_MOVED",
 
     -- ***** OTHER
-    TASK_LIST_UPDATE = "TASK_LIST_UPDATE" -- fired whenever a search within the taskmanager has begun
+    TASK_LIST_UPDATE    = "TASK_LIST_UPDATE",   -- fired whenever a search within the task manager has begun
+    FILTER_CHANGED      = "FILTER_CHANGED",     -- fired when filter in task manager has changed
 }
 
 Todoloo.Reset.Events = {

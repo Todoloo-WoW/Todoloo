@@ -1,3 +1,5 @@
+local _, Todoloo = ...
+
 TodolooConfigBasicOptionsFrameMixin = {}
 
 function TodolooConfigBasicOptionsFrameMixin:OnLoad()

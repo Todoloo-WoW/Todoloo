@@ -1,3 +1,5 @@
+local _, Todoloo = ...
+
 function Todoloo.Debug.IsActive()
     return Todoloo.Config.Get(Todoloo.Config.Options.DEBUG)
 end

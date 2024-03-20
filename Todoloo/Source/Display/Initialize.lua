@@ -1,3 +1,5 @@
+local _, Todoloo = ...
+
 local function InitializeBase()
     Todoloo.MinimapIcon.Initialize()
 

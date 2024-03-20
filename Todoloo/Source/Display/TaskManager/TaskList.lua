@@ -1,3 +1,5 @@
+local _, Todoloo = ...
+
 -- *****************************************************************************************************
 -- ***** GROUP LIST
 -- *****************************************************************************************************
@@ -13,7 +15,23 @@ local function SetupScrollBox(self)
 
     view:SetElementFactory(function(factory, node)
         local elementData = node:GetData()
-        if elementData.groupInfo then
+        if elementData.characterInfo then
+            -- if the element is a character
+            local function Initializer(characterButton, node)
+                characterButton:Initialize(node)
+
+                characterButton:SetScript("OnClick", function(button, buttonName)
+                    if buttonName == "LeftButton" then
+                        node:ToggleCollapsed()
+                        button:SetCollapseState(node:IsCollapsed())
+                        PlaySound(SOUNDKIT.UI_90_BLACKSMITHING_TREEITEMCLICK);
+                    elseif buttonName == "RightButton" then
+                        ToggleDropDownMenu(1, elementData.characterInfo, self.CharacterContextMenu, "cursor")
+                    end
+                end)
+            end
+            factory("TodolooTaskListCharacterTemplate", Initializer)
+        elseif elementData.groupInfo then
             -- if the element is a group
             local function Initializer(groupButton, node)
                 groupButton:Initialize(node)
@@ -69,7 +87,12 @@ local function SetupScrollBox(self)
     view:SetElementExtentCalculator(function(dataIndex, node)
         local elementData = node:GetData()
         local baseElementHeight = 20
+        local characterPadding = 10
         local groupPadding = 5
+
+        if elementData.characterInfo then
+            return baseElementHeight + characterPadding
+        end
 
         if elementData.taskInfo then
             return baseElementHeight
@@ -77,10 +100,6 @@ local function SetupScrollBox(self)
 
         if elementData.groupInfo then
             return baseElementHeight + groupPadding
-        end
-
-        if elementData.dividerHeight then
-            return elementData.dividerHeight
         end
 
         if elementData.topPadding  then
@@ -91,13 +110,13 @@ local function SetupScrollBox(self)
             return 10
         end
     end)
-    
+
     ScrollUtil.InitScrollBoxListWithScrollBar(self.ScrollBox, self.ScrollBar, view);
 
     local function OnSelectionChanged(o, elementData, selected)
         local button = self.ScrollBox:FindFrame(elementData)
 
-        if selected then
+        if button and selected then
             local data = elementData:GetData()
             if data.groupInfo then
                 button:SetEditMode(true)
@@ -117,18 +136,52 @@ local function SetupDragBehavior(self)
 end
 
 function TodolooTaskListMixin:OnLoad()
+    Todoloo.EventBus:RegisterSource(self, "task_list")
+
     -- setup scroll box
     SetupScrollBox(self)
 
     -- setup drag behaviour
     SetupDragBehavior(self)
 
+    -- setup filter menu
+    self.FilterButton:SetResetFunction(Todoloo.Tasks.SetDefaultFilters)
+    self.FilterButton:SetScript("OnMouseDown", function(button, buttonName, down)
+        UIMenuButtonStretchMixin.OnMouseDown(self.FilterButton, buttonName); --TODO: What does this do?
+        ToggleDropDownMenu(1, nil, self.FilterDropDown, self.FilterButton, 74, 15);
+        PlaySound(SOUNDKIT.UI_PROFESSION_FILTER_MENU_OPEN_CLOSE);
+    end)
+
+    UIDropDownMenu_SetInitializeFunction(self.FilterDropDown, GenerateClosure(self.InitializeFilterContextMenu, self))
+    UIDropDownMenu_SetDisplayMode(self.FilterDropDown, "MENU")
+
     -- setup context menus
+    UIDropDownMenu_SetInitializeFunction(self.CharacterContextMenu, GenerateClosure(self.InitializeCharacterContextMenu, self))
+    UIDropDownMenu_SetDisplayMode(self.CharacterContextMenu, "MENU")
+
     UIDropDownMenu_SetInitializeFunction(self.GroupContextMenu, GenerateClosure(self.InitializeGroupContextMenu, self))
     UIDropDownMenu_SetDisplayMode(self.GroupContextMenu, "MENU")
 
     UIDropDownMenu_SetInitializeFunction(self.TaskContextMenu, GenerateClosure(self.InitializeTaskContextMenu, self))
     UIDropDownMenu_SetDisplayMode(self.TaskContextMenu, "MENU")
+end
+
+function TodolooTaskListMixin:InitializeFilterContextMenu(dropdown, level)
+    Todoloo.Tasks.InitFilterMenu(dropdown, level, GenerateClosure(self.UpdateFilterResetVisibility, self))
+end
+
+function TodolooTaskListMixin:UpdateFilterResetVisibility()
+    self.FilterButton.ResetButton:SetShown(not Todoloo.Tasks.IsUsingDefaultFilters())
+end
+
+function TodolooTaskListMixin:InitializeCharacterContextMenu(dropDown, level)
+    local characterInfo = UIDROPDOWNMENU_MENU_VALUE
+    local info = UIDropDownMenu_CreateInfo()
+    
+    info.notCheckable = true
+    info.text = "Add new group"
+    info.func = function() self:AddNewGroup(characterInfo) end
+    UIDropDownMenu_AddButton(info, level)
 end
 
 function TodolooTaskListMixin:InitializeGroupContextMenu(dropDown, level)
@@ -183,12 +236,12 @@ function TodolooTaskListMixin:InitializeGroupContextMenu(dropDown, level)
     info.notCheckable = true
     info.text = "Delete"
     info.func = function() 
-        local numTasks = Todoloo.TaskManager:GetNumTasks(groupInfo.id)
+        local numTasks = Todoloo.TaskManager:GetNumTasks(groupInfo.id, groupInfo.character)
         if numTasks > 0 then
             -- if the group has nested tasks, we should ask the player for confirmation
             StaticPopup_Show("TODLOO_DELETE_GROUP", groupInfo.name, nil, { groupInfo = groupInfo })
         else
-            Todoloo.TaskManager:RemoveGroup(groupInfo.id)
+            Todoloo.TaskManager:RemoveGroup(groupInfo.id, groupInfo.character)
         end
     end
 
@@ -197,7 +250,7 @@ end
 
 function TodolooTaskListMixin:InitializeTaskContextMenu(dropDown, level)
     local taskInfo = UIDROPDOWNMENU_MENU_VALUE
-    local groupInfo = Todoloo.TaskManager:GetGroup(taskInfo.groupId)
+    local groupInfo = Todoloo.TaskManager:GetGroup(taskInfo.groupId, taskInfo.character)
     local info = UIDropDownMenu_CreateInfo()
 
     info.isTitle = true
@@ -269,36 +322,45 @@ function TodolooTaskListMixin:SetTaskInterval(taskInfo, resetInterval)
     self:UpdateTask(taskInfo)
 end
 
+function TodolooTaskListMixin:AddNewGroup(characterInfo)
+    Todoloo.TaskManager:AddGroup("", characterInfo.name)
+end
+
 function TodolooTaskListMixin:AddNewTask(groupInfo)
-    local task, id = Todoloo.TaskManager:AddTask(groupInfo.id, "", nil, nil)
+    Todoloo.TaskManager:AddTask(groupInfo.id, "", nil, nil, groupInfo.character)
 end
 
 function TodolooTaskListMixin:DeleteTask(taskInfo)
-    Todoloo.TaskManager:RemoveTask(taskInfo.groupId, taskInfo.id)
+    Todoloo.TaskManager:RemoveTask(taskInfo.groupId, taskInfo.id, taskInfo.character)
 end
 
 function TodolooTaskListMixin:OpenTask(taskInfo, scrollToTask)
-    local elementData = self.selectionBehavior:SelectElementDataByPredicate(function(node)
+    local elementData = self.ScrollBox:FindElementDataByPredicate(function(node)
         local data = node:GetData()
-        return data.taskInfo and data.taskInfo.id == taskInfo.id and data.taskInfo.groupId == taskInfo.groupId
+        return data.taskInfo and data.taskInfo.id == taskInfo.id and data.taskInfo.groupId == taskInfo.groupId and data.taskInfo.character == taskInfo.character
     end)
 
     if scrollToTask then
         self.ScrollBox:ScrollToElementData(elementData)
     end
+
+    self.selectionBehavior:SelectElementData(elementData)
 
     return elementData
 end
 
 function TodolooTaskListMixin:OpenGroup(groupInfo, scrollToTask)
-    local elementData = self.selectionBehavior:SelectElementDataByPredicate(function(node)
+    local elementData = self.ScrollBox:FindElementDataByPredicate(function(node)
         local data = node:GetData()
-        return data.groupInfo and data.groupInfo.id == groupInfo.id
+        return data.groupInfo and data.groupInfo.id == groupInfo.id and data.groupInfo.character == groupInfo.character
     end)
+
 
     if scrollToTask then
         self.ScrollBox:ScrollToElementData(elementData)
     end
+
+    self.selectionBehavior:SelectElementData(elementData)
 
     return elementData
 end
@@ -307,7 +369,8 @@ function TodolooTaskListMixin:UpdateGroup(groupInfo)
     Todoloo.TaskManager:UpdateGroup(
         groupInfo.id,
         groupInfo.name,
-        groupInfo.reset
+        groupInfo.reset,
+        groupInfo.character
     )
 end
 
@@ -317,8 +380,30 @@ function TodolooTaskListMixin:UpdateTask(taskInfo)
         taskInfo.id,
         taskInfo.name,
         taskInfo.describing,
-        taskInfo.reset
+        taskInfo.reset,
+        taskInfo.charatcer
     )
+end
+
+-- *****************************************************************************************************
+-- ***** CHARACTER
+-- *****************************************************************************************************
+TodolooTaskListCharacterMixin = {}
+
+function TodolooTaskListCharacterMixin:Initialize(node)
+    local elementData = node:GetData()
+    local characterInfo = elementData.characterInfo
+
+    self.Label:SetText(characterInfo.name)
+    self.Label:SetVertexColor(NORMAL_FONT_COLOR:GetRGB())
+
+    self:SetCollapseState(node:IsCollapsed());
+end
+
+function TodolooTaskListCharacterMixin:SetCollapseState(collapsed)
+    local atlas = collapsed and "Professions-recipe-header-expand" or "Professions-recipe-header-collapse";
+	self.CollapseIcon:SetAtlas(atlas, TextureKitConstants.UseAtlasSize);
+	self.CollapseIconAlphaAdd:SetAtlas(atlas, TextureKitConstants.UseAtlasSize);
 end
 
 -- *****************************************************************************************************
@@ -333,8 +418,8 @@ function TodolooTaskListGroupMixin:Initialize(node)
     local labelText = self.groupInfo.name
     if Todoloo.Config.Get(Todoloo.Config.Options.SHOW_GROUP_PROGRESS_TEXT) then
         -- set group progress
-        local numCompletedTasks = Todoloo.TaskManager:GetNumCompletedTasks(self.groupInfo.id)
-        local numTasks = Todoloo.TaskManager:GetNumTasks(self.groupInfo.id)
+        local numCompletedTasks = Todoloo.TaskManager:GetNumCompletedTasks(self.groupInfo.id, self.groupInfo.character)
+        local numTasks = Todoloo.TaskManager:GetNumTasks(self.groupInfo.id, self.groupInfo.character)
         local groupProgressText = " (" .. numCompletedTasks .. "/" .. numTasks .. ")"
         labelText = labelText .. groupProgressText
     end
@@ -397,7 +482,7 @@ function TodolooTaskListGroupMixin:Save()
     end
     
     if isDirty then
-        Todoloo.TaskManager:UpdateGroup(self.groupInfo.id, newName, self.groupInfo.reset)
+        Todoloo.TaskManager:UpdateGroup(self.groupInfo.id, newName, self.groupInfo.reset, self.groupInfo.character)
     end
 
     self:SetEditMode(false)
@@ -471,7 +556,12 @@ function TodolooTaskListTaskMixin:SetEditMode(enable)
 end
 
 function TodolooTaskListTaskMixin:ToggleCompletion()
-    Todoloo.TaskManager:SetTaskCompletion(self.taskInfo.groupId, self.taskInfo.id, not self.taskInfo.completed)
+    Todoloo.TaskManager:SetTaskCompletion(
+        self.taskInfo.groupId,
+        self.taskInfo.id,
+        not self.taskInfo.completed,
+        self.taskInfo.character
+    )
 end
 
 function TodolooTaskListTaskMixin:Save()
@@ -490,7 +580,8 @@ function TodolooTaskListTaskMixin:Save()
             self.taskInfo.id,
             self.taskInfo.name,
             self.taskInfo.description,
-            self.taskInfo.reset
+            self.taskInfo.reset,
+            self.taskInfo.character
         )
     end
 
@@ -506,7 +597,7 @@ StaticPopupDialogs["TODLOO_DELETE_GROUP"] = {
     button1 = YES,
     button2 = NO,
     OnAccept = function(self, data)
-        Todoloo.TaskManager:RemoveGroup(data.groupInfo.id)
+        Todoloo.TaskManager:RemoveGroup(data.groupInfo.id, data.groupInfo.character)
     end,
     timout = 0,
     whileDead = 1,

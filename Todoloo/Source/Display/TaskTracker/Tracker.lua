@@ -1,3 +1,5 @@
+local _, Todoloo = ...
+
 --TODO: Clean up file
 
 TODOLOO_TRACKER_HEADER_HEIGHT   = 25
