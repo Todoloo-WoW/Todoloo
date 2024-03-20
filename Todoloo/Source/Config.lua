@@ -1,3 +1,5 @@
+local _, Todoloo = ...
+
 ---Valid Todoloo config options
 Todoloo.Config.Options = {
     -- ***** TASK TRACKER SETTINGS

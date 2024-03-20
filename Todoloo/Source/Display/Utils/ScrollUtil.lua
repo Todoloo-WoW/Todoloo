@@ -1,8 +1,8 @@
+local _, Todoloo = ...
+
 -- *****************************************************************************************************
 -- ***** SCROLL UTILITIES
 -- *****************************************************************************************************
-
-Todoloo.ScrollUtil = {}
 
 ---@enum candidateType Candidate types
 Todoloo.ScrollUtil.CandidateType = {
@@ -54,19 +54,14 @@ function Todoloo.ScrollUtil.AddTaskListDragBehavior(scrollBox, cursorFactory, ta
         groupLineInitializer(cursorBox)
     end
 
-    ---Function called every frame as we're dragging and element
+    ---Function called every frame as we're dragging an element
     local function OnDragUpdate(cursorFrame, cursorLine, sourceElementData, sourceElementDataIndex, cx, cy)
-        -- we cannot reorder elements in the scroll box, and there's no need to continue
+        -- if we cannot reorder elements in the scroll box, there's no need to continue
         if not dragBehavior:GetReorderable() then
             return
         end
 
         local sourceData = sourceElementData:GetData()
-        if sourceData.groupInfo then
-            -- if we're moving a group we want to make sure that our groups are collapsed
-            dragBehavior.scrollBox:GetView():GetDataProvider():SetAllCollapsed(true)
-        end
-
         local candidate = nil
         candidateArea = nil
         candidateElementData = nil
@@ -100,12 +95,18 @@ function Todoloo.ScrollUtil.AddTaskListDragBehavior(scrollBox, cursorFactory, ta
                     local candidateData = elementData:GetData()
 
                     if not candidateData.groupInfo and not candidateData.taskInfo then
-                        -- we're only interested in tasks and groups - not dividers and padding
+                        -- We're only interested in tasks and groups
+                        return
+                    end
+
+                    if candidateData.character ~= sourceData.character then
+                        -- We're only interested in groups and tasks within the same character.
+                        -- It's not possible to drag groups and tasks between characters.
                         return
                     end
 
                     if candidateData.groupInfo then
-                        -- if the element we're currently hovering is a group
+                        -- If the element we're currently hovering is a group
                         candidateType = Todoloo.ScrollUtil.CandidateType.Group
                         if sourceData.taskInfo then
                             candidateArea = DragIntersectionArea.Inside
@@ -134,13 +135,7 @@ function Todoloo.ScrollUtil.AddTaskListDragBehavior(scrollBox, cursorFactory, ta
 
     ---Function called when we stop dragging and it's time to reorder the tasks
     local function OnDragStop(sourceElementData)
-        local sourceData = sourceElementData:GetData()
         if not candidateElementData or not candidateArea then
-            if sourceData.groupInfo then
-                -- if we're moving a group we want to make sure that our groups are no longer collapsed
-                dragBehavior.scrollBox:GetView():GetDataProvider():SetAllCollapsed(false)
-            end
-
             return
         end
 
@@ -156,7 +151,7 @@ function Todoloo.ScrollUtil.AddTaskListDragBehavior(scrollBox, cursorFactory, ta
             end
 
             PlaySound(SOUNDKIT.UI_90_BLACKSMITHING_TREEITEMCLICK)
-            Todoloo.TaskManager:MoveGroup(sourceId, newGroupId)
+            Todoloo.TaskManager:MoveGroup(sourceId, newGroupId, candidateData.character)
         elseif sourceData.taskInfo then
             -- if we're moving a task
             local sourceId = sourceData.taskInfo.id
@@ -170,7 +165,7 @@ function Todoloo.ScrollUtil.AddTaskListDragBehavior(scrollBox, cursorFactory, ta
                 end
 
                 PlaySound(SOUNDKIT.UI_90_BLACKSMITHING_TREEITEMCLICK)
-                Todoloo.TaskManager:MoveTask(sourceId, sourceGroupId, candidateData.groupInfo.id)
+                Todoloo.TaskManager:MoveTask(sourceId, sourceGroupId, candidateData.groupInfo.id, nil, candidateData.character)
             elseif candidateData.taskInfo and candidateData.taskInfo.groupId ~= sourceData.taskInfo.groupId then
                 -- moving to new group (move relative to task)
                 local offset
@@ -182,7 +177,7 @@ function Todoloo.ScrollUtil.AddTaskListDragBehavior(scrollBox, cursorFactory, ta
 
                 PlaySound(SOUNDKIT.UI_90_BLACKSMITHING_TREEITEMCLICK)
                 local newTaskId = candidateData.taskInfo.id + offset
-                Todoloo.TaskManager:MoveTask(sourceId, sourceGroupId, candidateData.taskInfo.groupId, newTaskId)
+                Todoloo.TaskManager:MoveTask(sourceId, sourceGroupId, candidateData.taskInfo.groupId, newTaskId, candidateData.character)
             else
                 -- moving within the same group but relative to another task
                 local offset
@@ -194,7 +189,7 @@ function Todoloo.ScrollUtil.AddTaskListDragBehavior(scrollBox, cursorFactory, ta
 
                 PlaySound(SOUNDKIT.UI_90_BLACKSMITHING_TREEITEMCLICK)
                 local newTaskId = candidateData.taskInfo.id + offset
-                Todoloo.TaskManager:MoveTask(sourceId, sourceGroupId, sourceGroupId, newTaskId)
+                Todoloo.TaskManager:MoveTask(sourceId, sourceGroupId, sourceGroupId, newTaskId, candidateData.character)
             end
         end
 
@@ -210,21 +205,74 @@ function Todoloo.ScrollUtil.AddTaskListDragBehavior(scrollBox, cursorFactory, ta
 end
 
 do
-    local function TaskLineIndicatorFactory(elementData)
+    local function TaskLineIndicatorFactory(_)
         return "TodolooScrollBoxDragLineTemplate"
     end
 
-    local function GroupLineIndicatorFactory(elementData)
+    local function GroupLineIndicatorFactory(_)
         return "TodolooScrollBoxDragGroupTemplate"
     end
+
+    local sourceFrameData
 
     local function NotifyDragSource(sourceFrame, drag)
         sourceFrame:SetAlpha(drag and .5 or 1)
         sourceFrame:SetMouseMotionEnabled(not drag)
+        
+        if sourceFrame.GetElementData == nil then
+            -- If the source frame is no longer visible in the scrollbox.
+            -- This can happen if we're is scrolling whilst dragging.
+            return
+        end
+
+        local node = sourceFrame:GetElementData()
+
+        if drag then
+            sourceFrameData = sourceFrame:GetData()
+
+            if sourceFrameData.groupInfo then
+                node:SetCollapsed(true)
+                sourceFrame:SetCollapseState(true)
+            end
+        else
+            if sourceFrameData.groupInfo then
+                node:SetCollapsed(false)
+                sourceFrame:SetCollapseState(false)
+            end
+
+            sourceFrameData = nil
+        end
     end
 
     local function NotifyDragCandidates(candidateFrame, drag)
         candidateFrame:SetMouseMotionEnabled(not drag)
+        local node = candidateFrame:GetElementData()
+        local candidateData = candidateFrame:GetData()
+
+        if drag and sourceFrameData then
+            if sourceFrameData.groupInfo and candidateData.groupInfo then
+                node:SetCollapsed(true)
+                candidateFrame:SetCollapseState(true)
+            end
+
+            if sourceFrameData.character ~= candidateData.character then
+                -- If the candidate frame's registered character is not the same as the source frame beign dragged,
+                -- make sure to visualize that it's not possible to drag between characters
+                candidateFrame:SetAlpha(.5)
+            else
+                -- This only exists to handle the scenario where tasks and groups on the same character
+                -- disappears from the scroll box because of scrolling whilst dragging, and getting
+                -- added again when being rendered back into the scroll box
+                candidateFrame:SetAlpha(1)
+            end
+        else
+            if candidateData.groupInfo then
+                node:SetCollapsed(false)
+                candidateFrame:SetCollapseState(false)
+            end
+
+            candidateFrame:SetAlpha(1)
+        end
     end
 
     local function GenerateCursorFactory(scrollbar)
@@ -233,7 +281,7 @@ do
             local function CursorIntializer(cursorFrame, candidateFrame, elementData)
                 cursorFrame:SetSize(candidateFrame:GetSize())
 
-                local template, initializer = view:GetFactoryDataFromElementData(elementData)
+                local _, initializer = view:GetFactoryDataFromElementData(elementData)
                 initializer(cursorFrame, elementData)
             end
 

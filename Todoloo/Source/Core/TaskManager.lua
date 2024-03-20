@@ -1,3 +1,6 @@
+--TODO: Move file to ./Storage
+local _, Todoloo = ...
+
 ---@enum reset Reset intervals defining when a task should automatically remove completion mark
 TODOLOO_RESET_INTERVALS = {
     -- Manual reset will never automatically reset the completion mark
@@ -155,6 +158,29 @@ function TodolooTaskManagerMixin:Init()
 end
 
 -- *****************************************************************************************************
+-- ***** REALMS
+-- *****************************************************************************************************
+
+---Get all known realms
+---@return string[]
+function TodolooTaskManagerMixin:GetAllRealms()
+    if TODOLOO_TASKS == nil then
+        error("TODOLOO_TASKS not initialized")
+    end
+
+    local realms = {}
+    
+    for characterName, _ in pairs(TODOLOO_TASKS) do
+        local realmName = select(2, strsplit("-", characterName))
+        if not Todoloo.Utils.StringArrayContains(realms, realmName) then
+            table.insert(realms, realmName)
+        end
+    end
+
+    return realms
+end
+
+-- *****************************************************************************************************
 -- ***** CHARACTERS
 -- *****************************************************************************************************
 
@@ -162,13 +188,42 @@ end
 ---@field groups Group[] All groups for character
 
 ---Get all characters
+---@param realmName string? Optional filter on realm name
 ---@return Character[]
-function TodolooTaskManagerMixin:GetAllCharacters()
+function TodolooTaskManagerMixin:GetAllCharacters(realmName)
     if TODOLOO_TASKS == nil then
         error("TODOLOO_TASKS not initialized")
     end
 
-    return TODOLOO_TASKS
+    if realmName == nil then
+        return TODOLOO_TASKS
+    end
+
+    local characters = {}
+    for characterName, character in pairs(TODOLOO_TASKS) do
+        local characterRealmName = select(2, strsplit("-", characterName))
+        if characterRealmName == realmName then
+            characters[characterName] = character
+        end
+    end
+
+    return characters
+end
+
+---Get all character names
+---@return string[] # All character names including realm name in format "player-realm"
+function TodolooTaskManagerMixin:GetAllCharacterNames()
+    if TODOLOO_TASKS == nil then
+        error("TODOLOO_TASKS not initialized")
+    end
+
+    local result = {}
+
+    for characterName, _ in pairs(TODOLOO_TASKS) do
+        table.insert(result, characterName)
+    end
+
+    return result
 end
 
 ---Get character
@@ -284,7 +339,7 @@ function TodolooTaskManagerMixin:AddGroup(name, characterFullName)
     table.insert(character.groups, group)
 
     local groupIndex = #character.groups
-    Todoloo.EventBus:TriggerEvent(self, Todoloo.Tasks.Events.GROUP_ADDED, groupIndex)
+    Todoloo.EventBus:TriggerEvent(self, Todoloo.Tasks.Events.GROUP_ADDED, groupIndex, characterFullName)
 
     return group, groupIndex
 end
@@ -448,7 +503,7 @@ function TodolooTaskManagerMixin:AddTask(groupIndex, name, description, reset, c
     table.insert(TODOLOO_TASKS[characterFullName].groups[groupIndex].tasks, task)
 
     local index = #TODOLOO_TASKS[characterFullName].groups[groupIndex].tasks
-    Todoloo.EventBus:TriggerEvent(self, Todoloo.Tasks.Events.TASK_ADDED, groupIndex, index)
+    Todoloo.EventBus:TriggerEvent(self, Todoloo.Tasks.Events.TASK_ADDED, groupIndex, index, characterFullName)
 
     return task, index
 end
@@ -583,110 +638,4 @@ function TodolooTaskManagerMixin:MoveTask(taskId, groupId, newGroupId, newTaskId
     end
 
     Todoloo.EventBus:TriggerEvent(self, Todoloo.Tasks.Events.TASK_MOVED, taskId, groupId, newGroupId, newTaskId)
-end
-
--- *****************************************************************************************************
--- ***** DATA PROVIDER
--- *****************************************************************************************************
-
-local function GetFilteredTasks(groups, searchCriteria)
-    local result = {}
-    
-    for _, group in pairs(groups) do
-        local match = false
-        local resultEntry = {
-            name = group.name,
-            tasks = {}
-        }
-
-        for _, task in pairs(group.tasks) do
-            if string.find(string.lower(task.name), string.lower(searchCriteria)) then
-                table.insert(resultEntry.tasks, task)
-                match = true
-            end
-        end
-
-        if not match then
-            if string.find(string.lower(group.name), string.lower(searchCriteria)) then
-                match = true
-            end
-        end
-
-        if match then
-            table.insert(result, resultEntry)
-        end
-    end
-
-    return result
-end
-
----Generate data provider for use in scroll box
----TODO: Does this belong in the task manager?
----@param searching boolean Are we currently searching?
----@param characterFullName string? Full character name in format "player-realm" (defaults to the currently logged in character)
-function TodolooTaskManagerMixin:GenerateDataProvider(searching, characterFullName)
-    characterFullName = characterFullName or Todoloo.Utils.GetCharacterFullName()
-    local groups = TODOLOO_TASKS[characterFullName].groups
-
-    if searching then
-        groups = GetFilteredTasks(groups, self.taskNameFilter)
-    end
-
-    local dataProvider = CreateTreeDataProvider()
-
-    for groupIndex, group in pairs(groups) do
-        local groupInfo = { id = groupIndex, name = group.name, reset = group.reset }
-        local groupNode = dataProvider:Insert({ groupInfo = groupInfo })
-
-        groupNode:Insert({ topPadding = true, order = -1 })
-
-        for taskIndex, task in pairs(group.tasks) do
-            local taskInfo = {
-                groupId = groupIndex,
-                id = taskIndex,
-                name = task.name,
-                description = task.description,
-                reset = task.reset,
-                completed = task.completed
-            }
-
-            groupNode:Insert({ taskInfo = taskInfo, order = 0 })
-        end
-
-        groupNode:Insert({ bottomPadding = true, order = 1 })
-    end
-
-    return dataProvider
-end
-
-function TodolooTaskManagerMixin:GetTaskNameFilter()
-    return self.taskNameFilter
-end
-
-function TodolooTaskManagerMixin:OnTaskListSearchTextChanged(text)
-    if strcmputf8i(self.taskNameFilter, text) == 0 then
-        return
-    end
-
-    self.taskNameFilter = text
-
-    Todoloo.EventBus:TriggerEvent(self, Todoloo.Tasks.Events.TASK_LIST_UPDATE)
-end
-
--- *****************************************************************************************************
--- ***** TASK MANAGER INFO
--- *****************************************************************************************************
-
----@class OpenTask
----@field taskId integer Index of the task within its respective group
----@field groupId integer Index of the tasks respective group within Todoloo tasks
-
----@class TaskManagerInfo
----@field openTask OpenTask? Info on the task that should be opened in the task manager
----@field openGroupId integer ID of the group that should be opened in the task manager
-
----TODO: Does this belong in the task manager, and is this even necessary?
----@return TaskManagerInfo # Current task manager info
-function TodolooTaskManagerMixin:GetTaskManagerInfo()
-    return {}
 end

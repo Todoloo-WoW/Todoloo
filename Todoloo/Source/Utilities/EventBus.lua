@@ -1,8 +1,10 @@
+local _, Todoloo = ...
+
 -- *****************************************************************************************************
 -- ***** EVENT BUS
 -- *****
--- ***** This file is highly inspired by plusmouse and Auctionator. A bug thanks goes out to you
--- ***** for providing the idea of a custom event bus.
+-- ***** This file is highly inspired by plusmouse and Auctionator.
+-- ***** A big thanks goes out to you for providing the idea of a custom event bus.
 -- *****************************************************************************************************
 
 TodolooEventBusMixin = {}
@@ -98,11 +100,9 @@ end
 ---@param listener any Listener to unregister
 ---@param eventName string Event to unregsiter the listener from
 function TodolooEventBusMixin:UnregisterEvent(listener, eventName)
-    for _, eventName in ipairs(eventNames) do
-        local index = tIndexOf(self.registeredListeners[eventName], listener)
-        if index ~= nil then
-            table.remove(self.registeredListeners[eventName], index)
-        end
+    local index = tIndexOf(self.registeredListeners[eventName], listener)
+    if index ~= nil then
+        table.remove(self.registeredListeners[eventName], index)
     end
 
     return self

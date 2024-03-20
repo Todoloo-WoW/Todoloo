@@ -1,3 +1,5 @@
+local _, Todoloo = ...
+
 --TODO Clean up file
 
 TODOLOO_TASK_TRACKER_MODULE = TodolooTracker_GetModuleInfoTable("TODOLOO_TASK_TRACKER_MODULE")
@@ -81,7 +83,6 @@ end
 ---@param useFullHeight boolean
 local function TodolooTaskTracker_DoTasks(self, group, groupCompleted, existingGroup, useFullHeight)
     local completing = false
-    local numTasks = Todoloo.TaskManager:GetNumTasks(group.id)
 
     local tasks = Todoloo.TaskManager:GetGroupTasks(group.id)
     local iterTasks = {}
