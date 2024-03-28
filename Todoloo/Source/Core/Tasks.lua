@@ -163,6 +163,25 @@ local function GetFilteredTasks(characters, searchCriteria)
     return result
 end
 
+local function SortCharacterData(lhs, rhs)
+    if lhs ~= nil and rhs == nil then
+        return true
+    elseif rhs ~= nil and lhs == nil then
+        return false
+    end
+    
+    local lhsData = lhs:GetData()
+    local rhsData = rhs:GetData()
+
+    if lhsData.isCurrentCharacter then
+        return true
+    elseif rhsData.isCurrentCharacter then
+        return false
+    end
+    
+    return strcmputf8i(lhsData.character, rhsData.character) < 0;
+end
+
 function Todoloo.Tasks.GenerateTaskDataProvider(searching)
     local characters = {}
     for _, characterFullName in pairs(filters.ShownCharacters) do
@@ -174,12 +193,18 @@ function Todoloo.Tasks.GenerateTaskDataProvider(searching)
         characters = GetFilteredTasks(characters, filters.TaskNameFilter)
     end
 
+    local currentCharacter = Todoloo.Utils.GetCharacterFullName()
     local dataProvider = CreateTreeDataProvider()
     local node = dataProvider:GetRootNode()
 
+    local affectChildren = false
+    local skipSort = false
+    node:SetSortComparator(SortCharacterData, affectChildren, skipSort)
+
     for characterFullName, character in pairs(characters) do
         local characterInfo = { name = characterFullName }
-        local characterNode = node:Insert({ characterInfo = characterInfo, character = characterFullName })
+        local isCurrentCharacter = characterFullName == currentCharacter
+        local characterNode = node:Insert({ characterInfo = characterInfo, character = characterFullName, isCurrentCharacter = isCurrentCharacter })
 
         for groupIndex, group in pairs(character.groups) do
             local groupInfo = {
