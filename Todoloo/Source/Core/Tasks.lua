@@ -62,6 +62,21 @@ function Todoloo.Tasks.SetDefaultFilters()
     Todoloo.EventBus:TriggerEvent(Todoloo.Tasks, Todoloo.Tasks.Events.FILTER_CHANGED)
 end
 
+local function SortStrings(lhs, rhs)
+    return strcmputf8i(lhs, rhs) < 0;
+end
+
+local function GetSortedCharactersTable(characters)
+    local nameTable = {}
+    for characterName, _ in pairs(characters) do
+        table.insert(nameTable, characterName)
+    end
+
+    table.sort(nameTable, SortStrings)
+
+    return nameTable
+end
+
 function Todoloo.Tasks.InitFilterMenu(dropdown, level, onUpdate)
     local filterSystem = {}
     filterSystem.onUpdate = onUpdate
@@ -86,6 +101,7 @@ function Todoloo.Tasks.InitFilterMenu(dropdown, level, onUpdate)
 
     -- add all realms to filter system as title
     local realms = Todoloo.TaskManager:GetAllRealms()
+    table.sort(realms, SortStrings)
     for _, realm in pairs(realms) do
         local realmFilter =
         {
@@ -96,7 +112,9 @@ function Todoloo.Tasks.InitFilterMenu(dropdown, level, onUpdate)
 
         -- get all realm characters and add to filter system as checkboxes
         local realmCharacters = Todoloo.TaskManager:GetAllCharacters(realm)
-        for characterFullName, _ in pairs(realmCharacters) do
+        local sortedCharacters = GetSortedCharactersTable(realmCharacters)
+        
+        for _, characterFullName in ipairs(sortedCharacters) do
             local characterName = select(1, strsplit("-", characterFullName))
             local characterFilter =
             {
@@ -163,6 +181,32 @@ local function GetFilteredTasks(characters, searchCriteria)
     return result
 end
 
+local function SortCharacterData(lhs, rhs)
+    if lhs ~= nil and rhs == nil then
+        return true
+    elseif rhs ~= nil and lhs == nil then
+        return false
+    end
+    
+    local lhsData = lhs:GetData()
+    local rhsData = rhs:GetData()
+
+    if lhsData.isCurrentCharacter then
+        return true
+    elseif rhsData.isCurrentCharacter then
+        return false
+    end
+
+    local lhsCharacterName, lhsRealmName = strsplit("-", lhsData.character)
+    local rhsCharacterName, rhsRealmName = strsplit("-", rhsData.character)
+
+    if lhsRealmName ~= rhsRealmName then
+        return strcmputf8i(lhsRealmName, rhsRealmName) < 0;
+    end    
+    
+    return strcmputf8i(lhsCharacterName, rhsCharacterName) < 0;
+end
+
 function Todoloo.Tasks.GenerateTaskDataProvider(searching)
     local characters = {}
     for _, characterFullName in pairs(filters.ShownCharacters) do
@@ -174,12 +218,18 @@ function Todoloo.Tasks.GenerateTaskDataProvider(searching)
         characters = GetFilteredTasks(characters, filters.TaskNameFilter)
     end
 
+    local currentCharacter = Todoloo.Utils.GetCharacterFullName()
     local dataProvider = CreateTreeDataProvider()
     local node = dataProvider:GetRootNode()
 
+    local affectChildren = false
+    local skipSort = false
+    node:SetSortComparator(SortCharacterData, affectChildren, skipSort)
+
     for characterFullName, character in pairs(characters) do
         local characterInfo = { name = characterFullName }
-        local characterNode = node:Insert({ characterInfo = characterInfo, character = characterFullName })
+        local isCurrentCharacter = characterFullName == currentCharacter
+        local characterNode = node:Insert({ characterInfo = characterInfo, character = characterFullName, isCurrentCharacter = isCurrentCharacter })
 
         for groupIndex, group in pairs(character.groups) do
             local groupInfo = {
