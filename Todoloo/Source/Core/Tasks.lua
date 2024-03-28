@@ -62,6 +62,21 @@ function Todoloo.Tasks.SetDefaultFilters()
     Todoloo.EventBus:TriggerEvent(Todoloo.Tasks, Todoloo.Tasks.Events.FILTER_CHANGED)
 end
 
+local function SortStrings(lhs, rhs)
+    return strcmputf8i(lhs, rhs) < 0;
+end
+
+local function GetSortedCharactersTable(characters)
+    local nameTable = {}
+    for characterName, _ in pairs(characters) do
+        table.insert(nameTable, characterName)
+    end
+
+    table.sort(nameTable, SortStrings)
+
+    return nameTable
+end
+
 function Todoloo.Tasks.InitFilterMenu(dropdown, level, onUpdate)
     local filterSystem = {}
     filterSystem.onUpdate = onUpdate
@@ -86,6 +101,7 @@ function Todoloo.Tasks.InitFilterMenu(dropdown, level, onUpdate)
 
     -- add all realms to filter system as title
     local realms = Todoloo.TaskManager:GetAllRealms()
+    table.sort(realms, SortStrings)
     for _, realm in pairs(realms) do
         local realmFilter =
         {
@@ -96,7 +112,9 @@ function Todoloo.Tasks.InitFilterMenu(dropdown, level, onUpdate)
 
         -- get all realm characters and add to filter system as checkboxes
         local realmCharacters = Todoloo.TaskManager:GetAllCharacters(realm)
-        for characterFullName, _ in pairs(realmCharacters) do
+        local sortedCharacters = GetSortedCharactersTable(realmCharacters)
+        
+        for _, characterFullName in ipairs(sortedCharacters) do
             local characterName = select(1, strsplit("-", characterFullName))
             local characterFilter =
             {
@@ -178,8 +196,15 @@ local function SortCharacterData(lhs, rhs)
     elseif rhsData.isCurrentCharacter then
         return false
     end
+
+    local lhsCharacterName, lhsRealmName = strsplit("-", lhsData.character)
+    local rhsCharacterName, rhsRealmName = strsplit("-", rhsData.character)
+
+    if lhsRealmName ~= rhsRealmName then
+        return strcmputf8i(lhsRealmName, rhsRealmName) < 0;
+    end    
     
-    return strcmputf8i(lhsData.character, rhsData.character) < 0;
+    return strcmputf8i(lhsCharacterName, rhsCharacterName) < 0;
 end
 
 function Todoloo.Tasks.GenerateTaskDataProvider(searching)

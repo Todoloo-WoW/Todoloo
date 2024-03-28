@@ -152,6 +152,7 @@ function TodolooTaskListMixin:OnLoad()
         PlaySound(SOUNDKIT.UI_PROFESSION_FILTER_MENU_OPEN_CLOSE);
     end)
 
+    -- setup filter menu
     UIDropDownMenu_SetInitializeFunction(self.FilterDropDown, GenerateClosure(self.InitializeFilterContextMenu, self))
     UIDropDownMenu_SetDisplayMode(self.FilterDropDown, "MENU")
 

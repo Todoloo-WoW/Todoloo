@@ -10,11 +10,11 @@ function Todoloo.Utils.SplitStringArray(array, delimiter)
 end
 
 ---Check if the given string value exists in the given string array table
----@param list table Table in question
+---@param array table Table in question
 ---@param value string Value in question
 ---@return boolean # True if exists, false otherwise
-function Todoloo.Utils.StringArrayContains(list, value)
-    for _, v in ipairs(list) do
+function Todoloo.Utils.StringArrayContains(array, value)
+    for _, v in ipairs(array) do
         if v == value then
             return true
         end
@@ -24,11 +24,11 @@ function Todoloo.Utils.StringArrayContains(list, value)
 end
 
 ---Get the index of the given value in the string array
----@param list string[] The string array in question
+---@param array string[] The string array in question
 ---@param value string The value in question
 ---@return integer|nil # Index of the given value if found, else nil
-function Todoloo.Utils.StringArrayIndexOf(list, value)
-    for i, v in ipairs(list) do
+function Todoloo.Utils.StringArrayIndexOf(array, value)
+    for i, v in ipairs(array) do
         if v == value then
             return i
         end
