@@ -19,7 +19,12 @@ Todoloo is your friendly in-game task management assistant, making sure you've n
 
 ### Task Manager
 * Use the in-game help guide by clicking on the info icon in the task manager
-* Add groups and tasks in the task manager, by `Left-Click` on the minimap icon
+* Manage your tasks account-wide using the task manager, by `Left-Click` on the minimap icon
+* Toggle characters by using the "Filter" button
+
+#### Characters
+* `Right-Click` on the characters to add new groups
+* `Shift` + `Left-Click` on groups to minimize all character groups and tasks
 
 #### Groups
 * Drag and drop groups to reorder as you see fit
