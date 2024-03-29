@@ -1,3 +1,5 @@
+local _, Todoloo = ...
+
 --TODO: Clean up file
 
 TODOLOO_TRACKER_HEADER_HEIGHT   = 25
@@ -452,9 +454,6 @@ function TODOLOO_DEFAULT_TRACKER_MODULE:OnTaskClick(task, mouseButton)
 
         local taskInfo = Todoloo.TaskManager:GetTask(groupId, id)
         Todoloo.TaskManager:SetTaskCompletion(groupId, id, not taskInfo.completed)
-
-        --TODO: Update should happen through events - verify
-        --TodolooTracker_Update()
     end
 end
 
@@ -826,7 +825,6 @@ function TodolooTracker_Update(reason, id, subInfo)
 
     -- we can't update before we've initialized
     if not tracker.initialized then
-        Todoloo.Debug.Message("Tracker not initialized - aborting")
         tracker.isUpdating = false
         return
     end

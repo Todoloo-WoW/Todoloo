@@ -1,3 +1,5 @@
+local _, Todoloo = ...
+
 -- *****************************************************************************************************
 -- ***** TASK MANAGER
 -- *****************************************************************************************************
@@ -16,10 +18,6 @@ function TodolooTaskManagerFrameMixin:ApplyDesiredWidth()
     UpdateUIPanelPositions(self)
 end
 
-function TodolooTaskManagerFrameMixin:SetTaskManagerInfo(taskManagerInfo)
-    self:Refresh(taskManagerInfo)
-end
-
 function TodolooTaskManagerFrameMixin:Refresh(taskManagerInfo)
     self.ManagementPage:Refresh(taskManagerInfo)
 end
@@ -27,8 +25,7 @@ end
 function TodolooTaskManagerFrameMixin:OnShow()
     PlaySound(SOUNDKIT.UI_PROFESSIONS_WINDOW_OPEN);
 
-    local taskManagerInfo = Todoloo.TaskManager:GetTaskManagerInfo()
-    self:SetTaskManagerInfo(taskManagerInfo)
+    self:Refresh({})
 end
 
 function TodolooTaskManagerFrameMixin:OnHide()

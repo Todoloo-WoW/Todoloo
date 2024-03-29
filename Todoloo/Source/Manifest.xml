@@ -13,8 +13,8 @@ https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/FrameXML/UI
 
     <Script file="Debug.lua" />
     <Script file="Config.lua" />
-    <Script file="TaskManager.lua" />
-    <Script file="ResetManager.lua" />
+    
+    <Include file="Core/Manifest.xml" />
 
     <Script file="Initialize.lua" />
 

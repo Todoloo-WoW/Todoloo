@@ -1,3 +1,5 @@
+local _, Todoloo = ...
+
 local icon = LibStub("LibDBIcon-1.0")
 
 ---Initialize minimap icon

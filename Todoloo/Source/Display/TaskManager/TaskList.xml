@@ -2,16 +2,21 @@
 https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/FrameXML/UI_shared.xsd">
 
     <!-- Todoloo divider template used within the group list (this is not used yet, but here for future features) -->
-    <Frame name="TodolooTaskListDividerTemplate" virtual="true">
+    <Button name="TodolooTaskListCharacterTemplate" mixin="TodolooTaskListCharacterMixin" registerForClicks="RightButtonUp, LeftButtonUp" virtual="true">
         <Size y="30"/>
         <Layers>
             <Layer>
-                <FontString parentKey="Label" text="PROFESSIONS_CATEGORY_UNLEARNED" inherits="GameFontNormal_NoShadow">
+                <FontString parentKey="Label" inherits="GameFontNormal_NoShadow">
                     <Size x="0" y="13"/>
                     <Anchors>
                         <Anchor point="BOTTOMLEFT" x="10" y="10"/>
                     </Anchors>
                 </FontString>
+                <Texture parentKey="CollapseIcon">
+                    <Anchors>
+                        <Anchor point="RIGHT" x="-10" y="2" />
+                    </Anchors>
+                </Texture>
                 <Texture atlas="Options_HorizontalDivider">
                     <Size x="250" y="2"/>
                     <Anchors>
@@ -27,21 +32,20 @@ https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/FrameXML/UI
                     <Color color="NORMAL_FONT_COLOR" a=".5"/>
                 </Texture>
             </Layer>
+            <Layer level="HIGHLIGHT">
+                <Texture parentKey="CollapseIconAlphaAdd" alphaMode="ADD">
+                    <Anchors>
+                        <Anchor point="CENTER" relativeKey="$parent.CollapseIcon" />
+                    </Anchors>
+                </Texture>
+            </Layer>
         </Layers>
-    </Frame>
+    </Button>
 
     <!-- Todoloo group template used within the group list -->
     <Button name="TodolooTaskListGroupTemplate" mixin="TodolooTaskListGroupMixin" registerForClicks="RightButtonUp, LeftButtonUp" virtual="true">
         <Size y="25" />
         <Layers>
-            <Layer level="OVERLAY" textureSubLevel="1">
-                <FontString parentKey="Label" inherits="GameFontNormal_NoShadow" justifyH="LEFT">
-                    <Size y="10" />
-                    <Anchors>
-                        <Anchor point="LEFT" x="10" y="2" />
-                    </Anchors>
-                </FontString>
-            </Layer>
             <Layer level="BACKGROUND">
                 <Texture parentKey="LeftPiece" atlas="Professions-recipe-header-left" useAtlasSize="true">
                     <Anchors>
@@ -77,13 +81,28 @@ https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/FrameXML/UI
                     </Anchors>
                 </Texture>
             </Layer>
+            <Layer level="OVERLAY">
+                <Texture parentKey="ResetIcon" alpha="0.8">
+                    <Size x="14" y="14" />
+                    <Anchors>
+                        <Anchor point="RIGHT" relativeKey="$parent.CollapseIcon" relativePoint="LEFT" x="-10" />
+                    </Anchors>
+                </Texture>
+                <FontString parentKey="Label" inherits="GameFontNormal_NoShadow" justifyH="LEFT">
+                    <Size y="10" />
+                    <Anchors>
+                        <Anchor point="LEFT" x="10" y="2" />
+                        <Anchor point="RIGHT" relativeKey="$parent.ResetIcon" relativePoint="LEFT" x="-5" y="0" />
+                    </Anchors>
+                </FontString>
+            </Layer>
         </Layers>
         <Frames>
             <EditBox parentKey="Name" autoFocus="false" hidden="true">
                 <Size y="10" />
                 <Anchors>
                     <Anchor point="LEFT" x="10" y="2" />
-                    <Anchor point="RIGHT" relativeKey="$parent.CollapseIcon" x="-5" y="0" />
+                    <Anchor point="RIGHT" relativeKey="$parent.ResetIcon" x="-5" y="0" />
                 </Anchors>
                 <FontString inherits="GameFontNormal_NoShadow" />
                 <Scripts>
@@ -102,35 +121,30 @@ https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/FrameXML/UI
     <Button name="TodolooTaskListTaskTemplate" mixin="TodolooTaskListTaskMixin" registerForClicks="RightButtonUp, LeftButtonUp" virtual="true">
         <Size y="20" />
         <Layers>
-            <Layer level="OVERLAY" textureSubLevel="1">
-                <FontString parentKey="Label" inherits="GameFontHighlight_NoShadow" justifyH="LEFT">
-                    <Size y="12" />
-                    <Anchors>
-                        <Anchor point="LEFT" x="30" />
-                        <Anchor point="RIGHT" relativeKey="$parent.DeleteButton" x="-4" />
-                    </Anchors>
-                </FontString>
-            </Layer>
-            <Layer level="OVERLAY" textureSubLevel="1">
+            <Layer level="OVERLAY" textureSubLevel="2">
                 <Texture parentKey="Check" atlas="Tracker-Check" useAtlasSize="true" hidden="true" scale="0.8">
 					<Size x="16" y="16"/>
 					<Anchors>
 						<Anchor point="LEFT" x="10" />
 					</Anchors>
 				</Texture>
-                <FontString parentKey="ResetInterval" inherits="GameFontDisable" justifyH="CENTER">
-                    <Size x="14" y="12" />
+                <Texture parentKey="ResetIcon" alpha="0.8">
+                    <Size x="14" y="14" />
                     <Anchors>
-                        <Anchor point="RIGHT" x="-10" />
-                    </Anchors>
-                </FontString>
-                <Texture parentKey="ResetIcon" atlas="questlog-questtypeicon-clockyellow" useAtlasSize="true" scale="0.7">
-                    <Anchors>
-                        <Anchor point="RIGHT" relativeKey="$parent.ResetInterval" relativePoint="LEFT" x="-2" />
+                        <Anchor point="RIGHT" x="-31" />
                     </Anchors>
                 </Texture>
             </Layer>
-            <Layer level="OVERLAY" textureSubLevel="2">
+            <Layer level="OVERLAY" textureSubLevel="1">
+                <FontString parentKey="Label" inherits="GameFontHighlight_NoShadow" justifyH="LEFT">
+                    <Size y="12" />
+                    <Anchors>
+                        <Anchor point="LEFT" x="30" />
+                        <Anchor point="RIGHT" relativeKey="$parent.ResetIcon" x="-10" />
+                    </Anchors>
+                </FontString>
+            </Layer>
+            <Layer level="OVERLAY" textureSubLevel="3">
                 <Texture parentKey="SelectedOverlay" atlas="Professions_Recipe_Active" useAtlasSize="true" hidden="true">
                     <Anchors>
                         <Anchor point="CENTER" x="0" y="-1" />
@@ -153,7 +167,7 @@ https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/FrameXML/UI
                 <Size y="10" />
                 <Anchors>
                     <Anchor point="LEFT" x="30" />
-                    <Anchor point="RIGHT" relativeKey="$parent.ResetInterval" relativePoint="LEFT" x="-5" />
+                    <Anchor point="RIGHT" relativeKey="$parent.ResetIcon" relativePoint="LEFT" x="-10" />
                 </Anchors>
                 <FontString inherits="GameFontHighlight_NoShadow" />
                 <Scripts>
@@ -196,15 +210,25 @@ https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/FrameXML/UI
                     <Anchor point="BOTTOMRIGHT" />
                 </Anchors>
             </Frame>
+
+            <DropDownToggleButton parentKey="FilterButton" inherits="UIResettableDropdownButtonTemplate" text="FILTER">
+				<Size x="90" y="20"/>
+				<Anchors>
+					<Anchor point="TOPRIGHT" x="-8" y="-8"/>
+				</Anchors>
+			</DropDownToggleButton>
             
             <EditBox parentKey="SearchBox" autoFocus="false" inherits="SearchBoxTemplate">
                 <Size y="20"/>
                 <Anchors>
-                    <Anchor point="RIGHT" x="-8" />
+                    <Anchor point="RIGHT" relativeKey="$parent.FilterButton" relativePoint="LEFT" x="-4" />
                     <Anchor point="TOPLEFT" x="13" y="-8"/>
                 </Anchors>
             </EditBox>
 
+            <Frame parentKey="FilterDropDown" inherits="UIDropDownMenuTemplate"/>
+            
+            <Frame parentKey="CharacterContextMenu" inherits="UIDropDownMenuTemplate" enableMouse="true"></Frame>
             <Frame parentKey="GroupContextMenu" inherits="UIDropDownMenuTemplate" enableMouse="true"></Frame>
             <Frame parentKey="TaskContextMenu" inherits="UIDropDownMenuTemplate" enableMouse="true"></Frame>
 

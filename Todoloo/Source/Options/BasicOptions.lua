@@ -1,3 +1,5 @@
+local _, Todoloo = ...
+
 TodolooConfigBasicOptionsFrameMixin = {}
 
 function TodolooConfigBasicOptionsFrameMixin:OnLoad()
@@ -36,6 +38,8 @@ function TodolooConfigBasicOptionsFrameMixin:OnShow()
     self.ShowTaskTracker:SetChecked(Todoloo.Config.Get(Todoloo.Config.Options.SHOW_TASK_TRACKER))
     self.ShowCompletedGroups:SetChecked(Todoloo.Config.Get(Todoloo.Config.Options.SHOW_COMPLETED_GROUPS))
     self.ShowCompletedTasks:SetChecked(Todoloo.Config.Get(Todoloo.Config.Options.SHOW_COMPLETED_TASKS))
+    self.OrderByCompletion:SetChecked(Todoloo.Config.Get(Todoloo.Config.Options.ORDER_BY_COMPLETION))
+    self.ShowGroupProgressText:SetChecked(Todoloo.Config.Get(Todoloo.Config.Options.SHOW_GROUP_PROGRESS_TEXT))
     self.ShowMinimapIcon:SetChecked(not Todoloo.Config.Get(Todoloo.Config.Options.MINIMAP_ICON).hide)
 
     self.shownSettings = true
@@ -45,6 +49,8 @@ function TodolooConfigBasicOptionsFrameMixin:Save()
     Todoloo.Config.Set(Todoloo.Config.Options.SHOW_TASK_TRACKER, self.ShowTaskTracker:GetChecked())
     Todoloo.Config.Set(Todoloo.Config.Options.SHOW_COMPLETED_GROUPS, self.ShowCompletedGroups:GetChecked())
     Todoloo.Config.Set(Todoloo.Config.Options.SHOW_COMPLETED_TASKS, self.ShowCompletedTasks:GetChecked())
+    Todoloo.Config.Set(Todoloo.Config.Options.ORDER_BY_COMPLETION, self.OrderByCompletion:GetChecked())
+    Todoloo.Config.Set(Todoloo.Config.Options.SHOW_GROUP_PROGRESS_TEXT, self.ShowGroupProgressText:GetChecked())
 
     Todoloo.Config.Get(Todoloo.Config.Options.MINIMAP_ICON).hide = not self.ShowMinimapIcon:GetChecked()
     if Todoloo.MinimapIcon then
@@ -52,6 +58,7 @@ function TodolooConfigBasicOptionsFrameMixin:Save()
     end
 
     -- update tracker frame based on new settings
+    --TODO: Update via event
     if TodolooTrackerFrame then
         if Todoloo.Config.Get(Todoloo.Config.Options.SHOW_TASK_TRACKER) then
             TodolooTrackerFrame:Show()

@@ -1,3 +1,5 @@
+local _, Todoloo = ...
+
 function Todoloo.Config.Show()
     if Settings and SettingsPanel then
         Settings.OpenToCategory("Todoloo")

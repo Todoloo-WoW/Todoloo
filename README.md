@@ -20,11 +20,15 @@ Todoloo is your friendly in-game task management assistant, making sure you've n
 ### Task Manager
 * Use the in-game help guide by clicking on the info icon in the task manager
 * Add groups and tasks in the task manager, by `Left-Click` on the minimap icon
+
+#### Groups
 * Drag and drop groups to reorder as you see fit
+* `Right-Click` on groups to set group reset interval, add new tasks, or delete the group
+
+#### Tasks
 * Drag and drop tasks to reorder within the same group, or move between groups
 * `Shift` + `Left-Click` on tasks to toggle task completion
 * `Right-Click` on tasks to set reset interval or to delete the task
-* `Right-Click` on groups to add new tasks or delete the group
 
 ## 📣 Feedback
 ### Bug

@@ -1,6 +1,27 @@
+local _, Todoloo = ...
+
 -- *****************************************************************************************************
 -- ***** RESET MANAGER
 -- *****************************************************************************************************
+
+---Should the group be reset?
+---This function is only relevant in the instance where a given group has a reset interval.
+---@param group Group Group in question
+---@param previousDailyReset integer Previous daily reset time in unix time
+---@param previousWeeklyReset integer Previous weekly reset time in unix time
+---@return boolean # True if the group should reset, false otherwise
+local function ShouldResetGroup(group, previousDailyReset, previousWeeklyReset)
+    local lastResetPerformed = Todoloo.Config.Get(Todoloo.Config.Options.LAST_RESET_PERFORMED)
+    if group.reset == TODOLOO_RESET_INTERVALS.Daily and lastResetPerformed < previousDailyReset then
+        -- reset daily groups
+        return true
+    elseif group.reset == TODOLOO_RESET_INTERVALS.Weekly and lastResetPerformed < previousDailyReset then
+        -- reset weekly groups
+        return true
+    end
+
+    return false
+end
 
 ---Should the task be reset?
 ---@param task Task Task in question
@@ -25,12 +46,22 @@ end
 ---@param previousDailyReset integer Previous daily reset time in unix time
 ---@param previousWeeklyReset integer Previous weekly reset time in unix time
 local function PerformResetSince(characters, previousDailyReset, previousWeeklyReset)
-    -- if we haven't yet performed a reset since last daily reset time
+    -- if we haven't yet performed a reset since last reset time
     for characterName, character in pairs(characters) do
         for groupIndex, group in pairs(character.groups) do
-            for taskIndex, task in pairs(group.tasks) do
-                if ShouldResetTask(task, previousDailyReset, previousWeeklyReset) then
-                    Todoloo.TaskManager:ResetTask(groupIndex, taskIndex, characterName)
+            if group.reset ~= nil then
+                -- group reset interval
+                if ShouldResetGroup(group, previousDailyReset, previousWeeklyReset) then
+                    Todoloo.TaskManager:ResetGroup(groupIndex, characterName)
+                    Todoloo.Debug.Message("Group (" .. group.name .. ") has been reset")
+                end
+            else
+                -- task reset interval
+                for taskIndex, task in pairs(group.tasks) do
+                    if ShouldResetTask(task, previousDailyReset, previousWeeklyReset) then
+                        Todoloo.TaskManager:ResetTask(groupIndex, taskIndex, characterName)
+                        Todoloo.Debug.Message("Task (" .. task.name .. ") has been reset")
+                    end
                 end
             end
         end

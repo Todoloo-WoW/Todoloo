@@ -1,11 +1,18 @@
+local _, Todoloo = ...
+
+---Initialize on ADDON_LOADED event
 local function InitializeBase()
     Todoloo.Config.Initialize()
 end
 
+---Initialize on PLAYER_ENTERING_WORLD event
 local function InitializeCharacter()
+    -- create task manager
     Todoloo.TaskManager = CreateAndInitFromMixin(TodolooTaskManagerMixin)
 
-    -- reset all relevant tasks
+    Todoloo.Tasks.Initialize()
+
+    -- reset all relevant groups and tasks
     Todoloo.Reset.ResetManager.PerformReset()
 end
 

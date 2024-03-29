@@ -1,3 +1,5 @@
+local _, Todoloo = ...
+
 -- *****************************************************************************************************
 -- ***** MANAGEMENT PAGE
 -- *****************************************************************************************************
@@ -6,7 +8,7 @@
 ---@param dataProvider any
 ---@param taskId integer Task ID (is equal to the task index within the group in Todoloo tasks)
 ---@return any
-local function FindTaskInfo(dataProvider, taskId, groupId)
+local function FindTaskInfo(dataProvider, taskId, groupId, character)
     if not taskId then
         return nil
     end
@@ -14,7 +16,7 @@ local function FindTaskInfo(dataProvider, taskId, groupId)
     local function IsTaskMatchPredicate(node)
         local data = node:GetData()
         local taskInfo = data.taskInfo
-        return taskInfo and taskInfo.id == taskId and taskInfo.groupId == groupId
+        return taskInfo and taskInfo.id == taskId and taskInfo.groupId == groupId and taskInfo.character == character
     end
 
     local node = dataProvider:FindElementDataByPredicate(IsTaskMatchPredicate, TreeDataProviderConstants.IncludeCollapsed)
@@ -29,7 +31,7 @@ end
 ---@param dataProvider any
 ---@param groupId integer Group ID (is equal to the groupButton index within the character in Todoloo tasks)
 ---@return any
-local function FindGroupInfo(dataProvider, groupId)
+local function FindGroupInfo(dataProvider, groupId, character)
     if not groupId then
         return nil
     end
@@ -37,7 +39,7 @@ local function FindGroupInfo(dataProvider, groupId)
     local function IsGroupMatchPredicate(node)
         local data = node:GetData()
         local groupInfo = data.groupInfo
-        return groupInfo and groupInfo.id == groupId
+        return groupInfo and groupInfo.id == groupId and groupInfo.character == character
     end
 
     local node = dataProvider:FindElementDataByPredicate(IsGroupMatchPredicate, TreeDataProviderConstants.IncludeCollapsed)
@@ -66,7 +68,7 @@ function TodolooManagementPageMixin:OnLoad()
             self.TaskList.SearchBox:SetText(text)
         end
 
-        Todoloo.TaskManager:OnTaskListSearchTextChanged(text)
+        Todoloo.Tasks.OnTaskListSearchTextChanged(text)
     end)
 end
 
@@ -74,7 +76,7 @@ function TodolooManagementPageMixin:Initialize(taskManagerInfo)
     self.taskManagerInfo = taskManagerInfo
 
     local searching = self.TaskList.SearchBox:HasText()
-    local dataProvider = Todoloo.TaskManager:GenerateDataProvider(searching)
+    local dataProvider = Todoloo.Tasks.GenerateTaskDataProvider(searching)
 
     if searching then
         self.TaskList.ScrollBox:SetDataProvider(dataProvider, ScrollBoxConstants.DiscardScrollPosition)
@@ -86,15 +88,15 @@ function TodolooManagementPageMixin:Initialize(taskManagerInfo)
     -- if the task manager tells us to open a specific task in edit mode
     local currentTaskInfo = nil
     if taskManagerInfo.openTask then
-        currentTaskInfo = FindTaskInfo(dataProvider, taskManagerInfo.openTask.taskId, taskManagerInfo.openTask.groupId)
+        currentTaskInfo = FindTaskInfo(dataProvider, taskManagerInfo.openTask.taskId, taskManagerInfo.openTask.groupId, taskManagerInfo.openTask.character)
         local scrollToTask = true
         self.TaskList:OpenTask(currentTaskInfo, scrollToTask)
     end
 
     -- if the task manager tells us to open a specific group in edit mode
     local currentGroupInfo = nil
-    if taskManagerInfo.openGroupId then
-        currentGroupInfo = FindGroupInfo(dataProvider, taskManagerInfo.openGroupId)
+    if taskManagerInfo.openGroup then
+        currentGroupInfo = FindGroupInfo(dataProvider, taskManagerInfo.openGroup.groupId, taskManagerInfo.openGroup.character)
         local scrollToTask = true
         self.TaskList:OpenGroup(currentGroupInfo, scrollToTask)
     end
@@ -120,11 +122,13 @@ function TodolooManagementPageMixin:OnShow()
         Todoloo.Tasks.Events.TASK_UPDATED,
         Todoloo.Tasks.Events.TASK_LIST_UPDATE,
         Todoloo.Tasks.Events.TASK_MOVED,
-        Todoloo.Tasks.Events.TASK_COMPLETION_SET
+        Todoloo.Tasks.Events.TASK_COMPLETION_SET,
+        Todoloo.Tasks.Events.TASK_RESET,
+        Todoloo.Tasks.Events.FILTER_CHANGED
     })
     
     self:SetTitle()
-    self.TaskList.SearchBox:SetText(Todoloo.TaskManager:GetTaskNameFilter())
+    self.TaskList.SearchBox:SetText(Todoloo.Tasks.GetTaskListSearchText())
 end
 
 function TodolooManagementPageMixin:OnHide()
@@ -139,23 +143,24 @@ function TodolooManagementPageMixin:SetTitle()
 end
 
 function TodolooManagementPageMixin:CreateButtonGroup_OnClick()
-    -- create new blank group
     Todoloo.TaskManager:AddGroup("")
 end
 
 -- ***** EVENT HANDLERS
 
 function TodolooManagementPageMixin:ReceiveEvent(event, ...)
-    local taskManagerInfo = Todoloo.TaskManager:GetTaskManagerInfo()
+    local taskManagerInfo = {}
 
     if event == Todoloo.Tasks.Events.GROUP_ADDED then
-        local groupId = ...
-        taskManagerInfo.openGroupId = groupId
+        --TODO: This needs to be able to handle multiple characters
+        local groupId, character = ...
+        taskManagerInfo.openGroup = { groupId = groupId, character = character }
 
         self:Refresh(taskManagerInfo)
     elseif event == Todoloo.Tasks.Events.TASK_ADDED then
-        local groupId, taskId = ...
-        taskManagerInfo.openTask = { taskId = taskId, groupId = groupId }
+        --TODO: This needs to be able to handle multiple characters
+        local groupId, taskId, character = ...
+        taskManagerInfo.openTask = { taskId = taskId, groupId = groupId, character = character }
 
         self:Refresh(taskManagerInfo)
     else

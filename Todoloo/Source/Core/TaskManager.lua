@@ -1,3 +1,6 @@
+--TODO: Move file to ./Storage
+local _, Todoloo = ...
+
 ---@enum reset Reset intervals defining when a task should automatically remove completion mark
 TODOLOO_RESET_INTERVALS = {
     -- Manual reset will never automatically reset the completion mark
@@ -155,6 +158,29 @@ function TodolooTaskManagerMixin:Init()
 end
 
 -- *****************************************************************************************************
+-- ***** REALMS
+-- *****************************************************************************************************
+
+---Get all known realms
+---@return string[]
+function TodolooTaskManagerMixin:GetAllRealms()
+    if TODOLOO_TASKS == nil then
+        error("TODOLOO_TASKS not initialized")
+    end
+
+    local realms = {}
+    
+    for characterName, _ in pairs(TODOLOO_TASKS) do
+        local realmName = select(2, strsplit("-", characterName))
+        if not Todoloo.Utils.StringArrayContains(realms, realmName) then
+            table.insert(realms, realmName)
+        end
+    end
+
+    return realms
+end
+
+-- *****************************************************************************************************
 -- ***** CHARACTERS
 -- *****************************************************************************************************
 
@@ -162,13 +188,42 @@ end
 ---@field groups Group[] All groups for character
 
 ---Get all characters
+---@param realmName string? Optional filter on realm name
 ---@return Character[]
-function TodolooTaskManagerMixin:GetAllCharacters()
+function TodolooTaskManagerMixin:GetAllCharacters(realmName)
     if TODOLOO_TASKS == nil then
         error("TODOLOO_TASKS not initialized")
     end
 
-    return TODOLOO_TASKS
+    if realmName == nil then
+        return TODOLOO_TASKS
+    end
+
+    local characters = {}
+    for characterName, character in pairs(TODOLOO_TASKS) do
+        local characterRealmName = select(2, strsplit("-", characterName))
+        if characterRealmName == realmName then
+            characters[characterName] = character
+        end
+    end
+
+    return characters
+end
+
+---Get all character names
+---@return string[] # All character names including realm name in format "player-realm"
+function TodolooTaskManagerMixin:GetAllCharacterNames()
+    if TODOLOO_TASKS == nil then
+        error("TODOLOO_TASKS not initialized")
+    end
+
+    local result = {}
+
+    for characterName, _ in pairs(TODOLOO_TASKS) do
+        table.insert(result, characterName)
+    end
+
+    return result
 end
 
 ---Get character
@@ -191,6 +246,7 @@ end
 ---@class Group
 ---@field name string Name of the group
 ---@field tasks Task[] Array of tasks nested under the group
+---@field reset reset? Reset interval for the group
 
 ---Get all groups
 ---@param characterFullName string? Full character name in format "player-realm" (defaults to the currently logged in character)
@@ -225,6 +281,27 @@ function TodolooTaskManagerMixin:GetNumTasks(index, characterFullName)
     return #group.tasks
 end
 
+---Get the total number of completed tasks for a given group
+---@param index integer Index of the group within the task table
+---@param characterFullName string? Full character name in format "player-realm" (defaults to the currently logged in character)
+---@return integer # Total number of completed tasks
+function TodolooTaskManagerMixin:GetNumCompletedTasks(index, characterFullName)
+    assert(index)
+
+    characterFullName = characterFullName or Todoloo.Utils.GetCharacterFullName()
+
+    local group = TODOLOO_TASKS[characterFullName].groups[index]
+
+    local numCompletedTasks = 0
+    for _, task in ipairs(group.tasks) do
+        if task.completed then
+            numCompletedTasks = numCompletedTasks + 1
+        end
+    end
+
+    return numCompletedTasks
+end
+
 ---Are all tasks in this group complete?
 ---@param index integer Index of the group within the task table
 ---@param characterFullName string? Full character name in format "player-realm" (defaults to the currently logged in character)
@@ -257,12 +334,12 @@ function TodolooTaskManagerMixin:AddGroup(name, characterFullName)
     characterFullName = characterFullName or Todoloo.Utils.GetCharacterFullName()
     local character = TODOLOO_TASKS[characterFullName]
 
-    local group = { name = name, tasks = {} }
+    local group = { name = name, tasks = {}, reset = nil }
 
     table.insert(character.groups, group)
 
     local groupIndex = #character.groups
-    Todoloo.EventBus:TriggerEvent(self, Todoloo.Tasks.Events.GROUP_ADDED, groupIndex)
+    Todoloo.EventBus:TriggerEvent(self, Todoloo.Tasks.Events.GROUP_ADDED, groupIndex, characterFullName)
 
     return group, groupIndex
 end
@@ -270,15 +347,31 @@ end
 ---Update group
 ---@param index integer Index of the group within the task table
 ---@param newName string New name/title of the group
+---@param resetInterval reset? New reset interval for the group
 ---@param characterFullName string? Full character name in format "player-realm" (defaults to the currently logged in character)
-function TodolooTaskManagerMixin:UpdateGroup(index, newName, characterFullName)
+function TodolooTaskManagerMixin:UpdateGroup(index, newName, resetInterval, characterFullName)
     assert(index)
     assert(newName)
 
-    newName = newName or "No name"
-
     characterFullName = characterFullName or Todoloo.Utils.GetCharacterFullName()
-    TODOLOO_TASKS[characterFullName].groups[index].name = newName
+
+    local group = TODOLOO_TASKS[characterFullName].groups[index]
+
+    newName = newName or "No name"
+    if resetInterval == nil and group.reset ~= nil then
+        -- if the group reset is being removed, set the reset interval on the nested tasks
+        for _, task in ipairs(group.tasks) do
+            task.reset = group.reset
+        end
+    else
+        -- if group reset is being set, remove reset interval from tasks
+        for _, task in ipairs(group.tasks) do
+            task.reset = nil
+        end
+    end
+
+    group.name = newName
+    group.reset = resetInterval
 
     Todoloo.EventBus:TriggerEvent(self, Todoloo.Tasks.Events.GROUP_UPDATED, index)
 end
@@ -295,14 +388,19 @@ function TodolooTaskManagerMixin:RemoveGroup(index, characterFullName)
     Todoloo.EventBus:TriggerEvent(self, Todoloo.Tasks.Events.GROUP_REMOVED, index)
 end
 
----Reset group, removing all tasks
+---Reset completion state on group tasks
+---TODO: Test functionality
 ---@param index integer Index of the group within the task table
 ---@param characterFullName string? Full character name in format "player-realm" (defaults to the currently logged in character)
 function TodolooTaskManagerMixin:ResetGroup(index, characterFullName)
     assert(index)
 
     characterFullName = characterFullName or Todoloo.Utils.GetCharacterFullName()
-    TODOLOO_TASKS[characterFullName].groups[index].tasks = {}
+    local tasks = TODOLOO_TASKS[characterFullName].groups[index].tasks
+
+    for _, task in ipairs(tasks) do
+        task.completed = false
+    end
 
     Todoloo.EventBus:TriggerEvent(self, Todoloo.Tasks.Events.GROUP_RESET, index)
 end
@@ -361,11 +459,22 @@ function TodolooTaskManagerMixin:GetTask(groupIndex, index, characterFullName)
     return TODOLOO_TASKS[characterFullName].groups[groupIndex].tasks[index]
 end
 
+---Get tasks for a specific group
+---@param groupIndex integer Index of the group within the task table
+---@param characterFullName string? Full character name in format "player-realm" (defaults to the currently logged in character)
+---@return Task[] # All tasks within the given group
+function TodolooTaskManagerMixin:GetGroupTasks(groupIndex, characterFullName)
+    assert(groupIndex)
+
+    characterFullName = characterFullName or Todoloo.Utils.GetCharacterFullName()
+    return TODOLOO_TASKS[characterFullName].groups[groupIndex].tasks
+end
+
 ---Add new task to group
 ---@param groupIndex integer Index of the group in the task table
 ---@param name string Name/title of the task
 ---@param description string? Optional description of the task
----@param reset reset? Reset interval (sets default if none provided)
+---@param reset reset? Reset interval (if the task group has a reset interval defined, this value is ignored. If not, and the value is not provided, the default reset interval will be set)
 ---@param characterFullName string? Full character name in format "player-realm" (defaults to the currently logged in character)
 ---@return Task # The newly created task
 ---@return integer # Index of the newly created task
@@ -374,7 +483,15 @@ function TodolooTaskManagerMixin:AddTask(groupIndex, name, description, reset, c
     assert(name)
 
     characterFullName = characterFullName or Todoloo.Utils.GetCharacterFullName()
-    reset = reset or TODOLOO_DEFAULT_RESET_INTERVAL
+    local group = TODOLOO_TASKS[characterFullName].groups[groupIndex]
+
+    if group.reset ~= nil then
+        -- if there's a reset interval defined on the group
+        reset = nil
+    else
+        -- set to given reset interval or default
+        reset = reset or TODOLOO_DEFAULT_RESET_INTERVAL
+    end
 
     local  task = {
         name = name,
@@ -386,7 +503,7 @@ function TodolooTaskManagerMixin:AddTask(groupIndex, name, description, reset, c
     table.insert(TODOLOO_TASKS[characterFullName].groups[groupIndex].tasks, task)
 
     local index = #TODOLOO_TASKS[characterFullName].groups[groupIndex].tasks
-    Todoloo.EventBus:TriggerEvent(self, Todoloo.Tasks.Events.TASK_ADDED, groupIndex, index)
+    Todoloo.EventBus:TriggerEvent(self, Todoloo.Tasks.Events.TASK_ADDED, groupIndex, index, characterFullName)
 
     return task, index
 end
@@ -396,15 +513,23 @@ end
 ---@param index integer Index of the task within the group
 ---@param name string New name for the task
 ---@param description string? New description for the task
----@param reset reset New reset interval for the task
+---@param reset reset? New reset interval for the task (if the task group has a reset interval defined, this value is ignored)
 ---@param characterFullName string? Full character name in format "player-realm" (defaults to the currently logged in character)
 function TodolooTaskManagerMixin:UpdateTask(groupIndex, index, name, description, reset, characterFullName)
     assert(groupIndex)
     assert(index)
     assert(name)
-    assert(reset)
 
     characterFullName = characterFullName or Todoloo.Utils.GetCharacterFullName()
+
+    local group = TODOLOO_TASKS[characterFullName].groups[groupIndex]
+    if group.reset ~= nil then
+        -- if there's a reset interval defined on the group
+        reset = nil
+    else
+        -- if there's no reset interval set on the group, a reset interval for the task is required
+        assert(reset)
+    end
 
     local completed = TODOLOO_TASKS[characterFullName].groups[groupIndex].tasks[index].completed
     TODOLOO_TASKS[characterFullName].groups[groupIndex].tasks[index] = {
@@ -486,6 +611,19 @@ function TodolooTaskManagerMixin:MoveTask(taskId, groupId, newGroupId, newTaskId
         if newTaskId > #TODOLOO_TASKS[characterFullName].groups[newGroupId].tasks then
             newTaskId = #TODOLOO_TASKS[characterFullName].groups[newGroupId].tasks
         end
+    else
+        --[[if we're moving the task between groups, we need to set reset interval on the task,
+            in the scenario where the old group had a reset interval, but the new one does not.
+            We're basically setting the old group's reset interval specifically on the task.]]--
+        local oldGroup = TODOLOO_TASKS[characterFullName].groups[groupId]
+        local newGroup = TODOLOO_TASKS[characterFullName].groups[newGroupId]
+        if newGroup.reset ~= nil then
+            -- if a reset interval is defined on the new group, remove the tasks own reset interval
+            task.reset = nil
+        elseif oldGroup.reset ~= nil and newGroup.reset == nil then
+            -- if the new group has no reset interval defined, set reset on the task to be equal to the old group's reset interval
+            task.reset = oldGroup.reset
+        end
     end
     
     -- remove task at old location
@@ -500,110 +638,4 @@ function TodolooTaskManagerMixin:MoveTask(taskId, groupId, newGroupId, newTaskId
     end
 
     Todoloo.EventBus:TriggerEvent(self, Todoloo.Tasks.Events.TASK_MOVED, taskId, groupId, newGroupId, newTaskId)
-end
-
--- *****************************************************************************************************
--- ***** DATA PROVIDER
--- *****************************************************************************************************
-
-local function GetFilteredTasks(groups, searchCriteria)
-    local result = {}
-    
-    for _, group in pairs(groups) do
-        local match = false
-        local resultEntry = {
-            name = group.name,
-            tasks = {}
-        }
-
-        for _, task in pairs(group.tasks) do
-            if string.find(string.lower(task.name), string.lower(searchCriteria)) then
-                table.insert(resultEntry.tasks, task)
-                match = true
-            end
-        end
-
-        if not match then
-            if string.find(string.lower(group.name), string.lower(searchCriteria)) then
-                match = true
-            end
-        end
-
-        if match then
-            table.insert(result, resultEntry)
-        end
-    end
-
-    return result
-end
-
----Generate data provider for use in scroll box
----TODO: Does this belong in the task manager?
----@param searching boolean Are we currently searching?
----@param characterFullName string? Full character name in format "player-realm" (defaults to the currently logged in character)
-function TodolooTaskManagerMixin:GenerateDataProvider(searching, characterFullName)
-    characterFullName = characterFullName or Todoloo.Utils.GetCharacterFullName()
-    local groups = TODOLOO_TASKS[characterFullName].groups
-
-    if searching then
-        groups = GetFilteredTasks(groups, self.taskNameFilter)
-    end
-
-    local dataProvider = CreateTreeDataProvider()
-
-    for groupIndex, group in pairs(groups) do
-        local groupInfo = { id = groupIndex, name = group.name }
-        local groupNode = dataProvider:Insert({ groupInfo = groupInfo })
-
-        groupNode:Insert({ topPadding = true, order = -1 })
-
-        for taskIndex, task in pairs(group.tasks) do
-            local taskInfo = {
-                groupId = groupIndex,
-                id = taskIndex,
-                name = task.name,
-                description = task.description,
-                reset = task.reset,
-                completed = task.completed
-            }
-
-            groupNode:Insert({ taskInfo = taskInfo, order = 0 })
-        end
-
-        groupNode:Insert({ bottomPadding = true, order = 1 })
-    end
-
-    return dataProvider
-end
-
-function TodolooTaskManagerMixin:GetTaskNameFilter()
-    return self.taskNameFilter
-end
-
-function TodolooTaskManagerMixin:OnTaskListSearchTextChanged(text)
-    if strcmputf8i(self.taskNameFilter, text) == 0 then
-        return
-    end
-
-    self.taskNameFilter = text
-
-    Todoloo.EventBus:TriggerEvent(self, Todoloo.Tasks.Events.TASK_LIST_UPDATE)
-end
-
--- *****************************************************************************************************
--- ***** TASK MANAGER INFO
--- *****************************************************************************************************
-
----@class OpenTask
----@field taskId integer Index of the task within its respective group
----@field groupId integer Index of the tasks respective group within Todoloo tasks
-
----@class TaskManagerInfo
----@field openTask OpenTask? Info on the task that should be opened in the task manager
----@field openGroupId integer ID of the group that should be opened in the task manager
-
----TODO: Does this belong in the task manager, and is this even necessary?
----@return TaskManagerInfo # Current task manager info
-function TodolooTaskManagerMixin:GetTaskManagerInfo()
-    return {}
 end
