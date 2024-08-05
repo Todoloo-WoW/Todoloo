@@ -211,12 +211,12 @@ https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/FrameXML/UI
                 </Anchors>
             </Frame>
 
-            <DropDownToggleButton parentKey="FilterButton" inherits="UIResettableDropdownButtonTemplate" text="FILTER">
+            <DropdownButton parentKey="FilterButton" inherits="WowStyle1FilterDropdownTemplate" text="FILTER">
 				<Size x="90" y="20"/>
 				<Anchors>
 					<Anchor point="TOPRIGHT" x="-8" y="-8"/>
 				</Anchors>
-			</DropDownToggleButton>
+			</DropdownButton>
             
             <EditBox parentKey="SearchBox" autoFocus="false" inherits="SearchBoxTemplate">
                 <Size y="20"/>
@@ -247,6 +247,7 @@ https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/FrameXML/UI
         </Frames>
         <Scripts>
             <OnLoad method="OnLoad" />
+            <OnShow method="OnShow" />
         </Scripts>
     </Frame>
 

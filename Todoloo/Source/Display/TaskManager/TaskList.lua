@@ -6,7 +6,7 @@ local _, Todoloo = ...
 
 TodolooTaskListMixin = {}
 
-local function SetupScrollBox(self)
+function TodolooTaskListMixin:SetupScrollBox(self)
     local indent = 10;
 	local padLeft = 0;
 	local pad = 5;
@@ -113,11 +113,11 @@ local function SetupScrollBox(self)
 
     ScrollUtil.InitScrollBoxListWithScrollBar(self.ScrollBox, self.ScrollBar, view);
 
-    local function OnSelectionChanged(o, elementData, selected)
-        local button = self.ScrollBox:FindFrame(elementData)
+    local function OnSelectionChanged(o, node, selected)
+        local button = self.ScrollBox:FindFrame(node)
 
         if button and selected then
-            local data = elementData:GetData()
+            local data = node:GetData()
             if data.groupInfo then
                 button:SetEditMode(true)
             elseif data.taskInfo then
@@ -130,31 +130,226 @@ local function SetupScrollBox(self)
     self.selectionBehavior:RegisterCallback(SelectionBehaviorMixin.Event.OnSelectionChanged, OnSelectionChanged, self)
 end
 
-local function SetupDragBehavior(self)
-    self.dragBehavior = Todoloo.ScrollUtil.InitDefaultTaskListDragBehavior(self.ScrollBox)
-    self.dragBehavior:SetReorderable(true)
+function TodolooTaskListMixin:SetupDragBehavior()
+    local dragBehavior = Todoloo.ScrollUtil.AddTaskListDragBehavior(self.ScrollBox)
+
+    dragBehavior:SetReorderable(true)
+    dragBehavior:SetDragRelativeToCursor(true)
+    dragBehavior:SetAreaIntersectMargin(function(destinationElementData, sourceElementData, contextData)
+        if contextData.destinationData.parentElementData == nil and not destinationElementData.isGroup and not destinationElementData.isDivider then
+            return 20 * 0.5
+        end
+
+        return 20
+    end)
+
+
+    dragBehavior:SetDropEnter(function(factory, candidate)
+        local candidateArea = candidate.area
+        local candidateFrame = candidate.frame
+
+        if candidateFrame:GetElementData().data.taskInfo then
+            -- if our candidate is a task element
+            local frame = factory("TodolooScrollBoxDragLineTemplate")
+            if candidateArea == DragIntersectionArea.Above then
+                frame:SetPoint("BOTTOMLEFT", candidateFrame, "TOPLEFT", 40, 0);
+                frame:SetPoint("BOTTOMRIGHT", candidateFrame, "TOPRIGHT", -40, 0);
+            elseif candidateArea == DragIntersectionArea.Below then
+                frame:SetPoint("TOPLEFT", candidateFrame, "BOTTOMLEFT", 40, 0);
+                frame:SetPoint("TOPRIGHT", candidateFrame, "BOTTOMRIGHT", -40, 0);
+            end
+        elseif candidateFrame:GetElementData().data.groupInfo then
+            -- if our candidate is group element
+            local frame = factory("TodolooScrollBoxDragGroupTemplate");
+            if candidateArea == DragIntersectionArea.Above then
+                frame:SetPoint("BOTTOMLEFT", candidateFrame, "TOPLEFT", 40, 0);
+                frame:SetPoint("BOTTOMRIGHT", candidateFrame, "TOPRIGHT", -40, 0);
+            elseif candidateArea == DragIntersectionArea.Below then
+                frame:SetPoint("TOPLEFT", candidateFrame, "BOTTOMLEFT", 40, 0);
+                frame:SetPoint("TOPRIGHT", candidateFrame, "BOTTOMRIGHT", -40, 0);
+            elseif candidateArea == DragIntersectionArea.Inside then
+                frame:SetPoint("TOPLEFT", candidateFrame, "TOPLEFT", 0, 5);
+                frame:SetPoint("BOTTOMRIGHT", candidateFrame, "BOTTOMRIGHT", 0, 1);
+            end
+        end
+    end)
+
+
+    dragBehavior:SetNotifyDragStart(function(sourceFrame, dragging)
+        sourceFrame:SetAlpha(dragging and .5 or 1)
+        sourceFrame:SetMouseMotionEnabled(not dragging)
+        
+        if sourceFrame.GetElementData == nil then
+            -- If the source frame is no longer visible in the scrollbox.
+            -- This can happen if we're is scrolling whilst dragging.
+            return
+        end
+
+        local node = sourceFrame:GetElementData()
+        local sourceData = sourceFrame:GetData()
+
+        if sourceData.groupInfo then
+            node:SetCollapsed(dragging)
+            sourceFrame:SetCollapseState(dragging)
+        end
+    end)
+
+
+    dragBehavior:SetNotifyDropCandidates(function(candidateFrame, dragging, sourceElementData)
+        candidateFrame:SetMouseMotionEnabled(not dragging)
+        local node = candidateFrame:GetElementData()
+        local candidateData = candidateFrame:GetData()
+        local sourceData = sourceElementData:GetData()
+
+        if dragging and sourceData then
+            if sourceData.groupInfo and candidateData.groupInfo then
+                node:SetCollapsed(true)
+                candidateFrame:SetCollapseState(true)
+            end
+
+            if sourceData.character ~= candidateData.character then
+                -- If the candidate frame's registered character is not the same as the source frame beign dragged,
+                -- make sure to visualize that it's not possible to drag between characters
+                candidateFrame:SetAlpha(.5)
+            else
+                -- This only exists to handle the scenario where tasks and groups on the same character
+                -- disappears from the scroll box because of scrolling whilst dragging, and getting
+                -- added again when being rendered back into the scroll box
+                candidateFrame:SetAlpha(1)
+            end
+        else
+            if candidateData.groupInfo then
+                node:SetCollapsed(false)
+                candidateFrame:SetCollapseState(false)
+            end
+
+            candidateFrame:SetAlpha(1)
+        end
+    end)
+
+
+    -- Determines if the current drop case is valid.
+    dragBehavior:SetDropPredicate(function(sourceElementData, contextData)
+        -- Tasks and groups cannot be dropped directly above on inside a divider.
+        if contextData.elementData.isDivider then
+            return false
+        end
+
+        -- Nothing can be droppwn directly on a character.
+        if contextData.elementData.data.characterInfo then
+            return false
+        end
+
+        -- Cannot place groups within groups
+        if sourceElementData.data.groupInfo and contextData.elementData.data.groupInfo and contextData.area == DragIntersectionArea.Inside then
+            return false
+        end
+
+        -- Cannot place tasks within tasks
+        if sourceElementData.data.taskInfo and contextData.elementData.data.taskInfo and contextData.area == DragIntersectionArea.Inside then
+            return false
+        end
+
+        -- Cannot place tasks above or below groups
+        if sourceElementData.data.taskInfo and contextData.elementData.data.groupInfo and contextData.area ~= DragIntersectionArea.Inside then
+            return false
+        end
+
+        -- Cannot place tasks and groups across characters
+        if sourceElementData.data.character ~= contextData.elementData.data.character then
+            return false
+        end
+
+        -- Cannot place a task on a group the task is already in
+        if sourceElementData.data.taskInfo and contextData.elementData.data.groupInfo and sourceElementData.data.taskInfo.groupId == contextData.elementData.data.groupInfo.id then
+            return false
+        end
+
+        return true
+    end)
+
+    
+    -- Determines whether the frame can be dragged.
+    dragBehavior:SetDragPredicate(function(frame, elementData) 
+        -- Cannot drag dividers and characters
+        if elementData.isDivider or elementData.data.characterInfo then
+            return false
+        end
+
+        return true
+    end)
+
+
+    -- Update backing data based on the drop case.
+    dragBehavior:SetPostDrop(function(contextData)
+        local sourceData = contextData.sourceData
+        local sourceElementData = sourceData.elementData:GetData()
+        
+        local destinationData = contextData.destinationData
+        local destinationElementData = destinationData.elementData:GetData()
+
+        local area = contextData.area
+
+        -- If we're moving a group relative to another group.
+        if sourceElementData.groupInfo and destinationElementData.groupInfo then
+            local sourceId = sourceElementData.groupInfo.id
+            local newGroupId = destinationElementData.groupInfo.id
+            if area == DragIntersectionArea.Below then
+                newGroupId = newGroupId + 1
+            end
+
+            PlaySound(SOUNDKIT.UI_90_BLACKSMITHING_TREEITEMCLICK)
+            Todoloo.TaskManager:MoveGroup(sourceId, newGroupId, destinationElementData.character)
+
+        -- If we're moving a task.
+        elseif sourceElementData.taskInfo then
+            local sourceId = sourceElementData.taskInfo.id
+            local sourceGroupId = sourceElementData.taskInfo.groupId
+            -- If we're moving a task inside a new group.
+            if area == DragIntersectionArea.Inside and destinationElementData.groupInfo and destinationElementData.groupInfo.id ~= sourceElementData.taskInfo.groupId then
+                -- Moving task into the same group as the one it's already in, do nothing
+                if destinationElementData.groupInfo.id == sourceElementData.taskInfo.groupId then
+                    return
+                end
+
+                -- Otherwise we need to move the task to the new group.
+                PlaySound(SOUNDKIT.UI_90_BLACKSMITHING_TREEITEMCLICK)
+                Todoloo.TaskManager:MoveTask(sourceId, sourceGroupId, destinationElementData.groupInfo.id, nil, destinationElementData.character)
+            
+            -- Moving task to a new group, relative to another task
+            elseif destinationElementData.taskInfo and destinationElementData.taskInfo.groupId ~= sourceGroupId then
+                local offset = 0
+                if area == DragIntersectionArea.Blow then
+                    offset = 1
+                end
+
+                PlaySound(SOUNDKIT.UI_90_BLACKSMITHING_TREEITEMCLICK)
+                local newTaskId = destinationElementData.taskInfo.id + offset
+                Todoloo.TaskManager:MoveTask(sourceId, sourceGroupId, destinationElementData.taskInfo.groupId, newTaskId, destinationElementData.character)
+                
+            -- Moving a task within the same group, but relative to another task
+            else
+                local offset = 0
+                if area == DragIntersectionArea.Below then
+                    offset = 1
+                end
+
+                PlaySound(SOUNDKIT.UI_90_BLACKSMITHING_TREEITEMCLICK)
+                local newTaskId = destinationElementData.taskInfo.id + offset
+                Todoloo.TaskManager:MoveTask(sourceId, sourceGroupId, sourceGroupId, newTaskId, destinationElementData.character)
+            end
+        end
+    end)
 end
 
 function TodolooTaskListMixin:OnLoad()
     Todoloo.EventBus:RegisterSource(self, "task_list")
 
     -- setup scroll box
-    SetupScrollBox(self)
+    self:SetupScrollBox(self)
 
     -- setup drag behaviour
-    SetupDragBehavior(self)
-
-    -- setup filter menu
-    self.FilterButton:SetResetFunction(Todoloo.Tasks.SetDefaultFilters)
-    self.FilterButton:SetScript("OnMouseDown", function(button, buttonName, down)
-        UIMenuButtonStretchMixin.OnMouseDown(self.FilterButton, buttonName); --TODO: What does this do?
-        ToggleDropDownMenu(1, nil, self.FilterDropDown, self.FilterButton, 74, 15);
-        PlaySound(SOUNDKIT.UI_PROFESSION_FILTER_MENU_OPEN_CLOSE);
-    end)
-
-    -- setup filter menu
-    UIDropDownMenu_SetInitializeFunction(self.FilterDropDown, GenerateClosure(self.InitializeFilterContextMenu, self))
-    UIDropDownMenu_SetDisplayMode(self.FilterDropDown, "MENU")
+    self:SetupDragBehavior()
 
     -- setup context menus
     UIDropDownMenu_SetInitializeFunction(self.CharacterContextMenu, GenerateClosure(self.InitializeCharacterContextMenu, self))
@@ -167,8 +362,8 @@ function TodolooTaskListMixin:OnLoad()
     UIDropDownMenu_SetDisplayMode(self.TaskContextMenu, "MENU")
 end
 
-function TodolooTaskListMixin:InitializeFilterContextMenu(dropdown, level)
-    Todoloo.Tasks.InitFilterMenu(dropdown, level, GenerateClosure(self.UpdateFilterResetVisibility, self))
+function TodolooTaskListMixin:OnShow()
+    Todoloo.Tasks.InitFilterMenu(self.FilterButton)
 end
 
 function TodolooTaskListMixin:UpdateFilterResetVisibility()
