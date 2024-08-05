@@ -77,63 +77,43 @@ local function GetSortedCharactersTable(characters)
     return nameTable
 end
 
-function Todoloo.Tasks.InitFilterMenu(dropdown, level, onUpdate)
-    local filterSystem = {}
-    filterSystem.onUpdate = onUpdate
-    filterSystem.filters =
-    {
-        {
-            type = FilterComponent.TextButton,
-            text = "Check all",
-            set = function()
-                Todoloo.Tasks.CheckAllFilters()
-            end
-        },
-        {
-            type = FilterComponent.TextButton,
-            text = "Uncheck all",
-            set = function()
-                Todoloo.Tasks.UncheckAllFilters()
-            end
-        },
-        { type = FilterComponent.Separator }
-    }
+function Todoloo.Tasks.InitFilterMenu(dropdown)
+    dropdown:SetDefaultCallback(function()
+        Todoloo.Tasks.SetDefaultFilters()
+    end)
 
-    -- add all realms to filter system as title
-    local realms = Todoloo.TaskManager:GetAllRealms()
-    table.sort(realms, SortStrings)
-    for _, realm in pairs(realms) do
-        local realmFilter =
-        {
-            type = FilterComponent.Title,
-            text = realm
-        }
-        table.insert(filterSystem.filters, realmFilter)
+    dropdown:SetIsDefaultCallback(function()
+        return Todoloo.Tasks.IsUsingDefaultFilters()
+    end)
 
-        -- get all realm characters and add to filter system as checkboxes
-        local realmCharacters = Todoloo.TaskManager:GetAllCharacters(realm)
-        local sortedCharacters = GetSortedCharactersTable(realmCharacters)
-        
-        for _, characterFullName in ipairs(sortedCharacters) do
-            local characterName = select(1, strsplit("-", characterFullName))
-            local characterFilter =
-            {
-                type = FilterComponent.Checkbox,
-                text = characterName,
-                set = function(value)
-                    Todoloo.Tasks.SetCharacterFilter(characterFullName, value)
-                end,
-                isSet = function()
+    dropdown:SetupMenu(function(dropdown, rootDescription)
+        rootDescription:SetTag("MENU_TODOLOO_TASKS_FILTER")
+
+        rootDescription:CreateButton("Check all", Todoloo.Tasks.CheckAllFilters)
+        rootDescription:CreateButton("Uncheck all", Todoloo.Tasks.UncheckAllFilters)
+
+        rootDescription:CreateDivider()
+
+        -- Add all realms to filter system as title.
+        local realms = Todoloo.TaskManager:GetAllRealms()
+        table.sort(realms, SortStrings)
+        for _, realm in pairs(realms) do
+            rootDescription:CreateTitle(realm)
+
+            -- get all realm characters and add to filter system as checkboxes
+            local realmCharacters = Todoloo.TaskManager:GetAllCharacters(realm)
+            local sortedCharacters = GetSortedCharactersTable(realmCharacters)
+
+            for _, characterFullName in ipairs(sortedCharacters) do
+                rootDescription:CreateCheckbox(characterFullName, function()
                     return Todoloo.Tasks.IsCharacterFiltered(characterFullName)
-                end
-            }
-            table.insert(filterSystem.filters, characterFilter)
+                end, function()
+                    Todoloo.Tasks.SetCharacterFilter(characterFullName, not Todoloo.Tasks.IsCharacterFiltered(characterFullName))
+                end)
+            end
         end
-    end
 
-    FilterDropDownSystem.Initialize(dropdown, filterSystem, level)
-
-    return filterSystem
+    end)
 end
 
 local function GetFilteredTasks(characters, searchCriteria)
