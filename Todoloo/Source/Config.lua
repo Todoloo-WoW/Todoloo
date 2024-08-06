@@ -4,6 +4,7 @@ local _, Todoloo = ...
 Todoloo.Config.Options = {
     -- ***** TASK TRACKER SETTINGS
     SHOW_TASK_TRACKER = "show_task_tracker",
+    ATTACH_TASK_TRACKER_TO_OBJECTIVE_TRACKER = "attach_task_tracker_to_objective_tracker",
     TASK_TRACKER_BACKGROUND_OPCAITY = "task_tracker_background_opacity",
     SHOW_COMPLETED_GROUPS = "show_completed_groups",
     SHOW_COMPLETED_TASKS = "show_completed_tasks",
@@ -20,11 +21,12 @@ Todoloo.Config.Options = {
 
     -- ***** CALCULATED VALUES
     LAST_RESET_PERFORMED = "last_reset_performed"
-}
+};
 
 ---Default Todoloo config option values
 Todoloo.Config.Defaults = {
     [Todoloo.Config.Options.SHOW_TASK_TRACKER] = true,
+    [Todoloo.Config.Options.ATTACH_TASK_TRACKER_TO_OBJECTIVE_TRACKER] = false,
     [Todoloo.Config.Options.TASK_TRACKER_BACKGROUND_OPCAITY] = 0,
     [Todoloo.Config.Options.SHOW_COMPLETED_GROUPS] = true,
     [Todoloo.Config.Options.SHOW_COMPLETED_TASKS] = false,
@@ -38,7 +40,7 @@ Todoloo.Config.Defaults = {
     [Todoloo.Config.Options.DEBUG] = false,
 
     [Todoloo.Config.Options.LAST_RESET_PERFORMED] = GetServerTime()
-}
+};
 
 -- *****************************************************************************************************
 -- ***** INITIALIZATION
@@ -48,18 +50,18 @@ Todoloo.Config.Defaults = {
 function Todoloo.Config.Reset()
     TODOLOO_CONFIG = {}
     for option, value in pairs(Todoloo.Config.Defaults) do
-        TODOLOO_CONFIG[option] = value
+        TODOLOO_CONFIG[option] = value;
     end
 end
 
 ---Initialize Todoloo config
 function Todoloo.Config.Initialize()
     if TODOLOO_CONFIG == nil then
-        Todoloo.Config.Reset()
+        Todoloo.Config.Reset();
     else
         for option, value in pairs(Todoloo.Config.Defaults) do
             if TODOLOO_CONFIG[option] == nil then
-                TODOLOO_CONFIG[option] = value
+                TODOLOO_CONFIG[option] = value;
             end
         end
     end
@@ -75,11 +77,11 @@ end
 function Todoloo.Config.IsValidOption(name)
     for _, option in pairs(Todoloo.Config.Options) do
         if option == name then
-            return true
+            return true;
         end
     end
 
-    return false
+    return false;
 end
 
 ---Get config option value
@@ -87,11 +89,11 @@ end
 ---@return any # Config value
 function Todoloo.Config.Get(name)
     if TODOLOO_CONFIG == nil  then
-        return Todoloo.Config.Default[name]
+        return Todoloo.Config.Default[name];
     elseif not Todoloo.Config.IsValidOption(name) then
-        error("Invalid option")
+        error("Invalid option");
     else
-        return TODOLOO_CONFIG[name]
+        return TODOLOO_CONFIG[name];
     end
 end
 
@@ -100,10 +102,10 @@ end
 ---@param value any Config option value
 function Todoloo.Config.Set(name, value)
     if TODOLOO_CONFIG == nil  then
-        error("TODOLOO_CONFIG not initialized")
+        error("TODOLOO_CONFIG not initialized");
     elseif not Todoloo.Config.IsValidOption(name) then
-        error("Invalid option")
+        error("Invalid option");
     else
-        TODOLOO_CONFIG[name] = value
+        TODOLOO_CONFIG[name] = value;
     end
 end

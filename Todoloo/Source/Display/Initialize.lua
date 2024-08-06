@@ -1,20 +1,14 @@
 local _, Todoloo = ...
 
-local function InitializeBase()
-    Todoloo.MinimapIcon.Initialize()
-
-    -- toggle task tracker frame
-    Todoloo.ToggleTracker = function()
-        --TODO: Show something else than just the task tracker?)
-        TodolooTrackerFrame:SetShown(not TodolooTrackerFrame:IsShown())
-    end
+local function OnAddonLoaded()
+    Todoloo.MinimapIcon.Initialize();
 
     -- toggle task management frame
     Todoloo.ToggleTaskManager = function()
         if TodolooTaskManagerFrame:IsVisible() then
-            HideUIPanel(TodolooTaskManagerFrame)
+            HideUIPanel(TodolooTaskManagerFrame);
         else
-            ShowUIPanel(TodolooTaskManagerFrame)
+            ShowUIPanel(TodolooTaskManagerFrame);
         end
     end
 
@@ -25,29 +19,30 @@ local function InitializeBase()
         pushable = 1,
         allowOtherPanels = 1,
         checkFit = 1
-    }
-    RegisterUIPanel(TodolooTaskManagerFrame, attributes)
+    };
+    RegisterUIPanel(TodolooTaskManagerFrame, attributes);
 end
 
-local function InitializeCharacter()
-    if Todoloo.Config.Get(Todoloo.Config.Options.SHOW_TASK_TRACKER) then
-        Todoloo.Debug.Message("Show task tracker")
-        TodolooTrackerFrame:Show()
+local function OnPlayerEnteringWorld()
+    if Todoloo.Config.Get(Todoloo.Config.Options.SHOW_TASK_TRACKER) and not Todoloo.Config.Get(Todoloo.Config.Options.ATTACH_TASK_TRACKER_TO_OBJECTIVE_TRACKER) then
+        TodolooFloatingTrackerFrame:Show();
     end
+
+    ObjectiveTrackerManager:SetModuleContainer(TodolooObjectiveTracker, ObjectiveTrackerFrame);
 end
 
 local CORE_EVENTS = {
     "ADDON_LOADED",
     "PLAYER_ENTERING_WORLD"
-}
-local coreFrame = CreateFrame("Frame")
+};
+local coreFrame = CreateFrame("Frame");
 
-FrameUtil.RegisterFrameForEvents(coreFrame, CORE_EVENTS)
+FrameUtil.RegisterFrameForEvents(coreFrame, CORE_EVENTS);
 coreFrame:SetScript("OnEvent", function(self, eventName, name)
     if eventName == "ADDON_LOADED" and name == "Todoloo" then
-        self:UnregisterEvent("ADDON_LOADED")
-        InitializeBase()
+        self:UnregisterEvent("ADDON_LOADED");
+        OnAddonLoaded();
     elseif eventName == "PLAYER_ENTERING_WORLD" then
-        InitializeCharacter()
+        OnPlayerEnteringWorld();
     end
 end)

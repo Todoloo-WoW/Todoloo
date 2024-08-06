@@ -1,44 +1,5 @@
 local _, Todoloo = ...
 
---TODO: Clean up file
-
-TODOLOO_TRACKER_HEADER_HEIGHT   = 25
-TODOLOO_TRACKER_TASK_WIDTH      = 248
-TODOLOO_TRACKER_HEADER_OFFSET_X = -10
-TODOLOO_TRACKER_MAX_HEIGHT      = 700
-
--- calculated values
-TODOLOO_TRACKER_DASH_WIDTH = 0
-TODOLOO_TRACKER_TEXT_WIDTH = 0
-
--- colors used throughout the task tracker
-TODOLOO_TRACKER_COLOR = {
-    ["Normal"] = { r = 0.8, g = 0.8, b = 0.8 },
-    ["NormalHighlight"] = { r = HIGHLIGHT_FONT_COLOR.r, g = HIGHLIGHT_FONT_COLOR.g, b = HIGHLIGHT_FONT_COLOR.b },
-    ["Header"] = { r = 0.75, g = 0.61, b = 0 },
-    ["HeaderHighlight"] = { r = NORMAL_FONT_COLOR.r, g = NORMAL_FONT_COLOR.g, b = NORMAL_FONT_COLOR.b },
-    ["Complete"] = { r = 0.6, g = 0.6, b = 0.6 },
-    ["CompleteHighlight"] = { r = HIGHLIGHT_FONT_COLOR.r, g = HIGHLIGHT_FONT_COLOR.g, b = HIGHLIGHT_FONT_COLOR.b }
-}
-    TODOLOO_TRACKER_COLOR["Normal"].reverse = TODOLOO_TRACKER_COLOR["NormalHighlight"]
-    TODOLOO_TRACKER_COLOR["NormalHighlight"].reverse = TODOLOO_TRACKER_COLOR["Normal"]
-    TODOLOO_TRACKER_COLOR["Header"].reverse = TODOLOO_TRACKER_COLOR["HeaderHighlight"]
-    TODOLOO_TRACKER_COLOR["HeaderHighlight"].reverse = TODOLOO_TRACKER_COLOR["Header"]
-    TODOLOO_TRACKER_COLOR["Complete"].reverse = TODOLOO_TRACKER_COLOR["CompleteHighlight"]
-    TODOLOO_TRACKER_COLOR["CompleteHighlight"].reverse = TODOLOO_TRACKER_COLOR["Complete"]
-
--- task states
-TODOLOO_TRACKER_TASK_STATE_PRESENT     = 0
-TODOLOO_TRACKER_TASK_STATE_ADDING      = 1
-TODOLOO_TRACKER_TASK_STATE_COMPLETING  = 2
-TODOLOO_TRACKER_TASK_STATE_COMPLETED   = 3
-TODOLOO_TRACKER_TASK_STATE_FADING      = 4
-
--- dash styles for tasks
-TODOLOO_TRACKER_DASH_STYLE_SHOW                = 1
-TODOLOO_TRACKER_DASH_STYLE_HIDE                = 2
-TODOLOO_TRACKER_DASH_STYLE_HIDE_AND_COLLAPSE   = 3
-
 -- *****************************************************************************************************
 -- ***** MODULE
 -- *****************************************************************************************************
@@ -67,7 +28,7 @@ function TODOLOO_DEFAULT_TRACKER_MODULE:OnLoad(friendlyName, defaultTemplate)
     self.updateReasonModule = 0
     self.updateReasonEvents = 0
 
-    self.groupsFrame = TodolooTrackerFrame.GroupsFrame
+    self.groupsFrame = TodolooFloatingTrackerFrame.GroupsFrame
 
     TODOLOO_DEFAULT_TRACKER_MODULE.AddGroupOffset(self, self.groupTemplate, 0, -6)
 end
@@ -211,7 +172,7 @@ function TODOLOO_DEFAULT_TRACKER_MODULE:GetGroup(id, overrideType, overrideTempl
 
     -- if no existing group exists, create it
     if not group then
-        local pool = self.poolCollection:GetOrCreatePool(groupType, self.GroupsFrame or TodolooTrackerFrame.GroupsFrame, groupTemplate)
+        local pool = self.poolCollection:GetOrCreatePool(groupType, self.GroupsFrame or TodolooFloatingTrackerFrame.GroupsFrame, groupTemplate)
 
         local isNewGroup = nil
         group, isNewGroup = pool:Acquire(self.groupTemplate)
@@ -698,7 +659,8 @@ function TodolooTracker_OnShow(self)
         Todoloo.Tasks.Events.TASK_RESET,
         Todoloo.Tasks.Events.TASK_UPDATED,
         Todoloo.Tasks.Events.TASK_MOVED,
-        Todoloo.Reset.Events.RESET_PERFORMED
+        Todoloo.Reset.Events.RESET_PERFORMED,
+        Todoloo.Config.Events.CONFIG_CHANGED
     }, TodolooTracker_ReceiveEvent)
     
     --TODO: Set max height based on Todoloo config
@@ -735,7 +697,7 @@ end
 
 ---Event handling (custom Todoloo events)
 function TodolooTracker_ReceiveEvent(event, ...)
-    TodolooTracker_Update()
+    TodolooTracker_Update();
 end
 
 function TodolooTracker_OnSizeChanged(self)
@@ -751,7 +713,7 @@ end
 ---Set the opacity of the background based on Todoloo config
 --TODO: Awaiting implementation
 function TodolooTracker_UpdateOpacity()
-    local self = TodolooTrackerFrame
+    local self = TodolooFloatingTrackerFrame
     local alpha = Todoloo.Config.Get(Todoloo.Config.Options.TASK_TRACKER_BACKGROUND_OPACITY) / 100
     self.NineSlice:SetAlpha(alpha)
 end
@@ -759,20 +721,20 @@ end
 ---Update the background
 --TODO: Awaiting implementation
 function TodolooTracker_UpdateBackground()
-    TodolooTrackerFrame.NineSlice:Hide()
+    TodolooFloatingTrackerFrame.NineSlice:Hide()
     --TODO: Implement
 
-    -- if lastGroup and not TodolooTrackerFrame.collapsed then
-    --     TodolooTrackerFrame.NineSlice:Show()
-    --     TodolooTrackerFrame.NineSlice:SetPoint("BOTTOM", lastGroup, "BOTTOM", 0, -10)
+    -- if lastGroup and not TodolooFloatingTrackerFrame.collapsed then
+    --     TodolooFloatingTrackerFrame.NineSlice:Show()
+    --     TodolooFloatingTrackerFrame.NineSlice:SetPoint("BOTTOM", lastGroup, "BOTTOM", 0, -10)
     -- else
-    --     TodolooTrackerFrame.NineSlice:Hide()
+    --     TodolooFloatingTrackerFrame.NineSlice:Hide()
     -- end
 end
 
 --TODO: Add resizing logic
 function TodolooTracker_UpdateResizeButton()
-    -- local tracker = TodolooTrackerFrame
+    -- local tracker = TodolooFloatingTrackerFrame
 
     -- if tracker.resizing then
     --     return;
@@ -788,18 +750,18 @@ function TodolooTracker_UpdateResizeButton()
     -- end
 
 
-    -- if lastGroup and not TodolooTrackerFrame.collapsed then
-    --     TodolooTrackerFrame.ResizeButton:Show()
-    --     TodolooTrackerFrame.ResizeButton:SetPoint("BOTTOMRIGHT", lastGroup, "BOTTOMRIGHT", 0, -10)
+    -- if lastGroup and not TodolooFloatingTrackerFrame.collapsed then
+    --     TodolooFloatingTrackerFrame.ResizeButton:Show()
+    --     TodolooFloatingTrackerFrame.ResizeButton:SetPoint("BOTTOMRIGHT", lastGroup, "BOTTOMRIGHT", 0, -10)
     -- else
-    --     TodolooTrackerFrame.ResizeButton:Hide()
+    --     TodolooFloatingTrackerFrame.ResizeButton:Hide()
     -- end
 end
 
 ---Get currently visible headers across all modules
 function TodolooTracker_GetVisibleHeaders()
     local headers = {}
-    for _, module in ipairs(TodolooTrackerFrame.MODULES) do
+    for _, module in ipairs(TodolooFloatingTrackerFrame.MODULES) do
         local header = module.Header
         if header.added and header:IsVisible() then
             headers[header] = true
@@ -810,7 +772,7 @@ function TodolooTracker_GetVisibleHeaders()
 end
 
 function TodolooTracker_Update(reason, id, subInfo)
-    local tracker = TodolooTrackerFrame
+    local tracker = TodolooFloatingTrackerFrame
 
     if not reason then
         --TODO: See line 1404 in Blizzard_ObjectiveTracker.lua. Is this necessary?

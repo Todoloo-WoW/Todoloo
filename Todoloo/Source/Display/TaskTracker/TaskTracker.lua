@@ -3,7 +3,7 @@ local _, Todoloo = ...
 --TODO Clean up file
 
 TODOLOO_TASK_TRACKER_MODULE = TodolooTracker_GetModuleInfoTable("TODOLOO_TASK_TRACKER_MODULE")
-TODOLOO_TASK_TRACKER_MODULE:SetHeader(TodolooTrackerFrame.GroupsFrame.TaskHeader, "Todoloo's")
+TODOLOO_TASK_TRACKER_MODULE:SetHeader(TodolooFloatingTrackerFrame.GroupsFrame.TaskHeader, "Todoloo's")
 
 ---@class GroupInfo
 ---@field name string Name of the group

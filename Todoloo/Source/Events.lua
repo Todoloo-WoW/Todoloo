@@ -19,8 +19,12 @@ Todoloo.Tasks.Events = {
     -- ***** OTHER
     TASK_LIST_UPDATE    = "TASK_LIST_UPDATE",   -- fired whenever a search within the task manager has begun
     FILTER_CHANGED      = "FILTER_CHANGED",     -- fired when filter in task manager has changed
-}
+};
 
 Todoloo.Reset.Events = {
     RESET_PERFORMED = "RESET_PERFORMED"
-}
+};
+
+Todoloo.Config.Events = {
+    CONFIG_CHANGED = "CONFIG_CHANGED"
+};

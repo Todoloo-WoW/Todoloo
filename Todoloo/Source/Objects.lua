@@ -1,17 +1,17 @@
 local _, Todoloo = ...
 
 -- ***** CORE
-Todoloo.Tasks = {}
-Todoloo.Reset = { ResetManager = {} }
-Todoloo.EventBus = {}
+Todoloo.Tasks = {};
+Todoloo.Reset = { ResetManager = {} };
+Todoloo.EventBus = {};
 
 -- ***** SETTINGS & CONFIG
-Todoloo.Config = {}
-Todoloo.MinimapIcon = {}
+Todoloo.Config = {};
+Todoloo.MinimapIcon = {};
 
 -- ***** FRAME UTILS
-Todoloo.ScrollUtil = {}
+Todoloo.ScrollUtil = {};
 
 -- ***** OTHERS
-Todoloo.Utils = {}
-Todoloo.Debug = {}
+Todoloo.Utils = {};
+Todoloo.Debug = {};
