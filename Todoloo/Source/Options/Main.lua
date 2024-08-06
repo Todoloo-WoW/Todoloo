@@ -2,9 +2,9 @@ local _, Todoloo = ...
 
 function Todoloo.Config.Show()
     if Settings and SettingsPanel then
-        Settings.OpenToCategory("Todoloo")
+        Settings.OpenToCategory("Todoloo");
     elseif InterfaceOptionsFrame ~= nil then
-        InterfaceOptionsFrame:Show()
-        InterfaceOptionsFrame_OpenToCategory("Todoloo")
+        InterfaceOptionsFrame:Show();
+        InterfaceOptionsFrame_OpenToCategory("Todoloo");
     end
 end

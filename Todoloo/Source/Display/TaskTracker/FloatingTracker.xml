@@ -1,12 +1,8 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
 https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/FrameXML/UI_shared.xsd">
 	
-	<Script file="Tracker.lua" />
+	<Script file="FloatingTracker.lua" />
 
-    <!-- 
-        Template resembling Blizzard ObjectiveTrackerMinimizeButtonTemplate.
-        Thie template is used only once, to collapse Todoloo tracker module.
-    -->
     <Button name="TodolooTrackerMinimizeButtonTemplate" mixin="TodolooTrackerMinimizeButtonMixin" virtual="true">
 		<KeyValues>
   			<KeyValue key="buttonType" value="all" type="string"/>
@@ -20,10 +16,6 @@ https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/FrameXML/UI
 		</Scripts>
 	</Button>
 
-    <!-- 
-        Template resembling Blizzard ObjectiveTrackerHeaderTemplate.
-        This template is used only once, to display all groups and tasks.
-    -->
     <Frame name="TodolooTrackerHeaderTemplate" mixin="TodolooTrackerHeaderMixin" virtual="true" hidden="true">
         <Size x="235" y="25" />
         <Layers>
@@ -108,12 +100,51 @@ https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/FrameXML/UI
 		</Scripts>
     </Frame>
 
-    <!-- 
-        Template resembling Blizzard ObjectiveTrackerBlockTemplate.
-        This template is used to display task group names, and should therefore
-        be combine with and nested under TodolooTrackerHeaderTemplate.
-    -->
-	<!--TODO: Rename everything "Header" to simply "Group" - This has nothing to do with a header-->
+	<Frame name="TodolooFloatingTrackerHeaderTemplate" mixin="TodolooFloatingTrackerHeaderMixin" virtual="true">
+		<Size x="260" y="32"/>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture parentKey="Background" atlas="ui-questtracker-primary-objective-header" useAtlasSize="true">
+					<Anchors>
+						<Anchor point="CENTER"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="ARTWORK">
+				<FontString parentKey="Text" inherits="ObjectiveTrackerHeaderFont" mixin="AutoScalingFontStringMixin" maxLines="1" justifyH="LEFT">
+					<KeyValues>
+						<KeyValue key="minLineHeight" value="12" type="number"/>
+					</KeyValues>
+					<Size x="208"/>
+					<Anchors>
+						<Anchor point="LEFT" x="7" y="0"/>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button parentKey="MinimizeButton" inherits="ObjectiveTrackerContainerMinimizeButtonTemplate">
+				<KeyValues>
+		  			<KeyValue key="buttonType" value="module" type="string"/>
+		  		</KeyValues>
+				<Anchors>
+					<Anchor point="RIGHT" x="-1"/>
+				</Anchors>
+			</Button>
+			<Button parentKey="FilterButton" inherits="ObjectiveTrackerContainerFilterButtonTemplate" hidden="true">
+				<KeyValues>
+		  			<KeyValue key="buttonType" value="module" type="string"/>
+		  		</KeyValues>
+				<Anchors>
+					<Anchor point="RIGHT" relativeKey="$parent.MinimizeButton" relativePoint="LEFT" x="-2"/>
+				</Anchors>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnLoad method="OnLoad"/>
+		</Scripts>
+	</Frame>
+
     <Frame name="TodolooTrackerGroupTemplate" hidden="true" virtual="true">
         <Size x="232" y="10" />
         <Layers>
@@ -143,11 +174,6 @@ https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/FrameXML/UI
         </Frames>
     </Frame>
 
-    <!-- 
-        Template resembling a combination of Blizzard ObjectTrackerLineTemplate and QuestObjectiveAnimLineTemplate.
-        This template is used to display the individual tasks in a group, and should therefore
-        be combined with and nested under TodolooTrackerGroupTemplate.
-    -->
     <Frame name="TodolooTrackerTaskTemplate" mixin="TodolooTrackerTaskMixin" virtual="true">
 		<Size x="232" y="16"/>
 		<Layers>
@@ -254,11 +280,6 @@ https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/FrameXML/UI
 		</Scripts>
 	</Frame>
 
-    <!-- 
-        Template resembling Blizzard ObjectiveTrackerProgressBarTemplate.
-        This template is used to display progress on the group based on tasks.
-    -->
-	<!--TODO: This is not yet used, but could be implemented as a config-->
     <Frame name="TodolooTrackerProgressBarTemplate" virtual="true" hidden="true">
 		<Size x="192" y="25"/>
 		<Anchors>
@@ -314,17 +335,12 @@ https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/FrameXML/UI
 		</Scripts>
 	</Frame>
     
-    <!-- 
-        Frame resembling Blizzard ObjectiveTrackerFrame.
-        This frame is our main tracker frame, which resembles the games objective frame with quests.
-    -->
-    <Frame name="TodolooTrackerFrame" parent="UIParent" movable="true" clampedToScreen="true" frameStrata="LOW">
+    <Frame name="TodolooFloatingTrackerFrame" parent="UIParent" movable="true" clampedToScreen="true" frameStrata="LOW" hidden="true">
         <Size x="235" y="500" />
 		<Anchors>
 			<Anchor point="TOPLEFT" x="100" y="-150" />
 		</Anchors>
         <Frames>
-            <!-- Used to set a background if the player prefers that -->
             <Frame parentKey="NineSlice" useParentLevel="true" inherits="NineSlicePanelTemplate">
 				<KeyValues>
 					<KeyValue key="layoutType" value="UniqueCornersLayout" type="string"/>

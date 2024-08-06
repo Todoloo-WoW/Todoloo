@@ -8,13 +8,14 @@ Todoloo is your friendly in-game task management assistant, making sure you've n
 * Create character specific tasks that automatically reset daily, weekly, or manually
 * Organize your tasks in custom made groups
 * Blizzard styled task manager to create, update, delete and reorganize groups and tasks
-* Blizzard styled task tracker to visualize your tasks
+* Blizzard styled floating task tracker or task tracker attached to the overall objective tracker, to visualize your tasks
 * Hide completed tasks and groups from the task tracker
 
 ## ❓ Getting started
 ### Task Tracker
 * `Shift` + `Left-Click` on tasks in the task tracker to toggle completion
-* Click and drag the task tracker around, to place the it as you see fit
+* Toggle between floating task tracker and task trakcer attached to the objective tracker
+* Click and drag the floating task tracker around, to place the it as you see fit
 * Toggle whether you want to see completed tasks and/or completed groups, in Todoloo settings (_`Right-Click` on the minimap icon, or via the options_)
 
 ### Task Manager

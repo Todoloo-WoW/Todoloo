@@ -7,36 +7,36 @@ local _, Todoloo = ...
 -- ***** A big thanks goes out to you for providing the idea of a custom event bus.
 -- *****************************************************************************************************
 
-TodolooEventBusMixin = {}
+TodolooEventBusMixin = {};
 
 function TodolooEventBusMixin:Init()
-    self.registeredListeners = {}
-    self.sources = {}
-    self.queue = {}
+    self.registeredListeners = {};
+    self.sources = {};
+    self.queue = {};
 end
 
 ---Register event source
 ---@param source any Source of events
 ---@param name string Source name
 function TodolooEventBusMixin:RegisterSource(source, name)
-    self.sources[source] = name
+    self.sources[source] = name;
 
-    return self
+    return self;
 end
 
 ---Unregister event source
 ---@param source any Source of events
 function TodolooEventBusMixin:UnregisterSource(source)
-    self.sources[source] = nil
+    self.sources[source] = nil;
 
-    return self
+    return self;
 end
 
 ---Is the given source of events currently registered?
 ---@param source any Source of events
 ---@return boolean # True if registered, false otherwise
 function TodolooEventBusMixin:IsSourceRegistered(source)
-    return self.sources[source] ~= nil
+    return self.sources[source] ~= nil;
 end
 
 ---Register multiple events to the given listener
@@ -45,23 +45,23 @@ end
 ---@param func function? Optional alternative function
 function TodolooEventBusMixin:RegisterEvents(listener, eventNames, func)
     if listener.ReceiveEvent == nil and func == nil then
-        error("Attempted to register and invalid listener. 'ReceiveEvent' of 'fun' method must be defined.")
-        return self
+        error("Attempted to register and invalid listener. 'ReceiveEvent' of 'fun' method must be defined.");
+        return self;
     end
 
     if listener.ReceiveEvent == nil and func ~= nil then
-        listener.ReceiveEvent = func
+        listener.ReceiveEvent = func;
     end
 
     for _, eventName in ipairs(eventNames) do
         if self.registeredListeners[eventName] == nil then
-            self.registeredListeners[eventName] = {}
+            self.registeredListeners[eventName] = {};
         end
 
-        table.insert(self.registeredListeners[eventName], listener)
+        table.insert(self.registeredListeners[eventName], listener);
     end
 
-    return self
+    return self;
 end
 
 ---Register a single event to the given listener
@@ -69,17 +69,17 @@ end
 ---@param eventName string Event name to register the listener to
 function TodolooEventBusMixin:RegisterEvent(listener, eventName)
     if listener.ReceiveEvent == nil then
-        error("Attempted to register and invalid listener. 'ReceiveEvent' method must be defined.")
-        return self
+        error("Attempted to register and invalid listener. 'ReceiveEvent' method must be defined.");
+        return self;
     end
 
     if self.registeredListeners[eventName] == nil then
-        self.registeredListeners[eventName] = {}
+        self.registeredListeners[eventName] = {};
     end
 
-    table.insert(self.registeredListeners[eventName], listener)
+    table.insert(self.registeredListeners[eventName], listener);
 
-    return self
+    return self;
 end
 
 ---Unregister multiple events from the given listener
@@ -87,25 +87,25 @@ end
 ---@param eventNames string[] List of events to unregister the listener from
 function TodolooEventBusMixin:UnregisterEvents(listener, eventNames)
     for _, eventName in ipairs(eventNames) do
-        local index = tIndexOf(self.registeredListeners[eventName], listener)
+        local index = tIndexOf(self.registeredListeners[eventName], listener);
         if index ~= nil then
-            table.remove(self.registeredListeners[eventName], index)
+            table.remove(self.registeredListeners[eventName], index);
         end
     end
 
-    return self
+    return self;
 end
 
 ---Unregister a single event from the given listener
 ---@param listener any Listener to unregister
 ---@param eventName string Event to unregsiter the listener from
 function TodolooEventBusMixin:UnregisterEvent(listener, eventName)
-    local index = tIndexOf(self.registeredListeners[eventName], listener)
+    local index = tIndexOf(self.registeredListeners[eventName], listener);
     if index ~= nil then
-        table.remove(self.registeredListeners[eventName], index)
+        table.remove(self.registeredListeners[eventName], index);
     end
 
-    return self
+    return self;
 end
 
 ---Fire event from the given source
@@ -114,19 +114,19 @@ end
 ---@param ... any Event data
 function TodolooEventBusMixin:TriggerEvent(source, eventName, ...)
     if self.sources[source] == nil then
-        error("Trying to trigger event (" .. eventName .. ") from an unregistered source. All events sources must be registered.")
+        error("Trying to trigger event (" .. eventName .. ") from an unregistered source. All events sources must be registered.");
     end
 
     if self.registeredListeners[eventName] == nil then
         -- no active listener
-        return self
+        return self;
     end
 
     for _, listener in ipairs(self.registeredListeners[eventName]) do
-        listener:ReceiveEvent(eventName, ...)
+        listener:ReceiveEvent(eventName, ...);
     end
 
-    return self
+    return self;
 end
 
-Todoloo.EventBus = CreateAndInitFromMixin(TodolooEventBusMixin)
+Todoloo.EventBus = CreateAndInitFromMixin(TodolooEventBusMixin);
