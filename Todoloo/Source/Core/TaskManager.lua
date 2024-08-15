@@ -1,5 +1,5 @@
---TODO: Move file to ./Storage
-local _, Todoloo = ...
+---@class Todoloo
+local Todoloo = select(2, ...);
 
 ---@enum reset Reset intervals defining when a task should automatically remove completion mark
 TODOLOO_RESET_INTERVALS = {

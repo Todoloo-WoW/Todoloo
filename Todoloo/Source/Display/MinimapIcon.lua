@@ -1,4 +1,5 @@
-local _, Todoloo = ...
+---@class Todoloo
+local Todoloo = select(2, ...);
 
 local icon = LibStub("LibDBIcon-1.0")
 

@@ -1,4 +1,5 @@
-local _, Todoloo = ...
+---@class Todoloo
+local Todoloo = select(2, ...);
 
 function Todoloo.Debug.IsActive()
     return Todoloo.Config.Get(Todoloo.Config.Options.DEBUG);
