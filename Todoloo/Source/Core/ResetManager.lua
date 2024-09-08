@@ -16,7 +16,7 @@ local function ShouldResetGroup(group, previousDailyReset, previousWeeklyReset)
     if group.reset == TODOLOO_RESET_INTERVALS.Daily and lastResetPerformed < previousDailyReset then
         -- reset daily groups
         return true
-    elseif group.reset == TODOLOO_RESET_INTERVALS.Weekly and lastResetPerformed < previousDailyReset then
+    elseif group.reset == TODOLOO_RESET_INTERVALS.Weekly and lastResetPerformed < previousWeeklyReset then
         -- reset weekly groups
         return true
     end
