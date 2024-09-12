@@ -41,6 +41,7 @@ end
 ---Get the player name including realm (will return in form "Detílium-ShatteredHand")
 ---@return string characterFullName In format "Player-Realm"
 function Todoloo.Utils.GetCharacterFullName()
-    local characterName, realmName = UnitFullName("player");
+    local characterName = UnitName("player");
+    local realmName = GetNormalizedRealmName();
     return characterName .. "-" .. realmName;
 end

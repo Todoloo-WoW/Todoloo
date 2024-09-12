@@ -9,7 +9,7 @@ local settings = {
     headerText = "Todoloo's",
     events = { },
     lineTemplate = "TodolooObjectiveTaskTemplate",
-    blockTemplate = "ObjectiveTrackerQuestPOIBlockTemplate",
+    blockTemplate = "ObjectiveTrackerAnimBlockTemplate",
     rightEdgeFrameSpacing = 2,
     uiOrder = 99
 };
