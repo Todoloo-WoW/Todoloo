@@ -24,14 +24,6 @@ local function OnAddonLoaded()
     RegisterUIPanel(TodolooTaskManagerFrame, attributes);
 end
 
-local function OnPlayerEnteringWorld()
-    if Todoloo.Config.Get(Todoloo.Config.Options.SHOW_TASK_TRACKER) and not Todoloo.Config.Get(Todoloo.Config.Options.ATTACH_TASK_TRACKER_TO_OBJECTIVE_TRACKER) then
-        TodolooFloatingTrackerFrame:Show();
-    end
-
-    ObjectiveTrackerManager:SetModuleContainer(TodolooObjectiveTracker, ObjectiveTrackerFrame);
-end
-
 local CORE_EVENTS = {
     "ADDON_LOADED",
     "PLAYER_ENTERING_WORLD"
@@ -43,7 +35,5 @@ coreFrame:SetScript("OnEvent", function(self, eventName, name)
     if eventName == "ADDON_LOADED" and name == "Todoloo" then
         self:UnregisterEvent("ADDON_LOADED");
         OnAddonLoaded();
-    elseif eventName == "PLAYER_ENTERING_WORLD" then
-        OnPlayerEnteringWorld();
     end
 end)

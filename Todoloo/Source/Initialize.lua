@@ -15,6 +15,13 @@ local function OnPlayerEnteringWorld()
 
     -- reset all relevant groups and tasks
     Todoloo.Reset.ResetManager.PerformReset();
+
+    -- Load appropriate task tracker based on player configuration
+    if Todoloo.Config.Get(Todoloo.Config.Options.SHOW_TASK_TRACKER) and not Todoloo.Config.Get(Todoloo.Config.Options.ATTACH_TASK_TRACKER_TO_OBJECTIVE_TRACKER) then
+        TodolooFloatingTrackerFrame:Show();
+    end
+    
+    ObjectiveTrackerManager:SetModuleContainer(TodolooObjectiveTracker, ObjectiveTrackerFrame);
 end
 
 local CORE_EVENTS = {
