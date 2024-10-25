@@ -39,8 +39,8 @@ Todoloo is your friendly in-game task management assistant, making sure you've n
 
 ## 📧 Commands
 Commands should either start with `/tdl` or `/todoloo`. The following commands are available:
-* `tm`, `task-manager`: Open the Task Manager
-* `tt`, `task-tracker`: Toggle the floating Task Tracker
+* `tm`, `task-manager`: Open the task manager
+* `tt`, `task-tracker`: Toggle the floating task tracker
 * `s`, `settings`: Open Todoloo settings
 
 ## 📣 Feedback
