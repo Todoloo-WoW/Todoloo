@@ -18,7 +18,7 @@ Todoloo.Config.Options = {
     SHOW_GROUP_PROGRESS_TEXT = "show_group_progress_text",
 
     -- ***** ADVANCED SETTINGS
-    DEBUG = "debug",
+    MESSENGER = "messenger",
 
     -- ***** CALCULATED VALUES
     LAST_RESET_PERFORMED = "last_reset_performed"
@@ -38,7 +38,7 @@ Todoloo.Config.Defaults = {
     [Todoloo.Config.Options.MINIMAP_ICON] = { hide = false },
     [Todoloo.Config.Options.SHOW_GROUP_PROGRESS_TEXT] = false,
 
-    [Todoloo.Config.Options.DEBUG] = false,
+    [Todoloo.Config.Options.MESSENGER] = false,
 
     [Todoloo.Config.Options.LAST_RESET_PERFORMED] = GetServerTime()
 };

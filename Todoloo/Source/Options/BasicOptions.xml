@@ -18,12 +18,32 @@
                 </KeyValues>
             </Frame>
 
+            <Frame inherits="TodolooSectionHeader" parentKey="GeneralHeader">
+                <KeyValues>
+                    <KeyValue key="headerText" value="General" />
+                </KeyValues>
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeKey="$parent.FrameTitle" relativePoint="BOTTOMLEFT" />
+                </Anchors>
+            </Frame>
+
+            <Frame inherits="TodolooConfigCheckbox" parentKey="AnnounceResets">
+                <KeyValues>
+                    <KeyValue key="tooltipTitleText" value="Announce resets" />
+                    <KeyValue key="tooltipText" value="With this setting active, daily and weekly resets of groups and tasks will be announced in the chat." />
+                    <KeyValue key="labelText" value="Announce daily and weekly resets og groups and tasks in chat" />
+                </KeyValues>
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeKey="$parent.GeneralHeader" relativePoint="BOTTOMLEFT"/>
+                </Anchors>
+            </Frame>
+
             <Frame inherits="TodolooSectionHeader" parentKey="TaskTrackerHeader">
                 <KeyValues>
                     <KeyValue key="headerText" value="Task tracker" />
                 </KeyValues>
                 <Anchors>
-                    <Anchor point="TOPLEFT" relativeKey="$parent.FrameTitle" relativePoint="BOTTOMLEFT" />
+                    <Anchor point="TOPLEFT" relativeKey="$parent.AnnounceResets" relativePoint="BOTTOMLEFT" />
                 </Anchors>
             </Frame>
 
@@ -38,6 +58,8 @@
 
             <Frame inherits="TodolooConfigCheckbox" parentKey="AttachTaskTrackerToObjectiveTracker">
                 <KeyValues>
+                    <KeyValue key="tooltipTitleText" value="Attached task tracker" />
+                    <KeyValue key="tooltipText" value="The task tracked will be attached to Blizzard objective tracker. Be aware that the task tracker will always be the last module and displayed at the bottom. If the objective tracker is full, you will need to minimize other modules before you can see the task tracker." />
                     <KeyValue key="labelText" value="Attach task tracker to objective tracker" />
                 </KeyValues>
                 <Anchors>
@@ -45,10 +67,10 @@
                 </Anchors>
             </Frame>
 
-            <!--TODO: Implement slider for background opacity (see TodolooTracker_UpdateOpacity and TodolooTracker_UpdateBackground)-->
-
             <Frame inherits="TodolooConfigCheckbox" parentKey="ShowCompletedGroups">
                 <KeyValues>
+                    <KeyValue key="tooltipTitleText" value="Show completed groups" />
+                    <KeyValue key="tooltipText" value="With this setting active, groups will stay visible in the task tracker when they are completed." />
                     <KeyValue key="labelText" value="Show completed groups" />
                 </KeyValues>
                 <Anchors>
@@ -58,6 +80,8 @@
 
             <Frame inherits="TodolooConfigCheckbox" parentKey="ShowCompletedTasks">
                 <KeyValues>
+                    <KeyValue key="tooltipTitleText" value="Show completed tasks" />
+                    <KeyValue key="tooltipText" value="With this setting active, tasks will stay visible in the task tracker when they are completed." />
                     <KeyValue key="labelText" value="Show completed tasks" />
                 </KeyValues>
                 <Anchors>
@@ -67,6 +91,8 @@
 
             <Frame inherits="TodolooConfigCheckbox" parentKey="OrderByCompletion">
                 <KeyValues>
+                    <KeyValue key="tooltipTitleText" value="Order by completion" />
+                    <KeyValue key="tooltipText" value="With this setting active, all completed tasks will be moved to the bottom of the group within the task tracker, regardless of the predefined order in the task manager." />
                     <KeyValue key="labelText" value="Move completed tasks to bottom of groups" />
                 </KeyValues>
                 <Anchors>
@@ -76,6 +102,8 @@
 
             <Frame inherits="TodolooConfigCheckbox" parentKey="ShowGroupProgressText">
                 <KeyValues>
+                    <KeyValue key="tooltipTitleText" value="Show progress" />
+                    <KeyValue key="tooltipText" value="Whether to show completed vs. not completed tasks besides the group name in the task tracker." />
                     <KeyValue key="labelText" value="Show group progress text" />
                 </KeyValues>
                 <Anchors>
@@ -94,6 +122,8 @@
 
             <Frame inherits="TodolooConfigCheckbox" parentKey="ShowMinimapIcon">
                 <KeyValues>
+                    <KeyValue key="tooltipTitleText" value="Show minimap icon" />
+                    <KeyValue key="tooltipText" value="Show/hide the icon on the minimap." />
                     <KeyValue key="labelText" value="Show minimap icon" />
                 </KeyValues>
                 <Anchors>

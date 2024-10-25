@@ -16,10 +16,14 @@ end
 
 function TodolooConfigCheckboxMixin:OnEnter()
     self.Checkbox:LockHighlight()
-  end
+
+    TodolooConfigTooltipMixin.OnEnter(self)
+end
   
 function TodolooConfigCheckboxMixin:OnLeave()
     self.Checkbox:UnlockHighlight()
+
+    TodolooConfigTooltipMixin.OnLeave(self)
 end
 
 function TodolooConfigCheckboxMixin:GetChecked()

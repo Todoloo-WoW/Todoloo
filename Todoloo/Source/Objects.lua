@@ -15,4 +15,4 @@ Todoloo.ScrollUtil = {};
 
 -- ***** OTHERS
 Todoloo.Utils = {};
-Todoloo.Debug = {};
+Todoloo.Messenger = {};

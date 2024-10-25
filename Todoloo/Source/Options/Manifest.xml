@@ -3,7 +3,4 @@
 
     <Script file="BasicOptions.lua"/>
     <Include file="BasicOptions.xml" />
-
-    <Script file="AdvancedOptions.lua"/>
-    <Include file="AdvancedOptions.xml" />
 </Ui>
