@@ -4,6 +4,8 @@ local Todoloo = select(2, ...);
 ---Initialize on ADDON_LOADED event
 local function OnAddonLoaded()
     Todoloo.Config.Initialize();
+
+    Todoloo.SlashCmd.Init();
 end
 
 ---Initialize on PLAYER_ENTERING_WORLD event

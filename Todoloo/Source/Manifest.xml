@@ -11,6 +11,8 @@ https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/FrameXML/UI
     
     <Include file="Utilities/Manifest.xml" />
 
+    <Include file="SlashCmd/Manifest.xml" />
+
     <Script file="Messenger.lua" />
     <Script file="Config.lua" />
     

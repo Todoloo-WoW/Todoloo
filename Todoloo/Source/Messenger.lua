@@ -7,6 +7,10 @@ end
 
 function Todoloo.Messenger.Message(message, ...)
     if Todoloo.Messenger.IsActive() then
-        print(GREEN_FONT_COLOR:WrapTextInColorCode("[Todoloo] ") .. message, ...);
+        print(LIGHTBLUE_FONT_COLOR:WrapTextInColorCode("Todoloo: ") .. message, ...);
     end
+end
+
+function Todoloo.Messenger.SlashMessage(message, ...)
+    print(LIGHTBLUE_FONT_COLOR:WrapTextInColorCode("Todoloo: ") .. message, ...);
 end

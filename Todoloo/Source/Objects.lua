@@ -16,3 +16,4 @@ Todoloo.ScrollUtil = {};
 -- ***** OTHERS
 Todoloo.Utils = {};
 Todoloo.Messenger = {};
+Todoloo.SlashCmd = {};

@@ -45,3 +45,26 @@ function Todoloo.Utils.GetCharacterFullName()
     local realmName = GetNormalizedRealmName();
     return characterName .. "-" .. realmName;
 end
+
+---Split slash command
+---@param input string Command
+---@return string[] # Seperated command arguments
+function Todoloo.Utils.SplitCommand(input)
+    local result = {};
+
+    for match in string.gmatch(input:lower(), "%S+") do
+        table.insert(result, match);
+    end
+
+    return result;
+end
+
+function Todoloo.Utils.Slice(array, start, count)
+    local result = {}
+  
+    for index = start, math.min(#array, start + count - 1) do
+      table.insert(result, array[index])
+    end
+  
+    return result
+  end
