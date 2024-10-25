@@ -13,7 +13,7 @@ function TODOLOO_DEFAULT_TRACKER_MODULE:OnLoad(friendlyName, defaultTemplate)
     self.groupTemplate = defaultTemplate or "TodolooTrackerGroupTemplate"
     self.groupType = "Frame"
     self.taskTemplate = "TodolooTrackerTaskTemplate"
-    self.taskSpacing = 2
+    self.taskSpacing = 4
     self.taskWidth = TODOLOO_TRACKER_TEXT_WIDTH
     self.poolCollection = CreateFramePoolCollection()
     self.usedGroups = {}
