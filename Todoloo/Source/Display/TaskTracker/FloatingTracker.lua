@@ -6,9 +6,7 @@ local Todoloo = select(2, ...);
 -- *****************************************************************************************************
 TODOLOO_DEFAULT_TRACKER_MODULE = {}
 
----TODO: Add documentation
 function TODOLOO_DEFAULT_TRACKER_MODULE:OnLoad(friendlyName, defaultTemplate)
-    --TODO: Add documentation for everything down here?
     self.friendlyName = friendlyName or "UnnamedTodolooTrackerModule"
     self.groupTemplate = defaultTemplate or "TodolooTrackerGroupTemplate"
     self.groupType = "Frame"
@@ -31,7 +29,7 @@ function TODOLOO_DEFAULT_TRACKER_MODULE:OnLoad(friendlyName, defaultTemplate)
 
     self.groupsFrame = TodolooFloatingTrackerFrame.GroupsFrame
 
-    TODOLOO_DEFAULT_TRACKER_MODULE.AddGroupOffset(self, self.groupTemplate, 0, -6)
+    TODOLOO_DEFAULT_TRACKER_MODULE.AddGroupOffset(self, self.groupTemplate, 0, -10)
 end
 
 ---Build custom module info
@@ -868,38 +866,6 @@ function TodolooTracker_ResizeButton_OnMouseup(self)
 end
 
 -- *****************************************************************************************************
--- ***** GROUP HEADER HANDLERS
--- *****************************************************************************************************
-
----Load group header
----@param self Frame Group header frame
-function TodolooTrackerGroupHeader_OnLoad(self)
-    self:RegisterForClicks("LeftButtonUp", "RightButtonDown")
-end
-
----On group header clicked
----@param self Frame Group header frame
----@param mouseButton string Definition of which mouse button was clicked
-function TodolooTrackerGroupHeader_OnClick(self, mouseButton)
-    local block = self:GetParent()
-    --block.module:OnGroupHeaderClick(block, mouseButton)
-end
-
----On enter (mouse hover) on group header
----@param self Frame Group header frame
-function TodolooTrackerGroupHeader_OnEnter(self)
-    local block = self:GetParent()
-    block.module:OnGroupHeaderEnter(block)
-end
-
----On leave (mouse hover) on group header
----@param self Frame Group header frame
-function TodolooTrackerGroupHeader_OnLeave(self)
-    local block = self:GetParent()
-    block.module:OnGroupHeaderLeave(block)
-end
-
--- *****************************************************************************************************
 -- ***** TASK HANDLERS
 -- *****************************************************************************************************
 
@@ -1045,19 +1011,6 @@ TodolooTrackerHeaderMixin = {}
 function TodolooTrackerHeaderMixin:OnLoad()
     self.height = TODOLOO_TRACKER_HEADER_HEIGHT
     self.Text:SetText("Tasks")
-end
-
----Play HeaderOpenAnim animation
-function TodolooTrackerHeaderMixin:PlayAddAnimation()
-    self.animating = true
-    self.HeaderOpenAnim:Restart()
-end
-
----Reset header animating
----@param self Animation Animation
-function TaskHeader_OnAnimFinished(self)
-    local header = self:GetParent()
-    header.animating = nil
 end
 
 -- *****************************************************************************************************
