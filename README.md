@@ -16,6 +16,7 @@ Todoloo is your friendly in-game task management assistant, making sure you've n
 * `Shift` + `Left-Click` on tasks in the task tracker to toggle completion
 * Toggle between floating task tracker and task trakcer attached to the objective tracker
 * Click and drag the floating task tracker around, to place the it as you see fit
+* Toggle whether the floating task tracker should automatically hide in combat and show out of combat
 * Toggle whether you want to see completed tasks and/or completed groups, in Todoloo settings (_`Right-Click` on the minimap icon, or via the options_)
 
 ### Task Manager
@@ -35,6 +36,12 @@ Todoloo is your friendly in-game task management assistant, making sure you've n
 * Drag and drop tasks to reorder within the same group, or move between groups
 * `Shift` + `Left-Click` on tasks to toggle task completion
 * `Right-Click` on tasks to set reset interval or to delete the task
+
+## 📧 Commands
+Commands should either start with `/tdl` or `/todoloo`. The following commands are available:
+* `tm`, `task-manager`: Open the Task Manager
+* `tt`, `task-tracker`: Toggle the floating Task Tracker
+* `s`, `settings`: Open Todoloo settings
 
 ## 📣 Feedback
 ### Bug

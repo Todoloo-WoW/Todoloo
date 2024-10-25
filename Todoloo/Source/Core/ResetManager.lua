@@ -54,14 +54,14 @@ local function PerformResetSince(characters, previousDailyReset, previousWeeklyR
                 -- group reset interval
                 if ShouldResetGroup(characterName, groupIndex, group, previousDailyReset, previousWeeklyReset) then
                     Todoloo.TaskManager:ResetGroup(groupIndex, characterName)
-                    Todoloo.Messenger.Message("Group " .. YELLOW_FONT_COLOR:WrapTextInColorCode("[" .. group.name .. "]") .. " on " .. YELLOW_FONT_COLOR:WrapTextInColorCode("[" .. characterName .. "]") .. " has been reset")
+                    Todoloo.Messenger.Message("Group " .. YELLOW_FONT_COLOR:WrapTextInColorCode(group.name ) .. " on " .. YELLOW_FONT_COLOR:WrapTextInColorCode(characterName) .. " has been reset")
                 end
             else
                 -- task reset interval
                 for taskIndex, task in pairs(group.tasks) do
                     if ShouldResetTask(task, previousDailyReset, previousWeeklyReset) then
                         Todoloo.TaskManager:ResetTask(groupIndex, taskIndex, characterName)
-                        Todoloo.Messenger.Message("Task " .. YELLOW_FONT_COLOR:WrapTextInColorCode("[" .. task.name .. "]") .. " on " .. YELLOW_FONT_COLOR:WrapTextInColorCode("[" .. characterName .. "]") .. " has been reset")
+                        Todoloo.Messenger.Message("Task " .. YELLOW_FONT_COLOR:WrapTextInColorCode(task.name) .. " on " .. YELLOW_FONT_COLOR:WrapTextInColorCode(characterName) .. " has been reset")
                     end
                 end
             end
