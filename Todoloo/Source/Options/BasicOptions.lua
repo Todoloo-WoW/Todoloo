@@ -40,6 +40,7 @@ end
 function TodolooConfigBasicOptionsFrameMixin:OnShow()
     self.AnnounceResets:SetChecked(Todoloo.Config.Get(Todoloo.Config.Options.MESSENGER));
     self.ShowTaskTracker:SetChecked(Todoloo.Config.Get(Todoloo.Config.Options.SHOW_TASK_TRACKER));
+    self.HideTrackerInCombat:SetChecked(Todoloo.Config.Get(Todoloo.Config.Options.HIDE_TASK_TRACKER_IN_COMBAT));
     self.AttachTaskTrackerToObjectiveTracker:SetChecked(Todoloo.Config.Get(Todoloo.Config.Options.ATTACH_TASK_TRACKER_TO_OBJECTIVE_TRACKER));
     self.ShowCompletedGroups:SetChecked(Todoloo.Config.Get(Todoloo.Config.Options.SHOW_COMPLETED_GROUPS));
     self.ShowCompletedTasks:SetChecked(Todoloo.Config.Get(Todoloo.Config.Options.SHOW_COMPLETED_TASKS));
@@ -53,6 +54,7 @@ end
 function TodolooConfigBasicOptionsFrameMixin:Save()
     Todoloo.Config.Set(Todoloo.Config.Options.MESSENGER, self.AnnounceResets:GetChecked());
     Todoloo.Config.Set(Todoloo.Config.Options.SHOW_TASK_TRACKER, self.ShowTaskTracker:GetChecked());
+    Todoloo.Config.Set(Todoloo.Config.Options.HIDE_TASK_TRACKER_IN_COMBAT, self.HideTrackerInCombat:GetChecked());
     Todoloo.Config.Set(Todoloo.Config.Options.ATTACH_TASK_TRACKER_TO_OBJECTIVE_TRACKER, self.AttachTaskTrackerToObjectiveTracker:GetChecked());
     Todoloo.Config.Set(Todoloo.Config.Options.SHOW_COMPLETED_GROUPS, self.ShowCompletedGroups:GetChecked());
     Todoloo.Config.Set(Todoloo.Config.Options.SHOW_COMPLETED_TASKS, self.ShowCompletedTasks:GetChecked());

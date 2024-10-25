@@ -56,6 +56,17 @@
                 </Anchors>
             </Frame>
 
+            <Frame inherits="TodolooConfigCheckbox" parentKey="HideTrackerInCombat">
+                <KeyValues>
+                    <KeyValue key="tooltipTitleText" value="Hide in combat" />
+                    <KeyValue key="tooltipText" value="Hide the task tracker in combat and automatically show the tracker again once out of combat (this setting is only relevant when using the floating task tracker)." />
+                    <KeyValue key="labelText" value="Hide task tracker in combat" />
+                </KeyValues>
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeKey="$parent.ShowTaskTracker" relativePoint="BOTTOMLEFT"/>
+                </Anchors>
+            </Frame>
+
             <Frame inherits="TodolooConfigCheckbox" parentKey="AttachTaskTrackerToObjectiveTracker">
                 <KeyValues>
                     <KeyValue key="tooltipTitleText" value="Attached task tracker" />
@@ -63,7 +74,7 @@
                     <KeyValue key="labelText" value="Attach task tracker to objective tracker" />
                 </KeyValues>
                 <Anchors>
-                    <Anchor point="TOPLEFT" relativeKey="$parent.ShowTaskTracker" relativePoint="BOTTOMLEFT"/>
+                    <Anchor point="TOPLEFT" relativeKey="$parent.HideTrackerInCombat" relativePoint="BOTTOMLEFT"/>
                 </Anchors>
             </Frame>
 

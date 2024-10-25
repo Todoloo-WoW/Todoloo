@@ -643,6 +643,8 @@ function TodolooTracker_OnLoad(self)
 
     -- register for event to start up
     self:RegisterEvent("PLAYER_ENTERING_WORLD")
+    self:RegisterEvent("PLAYER_REGEN_DISABLED")
+    self:RegisterEvent("PLAYER_REGEN_ENABLED")
 end
 
 function TodolooTracker_OnShow(self)
@@ -691,6 +693,18 @@ function TodolooTracker_OnEvent(self, event, ...)
         end
 
         TodolooTracker_Update()
+    elseif event == "PLAYER_REGEN_ENABLED" then
+        if Todoloo.Config.Get(Todoloo.Config.Options.HIDE_TASK_TRACKER_IN_COMBAT) then
+            if not self:IsVisible() and Todoloo.Config.Get(Todoloo.Config.Options.SHOW_TASK_TRACKER) and not Todoloo.Config.Get(Todoloo.Config.Options.ATTACH_TASK_TRACKER_TO_OBJECTIVE_TRACKER) then
+                self:Show();
+            end 
+        end
+    elseif event == "PLAYER_REGEN_DISABLED" then
+        if Todoloo.Config.Get(Todoloo.Config.Options.HIDE_TASK_TRACKER_IN_COMBAT) then
+            if self:IsVisible() then
+                self:Hide();
+            end
+        end
     end
 end
 
