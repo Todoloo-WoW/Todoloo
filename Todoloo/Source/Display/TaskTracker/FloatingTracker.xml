@@ -3,19 +3,6 @@ https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/FrameXML/UI
 	
 	<Script file="FloatingTracker.lua" />
 
-    <Button name="TodolooTrackerMinimizeButtonTemplate" mixin="TodolooTrackerMinimizeButtonMixin" virtual="true">
-		<KeyValues>
-  			<KeyValue key="buttonType" value="all" type="string"/>
-  		</KeyValues>
-		<Size x="15" y="14"/>
-		<NormalTexture atlas="UI-QuestTrackerButton-Collapse-All" useAtlasSize="true"/>
-		<PushedTexture atlas="UI-QuestTrackerButton-Collapse-All-Pressed" useAtlasSize="true"/>
-		<HighlightTexture atlas="UI-QuestTrackerButton-Highlight" alphaMode="ADD" useAtlasSize="true"/>
-		<Scripts>
-			<OnLoad method="OnLoad"/>
-		</Scripts>
-	</Button>
-
     <Frame name="TodolooTrackerHeaderTemplate" mixin="TodolooTrackerHeaderMixin" virtual="true" hidden="true">
         <Size x="235" y="25" />
         <Layers>
@@ -82,19 +69,6 @@ https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/FrameXML/UI
 				</Scripts>
 			</AnimationGroup>
 		</Animations>
-		<Frames>
-			<Button parentKey="MinimizeButton" inherits="TodolooTrackerMinimizeButtonTemplate">
-				<KeyValues>
-		  			<KeyValue key="buttonType" value="module" type="string"/>
-		  		</KeyValues>
-				<Anchors>
-					<Anchor point="RIGHT"/>
-				</Anchors>
-				<Scripts>
-					<OnClick function="TodolooTracker_MinimizeModuleButton_OnClick"/>
-				</Scripts>
-			</Button>
-		</Frames>
 		<Scripts>
 			<OnLoad method="OnLoad"/>
 		</Scripts>
@@ -363,16 +337,6 @@ https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/FrameXML/UI
             </Frame>
 			<Frame parentKey="HeaderMenu">
 				<Size x="1" y="1"/>
-				<Frames>
-					<Button parentKey="MinimizeButton" inherits="TodolooTrackerMinimizeButtonTemplate">
-						<Anchors>
-							<Anchor point="RIGHT" x="0" y="0"/>
-						</Anchors>
-						<Scripts>
-							<OnClick function="TodolooTracker_MinimizeButton_OnClick"/>
-						</Scripts>
-					</Button>
-				</Frames>
 				<Layers>
 					<Layer level="ARTWORK">
 						<FontString parentKey="Title" inherits="GameFontNormal" hidden="true" text="OBJECTIVES_TRACKER_LABEL">
