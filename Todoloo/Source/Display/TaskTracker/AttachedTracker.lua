@@ -122,15 +122,13 @@ function TodolooObjectiveTrackerMixin:DoTasks(block, groupCompleted, isExistingB
                     line:SetState(ObjectiveTrackerAnimLineState.Completed);
                 end
             else
-                if not taskCompleting then
-                    if isExistingBlock and not line then
-                        line = block:AddObjective(task.id, task.name, nil, useFullHeight);
-                        line:SetState(ObjectiveTrackerAnimLineState.Adding);
-                    else
-                        line = block:AddObjective(task.id, task.name, nil, useFullHeight);
-                        if line.state == ObjectiveTrackerAnimLineState.Completed then
-                            line:SetState(ObjectiveTrackerAnimLineState.Present);
-                        end
+                if isExistingBlock and not line then
+                    line = block:AddObjective(task.id, task.name, nil, useFullHeight);
+                    line:SetState(ObjectiveTrackerAnimLineState.Adding);
+                else
+                    line = block:AddObjective(task.id, task.name, nil, useFullHeight);
+                    if line.state == ObjectiveTrackerAnimLineState.Completed then
+                        line:SetState(ObjectiveTrackerAnimLineState.Present);
                     end
                 end
             end
