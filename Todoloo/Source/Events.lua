@@ -1,6 +1,3 @@
----@class Todoloo
-local Todoloo = select(2, ...);
-
 Todoloo.Tasks.Events = {
     -- ***** GROUP EVENTS
     GROUP_ADDED     = "GROUP_ADDED",

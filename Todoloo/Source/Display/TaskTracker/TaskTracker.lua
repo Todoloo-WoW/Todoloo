@@ -1,6 +1,3 @@
----@class Todoloo
-local Todoloo = select(2, ...);
-
 --TODO Clean up file
 
 TODOLOO_TASK_TRACKER_MODULE = TodolooTracker_GetModuleInfoTable("TODOLOO_TASK_TRACKER_MODULE")

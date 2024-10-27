@@ -1,6 +1,3 @@
----@class Todoloo
-local Todoloo = select(2, ...);
-
 function Todoloo.SlashCmd.Init()
     SlashCmdList["Todoloo"] = Todoloo.SlashCmd.Handler
     SLASH_Todoloo1 = "/todoloo";

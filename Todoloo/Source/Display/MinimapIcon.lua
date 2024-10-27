@@ -1,6 +1,3 @@
----@class Todoloo
-local Todoloo = select(2, ...);
-
 local icon = LibStub("LibDBIcon-1.0")
 
 ---Initialize minimap icon

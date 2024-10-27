@@ -1,6 +1,3 @@
----@class Todoloo
-local Todoloo = select(2, ...);
-
 function Todoloo.Config.Show()
     if Settings and SettingsPanel then
         Settings.OpenToCategory("Todoloo");

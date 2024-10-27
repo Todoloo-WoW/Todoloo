@@ -1,6 +1,3 @@
----@class Todoloo
-local Todoloo = select(2, ...);
-
 ---Valid Todoloo config options
 Todoloo.Config.Options = {
     -- ***** TASK TRACKER SETTINGS

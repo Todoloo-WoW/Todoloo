@@ -1,6 +1,3 @@
----@class Todoloo
-local Todoloo = select(2, ...);
-
 local SLASH_COMMANDS_DEFINITIONS = {
     { commands = "tm, task-manager", description = "Open the task manager." },
     { commands = "tt, task-tracker", description = "Toggle the floating task tracker." },

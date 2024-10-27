@@ -1,5 +1,4 @@
----@class Todoloo
-local Todoloo = select(2, ...);
+Todoloo = {};
 
 -- ***** CORE
 Todoloo.Tasks = {};

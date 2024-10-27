@@ -1,6 +1,3 @@
----@class Todoloo
-local Todoloo = select(2, ...);
-
 function Todoloo.Messenger.IsActive()
     return Todoloo.Config.Get(Todoloo.Config.Options.MESSENGER);
 end

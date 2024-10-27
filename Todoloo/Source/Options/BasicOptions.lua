@@ -1,6 +1,3 @@
----@class Todoloo
-local Todoloo = select(2, ...);
-
 TodolooConfigBasicOptionsFrameMixin = {};
 
 function TodolooConfigBasicOptionsFrameMixin:OnLoad()

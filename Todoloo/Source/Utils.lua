@@ -1,6 +1,3 @@
----@class Todoloo
-local Todoloo = select(2, ...);
-
 ---Split string into string array
 ---@param array string String contianing multiple values split by the provided delimiter
 ---@param delimiter string? Delimiter (if not provided, defaults to ",")

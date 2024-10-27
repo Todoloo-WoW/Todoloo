@@ -1,15 +1,16 @@
----@class Todoloo
-local Todoloo = select(2, ...);
+local Main = {};
 
----Initialize on ADDON_LOADED event
-local function OnAddonLoaded()
+function Main:OnAddonLoaded()
     Todoloo.Config.Initialize();
 
     Todoloo.SlashCmd.Init();
 end
 
----Initialize on PLAYER_ENTERING_WORLD event
-local function OnPlayerEnteringWorld()
+function Main:OnPlayerEnteringWorld(isInitialLogin, isReloadingUi)
+    if not isInitialLogin and not isReloadingUi then
+        return
+    end
+
     -- create task manager
     Todoloo.TaskManager = CreateAndInitFromMixin(TodolooTaskManagerMixin);
 
@@ -26,19 +27,5 @@ local function OnPlayerEnteringWorld()
     ObjectiveTrackerManager:SetModuleContainer(TodolooObjectiveTracker, ObjectiveTrackerFrame);
 end
 
-local CORE_EVENTS = {
-    "ADDON_LOADED",
-    "PLAYER_ENTERING_WORLD"
-};
-local coreFrame = CreateFrame("Frame");
-
-FrameUtil.RegisterFrameForEvents(coreFrame, CORE_EVENTS);
-coreFrame:SetScript("OnEvent", function(self, eventName, name)
-    if eventName == "ADDON_LOADED" and name == "Todoloo" then
-        self:UnregisterEvent("ADDON_LOADED");
-        OnAddonLoaded();
-    elseif eventName == "PLAYER_ENTERING_WORLD" then
-        self:UnregisterEvent("PLAYER_ENTERING_WORLD");
-        OnPlayerEnteringWorld();
-    end
-end)
+EventRegistry:RegisterFrameEventAndCallback("ADDON_LOADED", Main.OnAddonLoaded, Main);
+EventRegistry:RegisterFrameEventAndCallback("PLAYER_ENTERING_WORLD", Main.OnPlayerEnteringWorld, Main);

@@ -1,6 +1,3 @@
----@class Todoloo
-local Todoloo = select(2, ...);
-
 local filters = {
     ShownCharacters = { },
     TaskNameFilter = ""

@@ -1,6 +1,3 @@
----@class Todoloo
-local Todoloo = select(2, ...);
-
 local function OnAddonLoaded()
     Todoloo.MinimapIcon.Initialize();
 

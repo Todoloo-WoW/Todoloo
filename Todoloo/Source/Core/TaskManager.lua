@@ -1,6 +1,3 @@
----@class Todoloo
-local Todoloo = select(2, ...);
-
 ---@enum reset Reset intervals defining when a task should automatically remove completion mark
 TODOLOO_RESET_INTERVALS = {
     -- Manual reset will never automatically reset the completion mark
