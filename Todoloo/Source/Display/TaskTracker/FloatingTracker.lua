@@ -1021,7 +1021,6 @@ TodolooTrackerHeaderMixin = {}
 
 function TodolooTrackerHeaderMixin:OnLoad()
     self.height = TODOLOO_TRACKER_HEADER_HEIGHT
-    self.Text:SetText("Tasks")
 end
 
 -- *****************************************************************************************************

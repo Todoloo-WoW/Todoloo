@@ -17,8 +17,8 @@ function Todoloo.MinimapIcon.Initialize()
         end,
         OnTooltipShow = function(tip)
             tip:SetText("Todoloo")
-            tip:AddLine("Left-Click: " .. WHITE_FONT_COLOR:WrapTextInColorCode("Open task manager"))
-            tip:AddLine("Right-Click: ".. WHITE_FONT_COLOR:WrapTextInColorCode("Open settings"))
+            tip:AddLine(TODOLOO_L_MINIMAP_ICON_LEFT_CLICK .. " " .. WHITE_FONT_COLOR:WrapTextInColorCode(TODOLOO_L_MINIMAP_ICON_OPEN_TASK_MANAGER))
+            tip:AddLine(TODOLOO_L_MINIMAP_ICON_RIGHT_CLICK .. " " .. WHITE_FONT_COLOR:WrapTextInColorCode(TODOLOO_L_MINIMAP_ICON_OPEN_SETTINGS))
         end
     })
 

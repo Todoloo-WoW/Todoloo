@@ -55,7 +55,7 @@ function TodolooManagementPageMixin:OnLoad()
     self.HelpButton:SetScript("OnClick", function() self:ToggleHelp() end)
     
     -- setup button to create new group
-    self.CreateGroupButton:SetTextToFit("Create group")
+    self.CreateGroupButton:SetTextToFit(TODOLOO_L_TASK_MANAGER_BUTTON_CREATE_GROUP)
 
     -- setup search box
     self.TaskList.SearchBox:SetScript("OnTextChanged", function(editBox)
@@ -137,7 +137,7 @@ end
 
 function TodolooManagementPageMixin:SetTitle()
     local taskManagementFrame = self:GetParent()
-    taskManagementFrame:SetTitle("Todoloo - Task management")
+    taskManagementFrame:SetTitle(TODOLOO_L_TASK_MANAGER_FRAME_HEADER)
 end
 
 function TodolooManagementPageMixin:CreateButtonGroup_OnClick()
@@ -180,12 +180,12 @@ function TodolooManagementPageMixin:UpdateHelp()
     if self.CreateGroupButton:IsShown() then
         local width = self.CreateGroupButton:GetWidth()
         local height = self.CreateGroupButton:GetHeight()
-        table.insert(TodolooTaskManagerManagementPage_HelpPlate, { ButtonPos = { x = 235, y = -11 }, HighLightBox = { x = 256, y = -21, width = width + 16, height = height + 5 }, ToolTipDir = "LEFT", ToolTipText = "Create a new group to get started with your task management!" })
+        table.insert(TodolooTaskManagerManagementPage_HelpPlate, { ButtonPos = { x = 235, y = -11 }, HighLightBox = { x = 256, y = -21, width = width + 16, height = height + 5 }, ToolTipDir = "LEFT", ToolTipText = TODOLOO_L_TASK_MANAGER_HELP_CREATE_GROUP_HELP })
     end
 
     if self.TaskList:IsShown() then
-        table.insert(TodolooTaskManagerManagementPage_HelpPlate, { ButtonPos = { x = 170, y = -44 }, HighLightBox = { x = 0, y = -52, width = 390, height = 30 }, ToolTipDir = "DOWN", ToolTipText = "Tip: Search for a specific task or group to find the item you are looking for more easily." })
-        table.insert(TodolooTaskManagerManagementPage_HelpPlate, { ButtonPos = { x = 365, y = -80 }, HighLightBox = { x = 0, y = -85, width = 390, height = 545 }, ToolTipDir = "RIGHT", ToolTipText = "This is your overview of all your current groups and tasks.\n\n[Double-Click] on groups and tasks to change the name.\n\n[Shift]+[Left-Click] on groups to collapse.\n\n[Right-Click] on groups to add tasks, set group reset interval, and delete.\n\n[Shift]+[Left-Click] on tasks to toggle completion.\n\n[Right-Click] on tasks to set reset interval and delete." })
+        table.insert(TodolooTaskManagerManagementPage_HelpPlate, { ButtonPos = { x = 170, y = -44 }, HighLightBox = { x = 0, y = -52, width = 390, height = 30 }, ToolTipDir = "DOWN", ToolTipText = TODOLOO_L_TASK_MANAGER_HELP_FILTER_TIP })
+        table.insert(TodolooTaskManagerManagementPage_HelpPlate, { ButtonPos = { x = 365, y = -80 }, HighLightBox = { x = 0, y = -85, width = 390, height = 545 }, ToolTipDir = "RIGHT", ToolTipText = TODOLOO_L_TASK_MANAGER_HELP_TASK_LIST_HELP })
     end
 end
 
