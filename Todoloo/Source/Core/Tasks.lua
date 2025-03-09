@@ -87,8 +87,8 @@ function Todoloo.Tasks.InitFilterMenu(dropdown)
     dropdown:SetupMenu(function(dropdown, rootDescription)
         rootDescription:SetTag("MENU_TODOLOO_TASKS_FILTER")
 
-        rootDescription:CreateButton("Check all", Todoloo.Tasks.CheckAllFilters)
-        rootDescription:CreateButton("Uncheck all", Todoloo.Tasks.UncheckAllFilters)
+        rootDescription:CreateButton(TODOLOO_L_TASK_FILTER_CHECK_ALL, Todoloo.Tasks.CheckAllFilters)
+        rootDescription:CreateButton(TODOLOO_L_TASK_FILTER_UNCHECK_ALL, Todoloo.Tasks.UncheckAllFilters)
 
         rootDescription:CreateDivider()
 

@@ -1,8 +1,8 @@
 local SLASH_COMMANDS_DEFINITIONS = {
-    { commands = "tm, task-manager", description = "Open the task manager." },
-    { commands = "tt, task-tracker", description = "Toggle the floating task tracker." },
-    { commands = "s, settings", description = "Open Todoloo settings." },
-    { commands = "h, help", description = "Show this help message." }
+    { commands = "tm, task-manager", description = TODOLOO_L_SLASHCMD_TASK_MANAGER_DESCRIPTION },
+    { commands = "tt, task-tracker", description = TODOLOO_L_SLASHCMD_TASK_TRACKER_DESCRIPTION },
+    { commands = "s, settings", description = TODOLOO_L_SLASHCMD_SETTINGS_DESCRIPTION },
+    { commands = "h, help", description = TODOLOO_L_SLASHCMD_HELP }
 }
 
 function Todoloo.SlashCmd.OpenTaskManager()

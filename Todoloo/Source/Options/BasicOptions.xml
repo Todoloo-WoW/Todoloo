@@ -13,14 +13,14 @@
         <Frames>
             <Frame inherits="TodolooTitleFrame" parentKey="FrameTitle">
                 <KeyValues>
-                    <KeyValue key="titleText" value="Basic Options" />
-                    <KeyValue key="subTitleText" value="Basic options for enabling features in Todoloo" />
+                    <KeyValue key="titleText" value="TODOLOO_L_CONFIG_BASIC_OPTIONS_LABEL" type="global" />
+                    <KeyValue key="subTitleText" value="TODOLOO_L_CONFIG_BASIC_OPTIONS_DESCRIPTION" type="global" />
                 </KeyValues>
             </Frame>
 
             <Frame inherits="TodolooSectionHeader" parentKey="GeneralHeader">
                 <KeyValues>
-                    <KeyValue key="headerText" value="General" />
+                    <KeyValue key="headerText" value="TODOLOO_L_CONFIG_GENERAL_SECTION_HEADER" type="global" />
                 </KeyValues>
                 <Anchors>
                     <Anchor point="TOPLEFT" relativeKey="$parent.FrameTitle" relativePoint="BOTTOMLEFT" />
@@ -29,9 +29,9 @@
 
             <Frame inherits="TodolooConfigCheckbox" parentKey="AnnounceResets">
                 <KeyValues>
-                    <KeyValue key="tooltipTitleText" value="Announce resets" />
-                    <KeyValue key="tooltipText" value="With this setting active, daily and weekly resets of groups and tasks will be announced in the chat." />
-                    <KeyValue key="labelText" value="Announce daily and weekly resets og groups and tasks in chat" />
+                    <KeyValue key="tooltipTitleText" value="TODOLOO_L_CONFIG_ANNOUNCE_RESET_TOOLTIP_LABEL" type="global" />
+                    <KeyValue key="tooltipText" value="TODOLOO_L_CONFIG_ANNOUNCE_RESET_TOOLTIP_DESCRIPTION" type="global" />
+                    <KeyValue key="labelText" value="TODOLOO_L_CONFIG_ANNOUNCE_RESET_LABEL" type="global" />
                 </KeyValues>
                 <Anchors>
                     <Anchor point="TOPLEFT" relativeKey="$parent.GeneralHeader" relativePoint="BOTTOMLEFT"/>
@@ -40,7 +40,7 @@
 
             <Frame inherits="TodolooSectionHeader" parentKey="TaskTrackerHeader">
                 <KeyValues>
-                    <KeyValue key="headerText" value="Task tracker" />
+                    <KeyValue key="headerText" value="TODOLOO_L_CONFIG_TASK_TRACKER_SECTION_HEADER" type="global" />
                 </KeyValues>
                 <Anchors>
                     <Anchor point="TOPLEFT" relativeKey="$parent.AnnounceResets" relativePoint="BOTTOMLEFT" />
@@ -49,7 +49,7 @@
 
             <Frame inherits="TodolooConfigCheckbox" parentKey="ShowTaskTracker">
                 <KeyValues>
-                    <KeyValue key="labelText" value="Show task tracker" />
+                    <KeyValue key="labelText" value="TODOLOO_L_CONFIG_SHOW_TASK_TRACKER_LABEL" type="global" />
                 </KeyValues>
                 <Anchors>
                     <Anchor point="TOPLEFT" relativeKey="$parent.TaskTrackerHeader" relativePoint="BOTTOMLEFT"/>
@@ -58,9 +58,9 @@
 
             <Frame inherits="TodolooConfigCheckbox" parentKey="HideTrackerInCombat">
                 <KeyValues>
-                    <KeyValue key="tooltipTitleText" value="Hide in combat" />
-                    <KeyValue key="tooltipText" value="Hide the task tracker in combat and automatically show the tracker again once out of combat (this setting is only relevant when using the floating task tracker)." />
-                    <KeyValue key="labelText" value="Hide task tracker in combat" />
+                    <KeyValue key="tooltipTitleText" value="TODOLOO_L_CONFIG_HIDE_TRACKER_IN_COMBAT_TOOLTIP_LABEL" type="global" />
+                    <KeyValue key="tooltipText" value="TODOLOO_L_CONFIG_HIDE_TRACKER_IN_COMBAT_TOOLTIP_DESCRIPTION" type="global" />
+                    <KeyValue key="labelText" value="TODOLOO_L_CONFIG_HIDE_TRACKER_IN_COMBAT_LABEL" type="global" />
                 </KeyValues>
                 <Anchors>
                     <Anchor point="TOPLEFT" relativeKey="$parent.ShowTaskTracker" relativePoint="BOTTOMLEFT"/>
@@ -69,9 +69,9 @@
 
             <Frame inherits="TodolooConfigCheckbox" parentKey="AttachTaskTrackerToObjectiveTracker">
                 <KeyValues>
-                    <KeyValue key="tooltipTitleText" value="Attached task tracker" />
-                    <KeyValue key="tooltipText" value="The task tracked will be attached to Blizzard objective tracker. Be aware that the task tracker will always be the last module and displayed at the bottom. If the objective tracker is full, you will need to minimize other modules before you can see the task tracker." />
-                    <KeyValue key="labelText" value="Attach task tracker to objective tracker" />
+                    <KeyValue key="tooltipTitleText" value="TODOLOO_L_CONFIG_ATTACH_TRACKER_TOOLTIP_LABEL" type="global" />
+                    <KeyValue key="tooltipText" value="TODOLOO_L_CONFIG_ATTACH_TRACKER_TOOLTIP_DESCRIPTION" type="global" />
+                    <KeyValue key="labelText" value="TODOLOO_L_CONFIG_ATTACH_TRACKER_LABEL" type="global" />
                 </KeyValues>
                 <Anchors>
                     <Anchor point="TOPLEFT" relativeKey="$parent.HideTrackerInCombat" relativePoint="BOTTOMLEFT"/>
@@ -80,9 +80,9 @@
 
             <Frame inherits="TodolooConfigCheckbox" parentKey="ShowCompletedGroups">
                 <KeyValues>
-                    <KeyValue key="tooltipTitleText" value="Show completed groups" />
-                    <KeyValue key="tooltipText" value="With this setting active, groups will stay visible in the task tracker when they are completed." />
-                    <KeyValue key="labelText" value="Show completed groups" />
+                    <KeyValue key="tooltipTitleText" value="TODOLOO_L_CONFIG_SHOW_COMPLETED_GROUPS_TOOLTIP_LABEL" type="global" />
+                    <KeyValue key="tooltipText" value="TODOLOO_L_CONFIG_SHOW_COMPLETED_GROUPS_TOOLTIP_DESCRIPTION" type="global" />
+                    <KeyValue key="labelText" value="TODOLOO_L_CONFIG_SHOW_COMPLETED_GROUPS_LABEL" type="global" />
                 </KeyValues>
                 <Anchors>
                     <Anchor point="TOPLEFT" relativeKey="$parent.AttachTaskTrackerToObjectiveTracker" relativePoint="BOTTOMLEFT" />
@@ -91,9 +91,9 @@
 
             <Frame inherits="TodolooConfigCheckbox" parentKey="ShowCompletedTasks">
                 <KeyValues>
-                    <KeyValue key="tooltipTitleText" value="Show completed tasks" />
-                    <KeyValue key="tooltipText" value="With this setting active, tasks will stay visible in the task tracker when they are completed." />
-                    <KeyValue key="labelText" value="Show completed tasks" />
+                    <KeyValue key="tooltipTitleText" value="TODOLOO_L_CONFIG_SHOW_COMPLETED_TASKS_TOOLTIP_LABEL" type="global" />
+                    <KeyValue key="tooltipText" value="TODOLOO_L_CONFIG_SHOW_COMPLETED_TASKS_TOOLTIP_DESCRIPTION" type="global" />
+                    <KeyValue key="labelText" value="TODOLOO_L_CONFIG_SHOW_COMPLETED_TASKS_LABEL" type="global" />
                 </KeyValues>
                 <Anchors>
                     <Anchor point="TOPLEFT" relativeKey="$parent.ShowCompletedGroups" relativePoint="BOTTOMLEFT" />
@@ -102,9 +102,9 @@
 
             <Frame inherits="TodolooConfigCheckbox" parentKey="OrderByCompletion">
                 <KeyValues>
-                    <KeyValue key="tooltipTitleText" value="Order by completion" />
-                    <KeyValue key="tooltipText" value="With this setting active, all completed tasks will be moved to the bottom of the group within the task tracker, regardless of the predefined order in the task manager." />
-                    <KeyValue key="labelText" value="Move completed tasks to bottom of groups" />
+                    <KeyValue key="tooltipTitleText" value="TODOLOO_L_CONFIG_ORDER_BY_COMPLETION_TOOLTIP_LABEL" type="global" />
+                    <KeyValue key="tooltipText" value="TODOLOO_L_CONFIG_ORDER_BY_COMPLETION_TOOLTIP_DESCRIPTION" type="global" />
+                    <KeyValue key="labelText" value="TODOLOO_L_CONFIG_ORDER_BY_COMPLETION_LABEL" type="global" />
                 </KeyValues>
                 <Anchors>
                     <Anchor point="TOPLEFT" relativeKey="$parent.ShowCompletedTasks" relativePoint="BOTTOMLEFT" />
@@ -113,9 +113,9 @@
 
             <Frame inherits="TodolooConfigCheckbox" parentKey="ShowGroupProgressText">
                 <KeyValues>
-                    <KeyValue key="tooltipTitleText" value="Show progress" />
-                    <KeyValue key="tooltipText" value="Whether to show completed vs. not completed tasks besides the group name in the task tracker." />
-                    <KeyValue key="labelText" value="Show group progress text" />
+                    <KeyValue key="tooltipTitleText" value="TODOLOO_L_CONFIG_SHOW_PROGRESS_TOOLTIP_LABEL" type="global" />
+                    <KeyValue key="tooltipText" value="TODOLOO_L_CONFIG_SHOW_PROGRESS_TOOLTIP_DESCRIPTION" type="global" />
+                    <KeyValue key="labelText" value="TODOLOO_L_CONFIG_SHOW_PROGRESS_LABEL" type="global" />
                 </KeyValues>
                 <Anchors>
                     <Anchor point="TOPLEFT" relativeKey="$parent.OrderByCompletion" relativePoint="BOTTOMLEFT" />
@@ -124,7 +124,7 @@
 
             <Frame inherits="TodolooSectionHeader" parentKey="MinimapIconHeader">
                 <KeyValues>
-                    <KeyValue key="headerText" value="Minimap Icon" />
+                    <KeyValue key="headerText" value="TODOLOO_L_CONFIG_MINIMAP_SECTION_HEADER" type="global" />
                 </KeyValues>
                 <Anchors>
                     <Anchor point="TOPLEFT" relativeKey="$parent.ShowGroupProgressText" relativePoint="BOTTOMLEFT" />
@@ -133,9 +133,9 @@
 
             <Frame inherits="TodolooConfigCheckbox" parentKey="ShowMinimapIcon">
                 <KeyValues>
-                    <KeyValue key="tooltipTitleText" value="Show minimap icon" />
-                    <KeyValue key="tooltipText" value="Show/hide the icon on the minimap." />
-                    <KeyValue key="labelText" value="Show minimap icon" />
+                    <KeyValue key="tooltipTitleText" value="TODOLOO_L_CONFIG_SHOW_MINIMAP_ICON_TOOLTIP_LABEL" type="global" />
+                    <KeyValue key="tooltipText" value="TODOLOO_L_CONFIG_SHOW_MINIMAP_ICON_TOOLTIP_DESCRIPTION" type="global" />
+                    <KeyValue key="labelText" value="TODOLOO_L_CONFIG_SHOW_MINIMAP_ICON_LABEL" type="global" />
                 </KeyValues>
                 <Anchors>
                     <Anchor point="TOPLEFT" relativeKey="$parent.MinimapIconHeader" relativePoint="BOTTOMLEFT" />

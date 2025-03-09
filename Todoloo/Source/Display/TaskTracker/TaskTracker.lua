@@ -201,12 +201,9 @@ function TODOLOO_TASK_TRACKER_MODULE:UpdateSingle(groupInfo)
         -- wait for animations to finish
         if not groupCompleting then
             -- if the player does not want to see completed tasks tell them we're done with this group
-            if Todoloo.Config.Get(Todoloo.Config.Options.SHOW_COMPLETED_GROUPS) then
-                local completionText = "Group tasks done" --TODO: Add localization, hence the below if-statement
-                if completionText then
-                    local forceCompletedToUseFullHeight = true
-                    self:AddTask(group, "GroupComplete", completionText, nil, forceCompletedToUseFullHeight, TODOLOO_TRACKER_DASH_STYLE_HIDE, TODOLOO_TRACKER_COLOR["Complete"])
-                end
+            if Todoloo.Config.Get(Todoloo.Config.Options.SHOW_COMPLETED_GROUPS) then                
+                local forceCompletedToUseFullHeight = true
+                self:AddTask(group, "GroupComplete", TODOLOO_L_TASK_TRACKER_GROUP_COMPLETE, nil, forceCompletedToUseFullHeight, TODOLOO_TRACKER_DASH_STYLE_HIDE, TODOLOO_TRACKER_COLOR["Complete"])
             end
         end
     else

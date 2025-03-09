@@ -22,7 +22,7 @@ function Todoloo.SlashCmd.Handler(input)
         local command = Todoloo.Utils.SplitCommand(input);
         local handler = SLASH_COMMANDS[command[1]];
         if handler == nil then
-            Todoloo.Messenger.SlashMessage("Unknown command '" .. command[1] .. "'");
+            Todoloo.Messenger.SlashMessage(TODOLOO_L_SLASHCMD_UNKNOWN_COMMAND .. " '" .. command[1] .. "'");
             Todoloo.SlashCmd.Help();
         else
             handler(unpack(Todoloo.Utils.Slice(command, 2, #command-1)));

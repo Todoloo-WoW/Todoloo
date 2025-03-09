@@ -16,3 +16,4 @@ Todoloo.ScrollUtil = {};
 Todoloo.Utils = {};
 Todoloo.Messenger = {};
 Todoloo.SlashCmd = {};
+Todoloo.Locales = {};

@@ -1,0 +1,1 @@
+TODOLOO_LOCALES = {}

@@ -171,7 +171,7 @@ function TodolooObjectiveTrackerMixin:UpdateSingle(group)
         local taskCompleting = self:DoTasks(block, isComplete, isExistingBlock, useFullHeight);
         if not taskCompleting then
             if Todoloo.Config.Get(Todoloo.Config.Options.SHOW_COMPLETED_GROUPS) then
-                block:AddObjective("GROUP_COMPLETE", "Group tasks done", nil, true, OBJECTIVE_DASH_STYLE_HIDE, OBJECTIVE_TRACKER_COLOR["Complete"]);
+                block:AddObjective("GROUP_COMPLETE", TODOLOO_L_TASK_TRACKER_GROUP_COMPLETE, nil, true, OBJECTIVE_DASH_STYLE_HIDE, OBJECTIVE_TRACKER_COLOR["Complete"]);
             end
         end
     else

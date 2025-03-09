@@ -16,4 +16,6 @@
 ## DefaultState: enabled
 ## OptionalDeps: LibStub, LibDBIcon-1.0, LibDataBroker-1.1
 
+Locales\Manifest.xml
+
 Source\Manifest.xml

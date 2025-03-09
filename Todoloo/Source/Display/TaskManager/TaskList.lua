@@ -373,7 +373,7 @@ function TodolooTaskListMixin:InitializeCharacterContextMenu(dropDown, level)
     local info = UIDropDownMenu_CreateInfo()
     
     info.notCheckable = true
-    info.text = "Add new group"
+    info.text = TODOLOO_L_TASK_MANAGER_CHARACTER_ADD_NEW_GROUP
     info.func = function() self:AddNewGroup(characterInfo) end
     UIDropDownMenu_AddButton(info, level)
 end
@@ -384,7 +384,7 @@ function TodolooTaskListMixin:InitializeGroupContextMenu(dropDown, level)
 
     info.isTitle = true
     info.notCheckable = true
-    info.text = "Reset interval"
+    info.text = TODOLOO_L_TASK_MANAGER_GROUP_RESET_INTERVAL_LABEL
     UIDropDownMenu_AddButton(info, level)
 
     info.isTitle = false
@@ -392,43 +392,43 @@ function TodolooTaskListMixin:InitializeGroupContextMenu(dropDown, level)
 
     info.notCheckable = false
     info.checked = groupInfo.reset == nil
-    info.text = "None"
+    info.text = TODOLOO_L_TASK_MANAGER_GROUP_RESET_INTERVAL_NONE
     info.func = function() self:SetGroupInterval(groupInfo, nil) end
     UIDropDownMenu_AddButton(info, level)
 
     info.notCheckable = false
     info.checked = groupInfo.reset == TODOLOO_RESET_INTERVALS.Manually
-    info.text = "Manually"
+    info.text = TODOLOO_L_TASK_MANAGER_GROUP_RESET_INTERVAL_MANUALLY
     info.func = function() self:SetGroupInterval(groupInfo, TODOLOO_RESET_INTERVALS.Manually) end
     UIDropDownMenu_AddButton(info, level)
 
     info.notCheckable = false
     info.checked = groupInfo.reset == TODOLOO_RESET_INTERVALS.Daily
-    info.text = "Daily"
+    info.text = TODOLOO_L_TASK_MANAGER_GROUP_RESET_INTERVAL_DAILY
     info.func = function() self:SetGroupInterval(groupInfo, TODOLOO_RESET_INTERVALS.Daily) end
     UIDropDownMenu_AddButton(info, level)
 
     info.notCheckable = false
     info.checked = groupInfo.reset == TODOLOO_RESET_INTERVALS.Weekly
-    info.text = "Weekly"
+    info.text = TODOLOO_L_TASK_MANAGER_GROUP_RESET_INTERVAL_WEEKLY
     info.func = function() self:SetGroupInterval(groupInfo, TODOLOO_RESET_INTERVALS.Weekly) end
     UIDropDownMenu_AddButton(info, level)
 
     info.isTitle = true
     info.notCheckable = true
-    info.text = "Group actions"
+    info.text = TODOLOO_L_TASK_MANAGER_GROUP_ACTIONS_LABEL
     UIDropDownMenu_AddButton(info, level)
     
     info.isTitle = false
     info.disabled = false
     
     info.notCheckable = true
-    info.text = "Add new task"
+    info.text = TODOLOO_L_TASK_MANAGER_GROUP_ACTIONS_ADD_NEW_TASK
     info.func = function() self:AddNewTask(groupInfo) end
     UIDropDownMenu_AddButton(info, level)
 
     info.notCheckable = true
-    info.text = "Delete"
+    info.text = TODOLOO_L_TASK_MANAGER_GROUP_ACTIONS_DELETE
     info.func = function() 
         local numTasks = Todoloo.TaskManager:GetNumTasks(groupInfo.id, groupInfo.character)
         if numTasks > 0 then
@@ -449,7 +449,7 @@ function TodolooTaskListMixin:InitializeTaskContextMenu(dropDown, level)
 
     info.isTitle = true
     info.notCheckable = true
-    info.text = "Reset interval"
+    info.text = TODOLOO_L_TASK_MANAGER_TASK_RESET_INTERVAL_LABEL
     UIDropDownMenu_AddButton(info, level)
 
     info.isTitle = false
@@ -457,40 +457,40 @@ function TodolooTaskListMixin:InitializeTaskContextMenu(dropDown, level)
 
     if groupInfo.reset ~= nil then
         -- if there's a reset interval on the group
-        info.text = "Reset interval is controlled by the parent group"
+        info.text = TODOLOO_L_TASK_MANAGER_TASK_RESET_INTERVAL_CONTROLLED_BY_GROUP
         info.disabled = true
         UIDropDownMenu_AddButton(info, level)
     else
         -- if there's not reset interval on the group
         info.notCheckable = false
         info.checked = taskInfo.reset == TODOLOO_RESET_INTERVALS.Manually
-        info.text = "Manually"
+        info.text = TODOLOO_L_TASK_MANAGER_TASK_RESET_INTERVAL_MANUALLY
         info.func = function() self:SetTaskInterval(taskInfo, TODOLOO_RESET_INTERVALS.Manually) end
         UIDropDownMenu_AddButton(info, level)
 
         info.notCheckable = false
         info.checked = taskInfo.reset == TODOLOO_RESET_INTERVALS.Daily
-        info.text = "Daily"
+        info.text = TODOLOO_L_TASK_MANAGER_TASK_RESET_INTERVAL_DAILY
         info.func = function() self:SetTaskInterval(taskInfo, TODOLOO_RESET_INTERVALS.Daily) end
         UIDropDownMenu_AddButton(info, level)
 
         info.notCheckable = false
         info.checked = taskInfo.reset == TODOLOO_RESET_INTERVALS.Weekly
-        info.text = "Weekly"
+        info.text = TODOLOO_L_TASK_MANAGER_TASK_RESET_INTERVAL_WEEKLY
         info.func = function() self:SetTaskInterval(taskInfo, TODOLOO_RESET_INTERVALS.Weekly) end
         UIDropDownMenu_AddButton(info, level)
     end
 
     info.isTitle = true
     info.notCheckable = true
-    info.text = "Task actions"
+    info.text = TODOLOO_L_TASK_MANAGER_TASK_ACTION_LABEL
     UIDropDownMenu_AddButton(info, level)
 
     info.isTitle = false
     info.disabled = false
 
     info.notCheckable = true
-    info.text = "Delete"
+    info.text = TODOLOO_L_TASK_MANAGER_TASK_ACTION_DELETE
     info.func = function() self:DeleteTask(taskInfo) end
 
     UIDropDownMenu_AddButton(info, level)
@@ -787,7 +787,7 @@ end
 -- *****************************************************************************************************
 
 StaticPopupDialogs["TODLOO_DELETE_GROUP"] = {
-    text = "Are you sure you want to delete '%s'?",
+    text = TODOLOO_L_TASK_MANAGER_DELETE_GROUP_DIALOG_QUESTION .. " '%s'?",
     button1 = YES,
     button2 = NO,
     OnAccept = function(self, data)
