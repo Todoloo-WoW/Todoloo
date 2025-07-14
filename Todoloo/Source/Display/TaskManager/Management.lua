@@ -131,7 +131,7 @@ end
 
 function TodolooManagementPageMixin:OnHide()
     if self:IsHelpShown() then
-        HelpPlate_Hide(false)
+        HelpPlate.Hide(false)
     end
 end
 
@@ -192,13 +192,13 @@ end
 ---Show the help guide
 function TodolooManagementPageMixin:ShowHelp()
     self:UpdateHelp()
-    HelpPlate_Show(TodolooTaskManagerManagementPage_HelpPlate, self, self.HelpButton)
+    HelpPlate.Show(TodolooTaskManagerManagementPage_HelpPlate, self, self.HelpButton)
 end
 
 ---Is the help guide currently being shown?
 ---@return boolean
 function TodolooManagementPageMixin:IsHelpShown()
-    return HelpPlate_IsShowing(TodolooTaskManagerManagementPage_HelpPlate)
+    return HelpPlate.IsShowingHelpInfo(TodolooTaskManagerManagementPage_HelpPlate)
 end
 
 ---Toggle the help guide. This automatically shows the hel guide if currently not shown, and hides if shown
@@ -206,6 +206,6 @@ function TodolooManagementPageMixin:ToggleHelp()
     if not self:IsHelpShown() then
         self:ShowHelp()
     else
-        HelpPlate_Hide(true)
+        HelpPlate.Hide(true)
     end
 end
