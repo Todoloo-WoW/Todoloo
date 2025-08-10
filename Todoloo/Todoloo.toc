@@ -1,4 +1,4 @@
-## Interface: 110105
+## Interface: 110200
 ## Title: Todoloo
 ## Notes: Your friendly task management assistant!
 ## IconTexture: Interface\AddOns\Todoloo\Images\Logo
