@@ -1,4 +1,12 @@
+local addonName, _ = ...;
+
 TodolooConfigBasicOptionsFrameMixin = {};
+
+-- add Todoloo category to addon settings
+local category = Settings.RegisterCanvasLayoutCategory(addonName);
+Settings.RegisterAddOnCategory(category);
+
+Todoloo.Config.Category = category;
 
 function TodolooConfigBasicOptionsFrameMixin:OnLoad()
     Todoloo.EventBus:RegisterSource(self, "basic_options");
@@ -19,15 +27,6 @@ function TodolooConfigBasicOptionsFrameMixin:OnLoad()
     self.OnCommit = self.okay;
     self.OnDefault = function() end
     self.OnRefresh = function() end
-
-    -- add Todoloo category to addon settings
-    if Settings and SettingsPanel then
-        local category = Settings.RegisterCanvasLayoutCategory(self, self.name);
-        category.ID = self.name;
-        Settings.RegisterAddOnCategory(category);
-    else
-        InterfaceOptions_AddCategory(self, self.name);
-    end
 end
 
 function TodolooConfigBasicOptionsFrameMixin:ResetTrackerPosition()

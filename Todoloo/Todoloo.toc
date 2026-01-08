@@ -1,4 +1,4 @@
-## Interface: 110207
+## Interface: 120000
 ## Title: Todoloo
 ## Notes: Your friendly task management assistant!
 ## IconTexture: Interface\AddOns\Todoloo\Images\Logo
@@ -15,6 +15,6 @@
 ## DefaultState: enabled
 ## OptionalDeps: LibStub, LibDBIcon-1.0, LibDataBroker-1.1
 
+Libs\Embeds.xml
 Locales\Manifest.xml
-
 Source\Manifest.xml
