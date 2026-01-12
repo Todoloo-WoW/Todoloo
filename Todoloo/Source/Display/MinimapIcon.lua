@@ -26,9 +26,9 @@ function Todoloo.MinimapIcon.Initialize()
 end
 
 function Todoloo.MinimapIcon.UpdateShown()
-    if Todoloo.Config.Get(Todoloo.Config.Options.MINIMAP_ICON).hide then
-        icon:Hide("Todoloo")
-    else
+    if Todoloo.Config.Get(Todoloo.Config.Options.SHOW_MINIMAP_ICON) then
         icon:Show("Todoloo")
+    else
+        icon:Hide("Todoloo")
     end
 end
