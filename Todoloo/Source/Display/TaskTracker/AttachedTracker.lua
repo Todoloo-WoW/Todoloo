@@ -182,7 +182,7 @@ function TodolooObjectiveTrackerMixin:UpdateSingle(group)
 end
 
 function TodolooObjectiveTrackerMixin:LayoutContents()
-    if Todoloo.Config.Get(Todoloo.Config.Options.ATTACH_TASK_TRACKER_TO_OBJECTIVE_TRACKER) then
+    if Todoloo.Config.Get(Todoloo.Config.Options.SHOW_TASK_TRACKER) and Todoloo.Config.Get(Todoloo.Config.Options.ATTACH_TASK_TRACKER_TO_OBJECTIVE_TRACKER) then
         self:EnumGroupData(self.UpdateSingle);
     end
 end

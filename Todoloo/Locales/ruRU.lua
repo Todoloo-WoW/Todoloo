@@ -6,35 +6,28 @@ TODOLOO_LOCALES.ruRU = function()
     L["CONFIG_BASIC_OPTIONS_DESCRIPTION"] = "Основные настройки для включения функций в Todoloo.";
     L["CONFIG_GENERAL_SECTION_HEADER"] = "Общее";
     
-    L["CONFIG_ANNOUNCE_RESET_TOOLTIP_LABEL"] = "Оповещение о сбросах";
+    L["CONFIG_ANNOUNCE_RESET_LABEL"] = "Оповещение о сбросах";
     L["CONFIG_ANNOUNCE_RESET_TOOLTIP_DESCRIPTION"] = "При активации этой настройки ежедневные и еженедельные сбросы групп и задач будут объявляться в чате.";
-    L["CONFIG_ANNOUNCE_RESET_LABEL"] = "Оповещать о ежедневных и еженедельных сбросах групп и задач в чате";
     
     L["CONFIG_TASK_TRACKER_SECTION_HEADER"] = "Трекер задач";
     L["CONFIG_SHOW_TASK_TRACKER_LABEL"] = "Показывать трекер задач";
     
     L["CONFIG_HIDE_TRACKER_IN_COMBAT_LABEL"] = "Скрывать трекер задач в бою";
-    L["CONFIG_HIDE_TRACKER_IN_COMBAT_TOOLTIP_LABEL"] = "Скрывать в бою";
     L["CONFIG_HIDE_TRACKER_IN_COMBAT_TOOLTIP_DESCRIPTION"] = "Скрывать трекер задач во время боя и автоматически показывать его снова после выхода из боя (эта настройка актуальна только при использовании плавающего трекера задач).";
 
     L["CONFIG_ATTACH_TRACKER_LABEL"] = "Прикрепить трекер задач к трекеру целей";
-    L["CONFIG_ATTACH_TRACKER_TOOLTIP_LABEL"] = "Прикрепленный трекер задач";
     L["CONFIG_ATTACH_TRACKER_TOOLTIP_DESCRIPTION"] = "Трекер задач будет прикреплен к трекеру целей Blizzard. Учтите, что трекер задач всегда будет последним модулем и отображаться внизу. Если трекер целей заполнен, вам нужно будет свернуть другие модули, чтобы увидеть трекер задач.";
 
     L["CONFIG_SHOW_COMPLETED_GROUPS_LABEL"] = "Показывать завершенные группы";
-    L["CONFIG_SHOW_COMPLETED_GROUPS_TOOLTIP_LABEL"] = "Показывать завершенные группы";
     L["CONFIG_SHOW_COMPLETED_GROUPS_TOOLTIP_DESCRIPTION"] = "При активации этой настройки группы останутся видимыми в трекере задач после их завершения.";
 
     L["CONFIG_SHOW_COMPLETED_TASKS_LABEL"] = "Показывать завершенные задачи";
-    L["CONFIG_SHOW_COMPLETED_TASKS_TOOLTIP_LABEL"] = "Показывать завершенные задачи";
     L["CONFIG_SHOW_COMPLETED_TASKS_TOOLTIP_DESCRIPTION"] = "При активации этой настройки задачи останутся видимыми в трекере задач после их завершения.";
 
-    L["CONFIG_ORDER_BY_COMPLETION_LABEL"] = "Перемещать завершенные задачи в конец групп";
-    L["CONFIG_ORDER_BY_COMPLETION_TOOLTIP_LABEL"] = "Сортировка по завершению";
+    L["CONFIG_ORDER_BY_COMPLETION_LABEL"] = "Сортировка по завершению";
     L["CONFIG_ORDER_BY_COMPLETION_TOOLTIP_DESCRIPTION"] = "При активации этой настройки все завершенные задачи будут перемещены в конец группы в трекере задач, независимо от заранее заданного порядка в менеджере задач.";
 
     L["CONFIG_SHOW_PROGRESS_LABEL"] = "Показывать текст прогресса группы";
-    L["CONFIG_SHOW_PROGRESS_TOOLTIP_LABEL"] = "Показывать прогресс";
     L["CONFIG_SHOW_PROGRESS_TOOLTIP_DESCRIPTION"] = "Показывать количество завершенных и незавершенных задач рядом с названием группы в трекере задач.";
 
     L["CONFIG_MINIMAP_SECTION_HEADER"] = "Иконка миникарты";

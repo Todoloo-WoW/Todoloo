@@ -1,6 +1,6 @@
 TODOLOO_LOCALES.zhCN = function()
     local L = {};
-
+    -- Translator: Sefank
     -- Configurations.
     L["CONFIG_BASIC_OPTIONS_LABEL"] = "基本选项";
     L["CONFIG_BASIC_OPTIONS_DESCRIPTION"] = "Todoloo 的基本功能设置选项。";
