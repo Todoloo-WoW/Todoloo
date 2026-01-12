@@ -8,7 +8,7 @@ local function FillMissingTranslations(incomplete, locale)
 
     local default = TODOLOO_LOCALES["enUS"]();
     for key, val in pairs(default) do
-        if incomplete[key] == nill then
+        if incomplete[key] == nil then
             incomplete[key] = val;
         end
     end
