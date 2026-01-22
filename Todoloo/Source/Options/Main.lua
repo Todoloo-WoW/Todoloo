@@ -176,31 +176,6 @@ EventUtil.ContinueOnAddOnLoaded("Todoloo", function()
         end);
     end
 
-    -- do
-    --     -- Task tracker width
-    --     local function GetValue()
-    --         return TODOLOO_CONFIG[Todoloo.Config.Options.TASK_TRACKER_WIDTH]
-    --     end
-
-    --     local function SetValue(value)
-    --         TODOLOO_CONFIG[Todoloo.Config.Options.TASK_TRACKER_WIDTH] = value;
-    --     end
-
-    --     local setting = Settings.RegisterProxySetting(
-    --         category,
-    --         "TASK_TRACKER_WIDTH",
-    --         Settings.VarType.Number,
-    --         TODOLOO_L_CONFIG_TASK_TRACKER_WIDTH_LABEL,
-    --         235.0,
-    --         GetValue,
-    --         SetValue
-    --     );
-
-    --     local options = Settings.CreateSliderOptions(25.0, 500.0, 5);
-    --     options:SetLabelFormatter(MinimalSliderWithSteppersMixin.Label.Right);
-    --     Settings.CreateSlider(category, setting, options, TODOLOO_L_CONFIG_TASK_TRACKER_WIDTH_TOOLTIP_DESCRIPTION);
-    -- end
-
     -- Minimap icon section
     layout:AddInitializer(CreateSettingsListSectionHeaderInitializer(TODOLOO_L_CONFIG_MINIMAP_SECTION_HEADER));
 
