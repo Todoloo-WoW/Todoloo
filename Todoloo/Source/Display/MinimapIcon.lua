@@ -32,3 +32,26 @@ function Todoloo.MinimapIcon.UpdateShown()
         icon:Hide("Todoloo")
     end
 end
+
+--Addon compartment callback function
+function Todoloo_CompartmentButton(addonName, button)
+    if button == "RightButton" then
+        Todoloo.Config.Show()
+    else
+        Todoloo.ToggleTaskManager()
+    end
+end
+
+--Addon compartment OnEnter function
+function Todoloo_CompartmentButtonOnEnter(addonName, button)
+    GameTooltip:SetOwner(button, "ANCHOR_LEFT");
+    GameTooltip:SetText("Todoloo", 1, 1, 1);
+    GameTooltip:AddLine(TODOLOO_L_MINIMAP_ICON_LEFT_CLICK .. " " .. WHITE_FONT_COLOR:WrapTextInColorCode(TODOLOO_L_MINIMAP_ICON_OPEN_TASK_MANAGER))
+    GameTooltip:AddLine(TODOLOO_L_MINIMAP_ICON_RIGHT_CLICK .. " " .. WHITE_FONT_COLOR:WrapTextInColorCode(TODOLOO_L_MINIMAP_ICON_OPEN_SETTINGS))
+    GameTooltip:Show();
+end
+
+--Addon compartment OnLeave function
+function Todoloo_CompartmentButtonOnLeave(addonName, button)
+    GameTooltip:Hide();
+end
