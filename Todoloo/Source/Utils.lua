@@ -35,6 +35,14 @@ function Todoloo.Utils.StringArrayIndexOf(array, value)
     return nil;
 end
 
+function Todoloo.Utils.GetTaskDisplayText(task)
+    if task.target > 1 then
+        return string.format("%d/%d %s", task.progress, task.target, task.name)
+    end
+
+    return task.name
+end
+
 ---Get the player name including realm (will return in form "Detílium-ShatteredHand")
 ---@return string characterFullName In format "Player-Realm"
 function Todoloo.Utils.GetCharacterFullName()
@@ -64,4 +72,4 @@ function Todoloo.Utils.Slice(array, start, count)
     end
   
     return result
-  end
+end

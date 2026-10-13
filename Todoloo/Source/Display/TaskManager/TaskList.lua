@@ -61,13 +61,20 @@ function TodolooTaskListMixin:SetupScrollBox(self)
                 taskButton:SetScript("OnClick", function(button, buttonName, down)
                     if buttonName == "RightButton" then
                         ToggleDropDownMenu(1, elementData.taskInfo, self.TaskContextMenu, "cursor")
-                    elseif buttonName == "LeftButton" and IsShiftKeyDown() then
-                        taskButton:ToggleCompletion()
+                    elseif buttonName == "LeftButton" then
+                        if IsControlKeyDown() then
+                            button:AdjustProgress(-1)
+                        elseif IsShiftKeyDown() then
+                            button:AdjustProgress(1)
+                        end
                     end
                 end)
 
                 taskButton:SetScript("OnDoubleClick", function(button, buttonName)
-                    if buttonName == "LeftButton" then
+                    if buttonName == "LeftButton"
+                        and not IsShiftKeyDown()
+                        and not IsControlKeyDown()
+                    then
                         --enter edit mode, enabling the player to edit the task name
                         PlaySound(SOUNDKIT.UI_90_BLACKSMITHING_TREEITEMCLICK)
                         button:SetEditMode(true)
@@ -414,6 +421,8 @@ function TodolooTaskListMixin:InitializeGroupContextMenu(dropDown, level)
     info.func = function() self:SetGroupInterval(groupInfo, TODOLOO_RESET_INTERVALS.Weekly) end
     UIDropDownMenu_AddButton(info, level)
 
+    UIDropDownMenu_AddSpace(level)
+
     info.isTitle = true
     info.notCheckable = true
     info.text = TODOLOO_L_TASK_MANAGER_GROUP_ACTIONS_LABEL
@@ -481,6 +490,31 @@ function TodolooTaskListMixin:InitializeTaskContextMenu(dropDown, level)
         UIDropDownMenu_AddButton(info, level)
     end
 
+    UIDropDownMenu_AddSpace(level)
+
+    info.isTitle = true
+    info.notCheckable = true
+    info.text = "Task configuration"
+    UIDropDownMenu_AddButton(info, level)
+
+    local entry = self:GetTargetMenuEntry()
+
+    entry:SetContextData({
+        groupId = taskInfo.groupId,
+        id = taskInfo.id,
+        character = taskInfo.character
+    })
+
+    entry.Input:SetText(tostring(taskInfo.target))
+
+    local targetInfo = UIDropDownMenu_CreateInfo()
+    targetInfo.notCheckable = true
+    targetInfo.customFrame = entry
+
+    UIDropDownMenu_AddButton(targetInfo, level)
+
+    UIDropDownMenu_AddSpace(level)
+
     info.isTitle = true
     info.notCheckable = true
     info.text = TODOLOO_L_TASK_MANAGER_TASK_ACTION_LABEL
@@ -494,6 +528,56 @@ function TodolooTaskListMixin:InitializeTaskContextMenu(dropDown, level)
     info.func = function() self:DeleteTask(taskInfo) end
 
     UIDropDownMenu_AddButton(info, level)
+end
+
+function TodolooTaskListMixin:GetTargetMenuEntry()
+    if self.TargetMenuEntry then
+        return self.TargetMenuEntry
+    end
+
+    local entry = CreateFrame("Frame", nil, self, "UIDropDownCustomMenuEntryTemplate")
+    entry:SetSize(220, 22)
+
+    local label = entry:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
+    label:SetPoint("LEFT", 0, 0)
+    label:SetText("Required count")
+
+    local input = CreateFrame("EditBox", nil, entry, "InputBoxTemplate")
+    input:SetSize(60, 22)
+    input:SetPoint("RIGHT", -5, 0)
+    input:SetAutoFocus(false)
+    input:SetNumeric(true)
+
+    entry.Input = input
+
+    input:SetScript("OnEnterPressed", function(editBox)
+        local target = tonumber(editBox:GetText())
+
+        if not target or target < 1 or target % 1 ~= 0 then
+            UIErrorsFrame:AddMessage("Enter a whole number of at least 1.", 1, 0.2, 0.2)
+            editBox:HighlightText()
+            return
+        end
+
+        local taskInfo = entry:GetContextData()
+
+        editBox:ClearFocus()
+        CloseDropDownMenus()
+
+        Todoloo.TaskManager:SetTaskTarget(taskInfo.groupId, taskInfo.id, target, taskInfo.character)
+    end)
+
+    input:SetScript("OnEscapePressed", function(editBox)
+        editBox:ClearFocus()
+        CloseDropDownMenus()
+    end)
+
+    entry:SetScript("OnHide", function()
+        input:ClearFocus()
+    end)
+
+    self.TargetMenuEntry = entry
+    return entry
 end
 
 function TodolooTaskListMixin:SetGroupInterval(groupInfo, resetInterval)
@@ -521,7 +605,7 @@ function TodolooTaskListMixin:AddNewGroup(characterInfo)
 end
 
 function TodolooTaskListMixin:AddNewTask(groupInfo)
-    Todoloo.TaskManager:AddTask(groupInfo.id, "", nil, nil, groupInfo.character)
+    Todoloo.TaskManager:AddTask(groupInfo.id, "", nil, 1, 0, nil, groupInfo.character)
 end
 
 function TodolooTaskListMixin:DeleteTask(taskInfo)
@@ -573,9 +657,9 @@ function TodolooTaskListMixin:UpdateTask(taskInfo)
         taskInfo.groupId,
         taskInfo.id,
         taskInfo.name,
-        taskInfo.describing,
+        taskInfo.description,
         taskInfo.reset,
-        taskInfo.charatcer
+        taskInfo.character
     )
 end
 
@@ -692,7 +776,7 @@ function TodolooTaskListTaskMixin:Initialize(node)
     self.taskInfo = elementData.taskInfo
     
     self.Name:SetText(self.taskInfo.name)
-    self.Label:SetText(self.taskInfo.name)
+    self.Label:SetText(Todoloo.Utils.GetTaskDisplayText(self.taskInfo))
 
     if self.taskInfo.completed then
         self.Label:SetVertexColor(DISABLED_FONT_COLOR:GetRGB())
@@ -749,13 +833,10 @@ function TodolooTaskListTaskMixin:SetEditMode(enable)
     end
 end
 
-function TodolooTaskListTaskMixin:ToggleCompletion()
-    Todoloo.TaskManager:SetTaskCompletion(
-        self.taskInfo.groupId,
-        self.taskInfo.id,
-        not self.taskInfo.completed,
-        self.taskInfo.character
-    )
+function TodolooTaskListTaskMixin:AdjustProgress(amount)
+    local info = self.taskInfo
+
+    Todoloo.TaskManager:AdjustTaskProgress(info.groupId, info.id, amount, info.character)
 end
 
 function TodolooTaskListTaskMixin:Save()

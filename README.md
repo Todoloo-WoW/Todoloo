@@ -1,9 +1,6 @@
 # Todoloo
 Todoloo is your friendly in-game task management assistant, making sure you've never forget your mount runs, transmog runs, profession tasks, and so much more.
 
-> 🚧 *Todoloo is actively being worked on, and you can expect multiple new features in the future.
-> You can follow the development on [Todoloo's GitHub](https://github.com/Todoloo-WoW/Todoloo).*
-
 ## ✨ Key features
 * Create character specific tasks that automatically reset daily, weekly, or manually
 * Organize your tasks in custom made groups
@@ -13,7 +10,8 @@ Todoloo is your friendly in-game task management assistant, making sure you've n
 
 ## ❓ Getting started
 ### Task Tracker
-* `Shift` + `Left-Click` on tasks in the task tracker to toggle completion
+* `Shift` + `Left-Click` on tasks in the task tracker to complete or add one repetition
+* `Ctrl` + `Left-Click` on tasks in the task tracker to clear completion or subtract one repetition
 * Toggle between floating task tracker and task trakcer attached to the objective tracker
 * Click and drag the floating task tracker around, to place the it as you see fit
 * Toggle whether the floating task tracker should automatically hide in combat and show out of combat
@@ -34,8 +32,9 @@ Todoloo is your friendly in-game task management assistant, making sure you've n
 
 #### Tasks
 * Drag and drop tasks to reorder within the same group, or move between groups
-* `Shift` + `Left-Click` on tasks to toggle task completion
-* `Right-Click` on tasks to set reset interval or to delete the task
+* `Shift` + `Left-Click` on tasks to complete or add one repetition
+* `Ctrl` + `Left-Click` on tasks to clear completion or subtract one repetition
+* `Right-Click` on tasks to configure reset interval or repetition count, or delete the task
 
 ## 📧 Commands
 Commands should either start with `/tdl` or `/todoloo`. The following commands are available:

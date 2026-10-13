@@ -68,7 +68,7 @@ TODOLOO_LOCALES.enUS = function()
 
     L["TASK_MANAGER_HELP_CREATE_GROUP_HELP"] = "Create a new group to get started with your task management!";
     L["TASK_MANAGER_HELP_FILTER_TIP"] = "Tip: Search for a specific task or group to find the item you are looking for more easily.";
-    L["TASK_MANAGER_HELP_TASK_LIST_HELP"] = "This is your overview of all your current groups and tasks.\n\n[Double-Click] on groups and tasks to change the name.\n\n[Shift]+[Left-Click] on groups to collapse.\n\n[Right-Click] on groups to add tasks, set group reset interval, and delete.\n\n[Shift]+[Left-Click] on tasks to toggle completion.\n\n[Right-Click] on tasks to set reset interval and delete."
+    L["TASK_MANAGER_HELP_TASK_LIST_HELP"] = "This is your overview of all your current groups and tasks.\n\n[Double-Click] on groups and tasks to change the name.\n\n[Shift]+[Left-Click] on groups to collapse.\n\n[Right-Click] on groups to add tasks, set group reset interval, and delete.\n\n[Shift]+[Left-Click] on tasks to complete or add one repetition, [Ctrl]+[Left Click] to clear completion or subtract one repetition.\n\n[Right-Click] on tasks to configure the reset interval and repetition count, or delete the task."
 
     -- Task tracker
     L["TASK_TRACKER_GROUP_COMPLETE"] = "Group tasks done";

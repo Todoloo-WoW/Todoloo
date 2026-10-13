@@ -94,15 +94,16 @@ function TodolooObjectiveTrackerMixin:DoTasks(block, groupCompleted, isExistingB
     end
 
     for _, task in pairs(iterTasks) do
+        local displayText = Todoloo.Utils.GetTaskDisplayText(task)
         local line = block:GetExistingLine(task.id);
         if groupCompleted then
             if line and line.state ~= ObjectiveTrackerAnimLineState.Faded then
-                line = block:AddObjective(task.id, task.name, nil, useFullHeight, OBJECTIVE_DASH_STYLE_HIDE, OBJECTIVE_TRACKER_COLOR["Complete"]);
+                line = block:AddObjective(task.id, displayText, nil, useFullHeight, OBJECTIVE_DASH_STYLE_HIDE, OBJECTIVE_TRACKER_COLOR["Complete"]);
                 if not line.state or line.state == ObjectiveTrackerAnimLineState.Present then
                     line:SetState(ObjectiveTrackerAnimLineState.Completing);
                 end
             elseif Todoloo.Config.Get(Todoloo.Config.Options.SHOW_COMPLETED_TASKS) then
-                line = block:AddObjective(task.id, task.name, nil, useFullHeight, OBJECTIVE_DASH_STYLE_HIDE, OBJECTIVE_TRACKER_COLOR["Complete"]);
+                line = block:AddObjective(task.id, displayText, nil, useFullHeight, OBJECTIVE_DASH_STYLE_HIDE, OBJECTIVE_TRACKER_COLOR["Complete"]);
                 line:SetState(ObjectiveTrackerAnimLineState.Completed);
             end
         else
@@ -110,20 +111,20 @@ function TodolooObjectiveTrackerMixin:DoTasks(block, groupCompleted, isExistingB
                 if line and line.state == ObjectiveTrackerAnimLineState.Faded then
                     -- Don't show this task anymore.
                 elseif line then
-                    line = block:AddObjective(task.id, task.name, nil, useFullHeight, OBJECTIVE_DASH_STYLE_HIDE, OBJECTIVE_TRACKER_COLOR["Complete"]);
+                    line = block:AddObjective(task.id, displayText, nil, useFullHeight, OBJECTIVE_DASH_STYLE_HIDE, OBJECTIVE_TRACKER_COLOR["Complete"]);
                     if not line.state or line.state == ObjectiveTrackerAnimLineState.Present then
                         line:SetState(ObjectiveTrackerAnimLineState.Completing);
                     end
                 else
-                    line = block:AddObjective(task.id, task.name, nil, useFullHeight, OBJECTIVE_DASH_STYLE_HIDE, OBJECTIVE_TRACKER_COLOR["Complete"])
+                    line = block:AddObjective(task.id, displayText, nil, useFullHeight, OBJECTIVE_DASH_STYLE_HIDE, OBJECTIVE_TRACKER_COLOR["Complete"])
                     line:SetState(ObjectiveTrackerAnimLineState.Completed);
                 end
             else
                 if isExistingBlock and not line then
-                    line = block:AddObjective(task.id, task.name, nil, useFullHeight);
+                    line = block:AddObjective(task.id, displayText, nil, useFullHeight);
                     line:SetState(ObjectiveTrackerAnimLineState.Adding);
                 else
-                    line = block:AddObjective(task.id, task.name, nil, useFullHeight);
+                    line = block:AddObjective(task.id, displayText, nil, useFullHeight);
                     if line.state == ObjectiveTrackerAnimLineState.Completed then
                         line:SetState(ObjectiveTrackerAnimLineState.Present);
                     end
@@ -206,25 +207,33 @@ function TodolooObjectiveTaskMixin:OnGlowAnimFinished()
     end
 end
 
-function TodolooObjectiveTaskMixin:OnClick()
+function TodolooObjectiveTaskMixin:OnClick(mouseButton)
+    if mouseButton ~= "LeftButton" then
+        return
+    end
+
+    local amount
+    if IsControlKeyDown() then
+        amount = -1
+    elseif IsShiftKeyDown() then
+        amount = 1
+    else
+        return
+    end
+
+    if self.objectiveKey == "GROUP_COMPLETE" then
+        return
+    end
+
+    if self.state == ObjectiveTrackerAnimLineState.Completing then
+        return
+    end
+
     local textColorStyle = OBJECTIVE_TRACKER_COLOR["Normal"];
     self.Text:SetTextColor(textColorStyle.r, textColorStyle.g, textColorStyle.b);
 
-    if IsShiftKeyDown() then
-        if self.objectiveKey == "GROUP_COMPLETE" then
-            return;
-        end
-
-        if self.state and self.state == ObjectiveTrackerAnimLineState.Completing then
-            return;
-        end
-
-        local groupId = self.parentBlock.id;
-        local id = self.objectiveKey;
-
-        local task = Todoloo.TaskManager:GetTask(groupId, id);
-        Todoloo.TaskManager:SetTaskCompletion(groupId, id, not task.completed);
-    end
+    local groupId = self.parentBlock.id
+    Todoloo.TaskManager:AdjustTaskProgress(groupId, self.objectiveKey, amount)
 end
 
 function TodolooObjectiveTaskMixin:OnEnter()

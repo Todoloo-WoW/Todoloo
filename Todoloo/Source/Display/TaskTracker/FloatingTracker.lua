@@ -393,25 +393,30 @@ end
 ---@param task Frame
 ---@param mouseButton string
 function TODOLOO_DEFAULT_TRACKER_MODULE:OnTaskClick(task, mouseButton)
-    if IsShiftKeyDown() then
-        -- if we're currently showing group complete, do nothing
-        if task.id == "GroupComplete" then
-            return
-        end
-
-        -- we have to wait for it to finish completing
-        if task.state and task.state == TODOLOO_TRACKER_TASK_STATE_COMPLETING then
-            return
-        end
-
-        -- complete the task
-        local group = task:GetParent()
-        local groupId = group.id
-        local id = task.id
-
-        local taskInfo = Todoloo.TaskManager:GetTask(groupId, id)
-        Todoloo.TaskManager:SetTaskCompletion(groupId, id, not taskInfo.completed)
+    if mouseButton ~= "LeftButton" then
+        return
     end
+
+    local amount
+    if IsControlKeyDown() then
+        amount = -1
+    elseif IsShiftKeyDown() then
+        amount = 1
+    else
+        return
+    end
+
+    if task.id == "GroupComplete" then
+        return
+    end
+
+    if task.state == TODOLOO_TRACKER_TASK_STATE_COMPLETING then
+        return
+    end
+
+    local groupId = task:GetParent().id
+
+    Todoloo.TaskManager:AdjustTaskProgress(groupId, task.id, amount)
 end
 
 ---Set text and style on the given font string element

@@ -228,6 +228,8 @@ function Todoloo.Tasks.GenerateTaskDataProvider(searching)
                     name = task.name,
                     description = task.description,
                     reset = task.reset,
+                    target = task.target,
+                    progress = task.progress,
                     completed = task.completed
                 }
     

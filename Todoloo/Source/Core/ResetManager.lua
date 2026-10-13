@@ -8,12 +8,12 @@
 ---@param previousDailyReset integer Previous daily reset time in unix time
 ---@param previousWeeklyReset integer Previous weekly reset time in unix time
 ---@return boolean # True if the group should reset, false otherwise
-local function ShouldResetGroup(characterName, groupIndex, group, previousDailyReset, previousWeeklyReset)
+local function ShouldResetGroup(group, previousDailyReset, previousWeeklyReset)
     local lastResetPerformed = Todoloo.Config.Get(Todoloo.Config.Options.LAST_RESET_PERFORMED)
-    if group.reset == TODOLOO_RESET_INTERVALS.Daily and Todoloo.TaskManager:IsGroupComplete(groupIndex, characterName) and lastResetPerformed < previousDailyReset then
+    if group.reset == TODOLOO_RESET_INTERVALS.Daily and lastResetPerformed < previousDailyReset then
         -- reset daily groups
         return true
-    elseif group.reset == TODOLOO_RESET_INTERVALS.Weekly and Todoloo.TaskManager:IsGroupComplete(groupIndex, characterName) and lastResetPerformed < previousWeeklyReset then
+    elseif group.reset == TODOLOO_RESET_INTERVALS.Weekly and lastResetPerformed < previousWeeklyReset then
         -- reset weekly groups
         return true
     end
@@ -28,10 +28,10 @@ end
 ---@return boolean # True if the task should reset, false otherwise
 local function ShouldResetTask(task, previousDailyReset, previousWeeklyReset)
     local lastResetPerformed = Todoloo.Config.Get(Todoloo.Config.Options.LAST_RESET_PERFORMED)
-    if task.reset == TODOLOO_RESET_INTERVALS.Daily and task.completed and lastResetPerformed < previousDailyReset then
+    if task.reset == TODOLOO_RESET_INTERVALS.Daily and lastResetPerformed < previousDailyReset then
         -- reset daily task
         return true
-    elseif task.reset == TODOLOO_RESET_INTERVALS.Weekly and task.completed and lastResetPerformed < previousWeeklyReset then
+    elseif task.reset == TODOLOO_RESET_INTERVALS.Weekly and lastResetPerformed < previousWeeklyReset then
         -- reset weekly task
         return true
     end
@@ -49,7 +49,7 @@ local function PerformResetSince(characters, previousDailyReset, previousWeeklyR
         for groupIndex, group in pairs(character.groups) do
             if group.reset ~= nil then
                 -- group reset interval
-                if ShouldResetGroup(characterName, groupIndex, group, previousDailyReset, previousWeeklyReset) then
+                if ShouldResetGroup(group, previousDailyReset, previousWeeklyReset) then
                     Todoloo.TaskManager:ResetGroup(groupIndex, characterName)
                     Todoloo.Messenger.Message(TODOLOO_L_RESET_MANAGER_GROUP .. " " .. YELLOW_FONT_COLOR:WrapTextInColorCode(group.name ) .. " " .. TODOLOO_L_RESET_MANAGER_ON .. " " .. YELLOW_FONT_COLOR:WrapTextInColorCode(characterName) .. " " .. TODOLOO_L_RESET_MANAGER_HAS_BEEN_RESET)
                 end

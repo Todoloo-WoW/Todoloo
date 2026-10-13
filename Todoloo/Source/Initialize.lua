@@ -21,12 +21,15 @@ function Main:OnPlayerEnteringWorld(isInitialLogin, isReloadingUi)
         return
     end
 
-    -- create task manager
+    -- Initialize task storage
     Todoloo.TaskManager = CreateAndInitFromMixin(TodolooTaskManagerMixin);
+
+    -- Ensure migrations have run prior toresets and display initialization
+    TodolooMigrationManagerMixin:Run();
 
     Todoloo.Tasks.Initialize();
 
-    -- reset all relevant groups and tasks
+    -- Reset all relevant groups and tasks
     Todoloo.Reset.ResetManager.PerformReset();
 
     -- Load appropriate task tracker based on player configuration
