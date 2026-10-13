@@ -1,7 +1,10 @@
-## Interface: 120100, 120001, 120000, 110207
+## Interface: 120105, 120100, 120001, 120000, 110207
 ## Title: Todoloo
 ## Notes: Your friendly task management assistant!
 ## IconTexture: Interface\AddOns\Todoloo\Images\Logo
+## AddonCompartmentFunc: Todoloo_CompartmentButton
+## AddonCompartmentFuncOnEnter: Todoloo_CompartmentButtonOnEnter
+## AddonCompartmentFuncOnLeave: Todoloo_CompartmentButtonOnLeave
 
 ## Author: Detilium
 
@@ -12,8 +15,7 @@
 
 ## SavedVariables: TODOLOO_CONFIG, TODOLOO_TASKS
 
-## DefaultState: enabled
-## OptionalDeps: LibStub, LibDBIcon-1.0, LibDataBroker-1.1
+Libs.xml
 
 Locales\Manifest.xml
 
