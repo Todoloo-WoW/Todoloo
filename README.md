@@ -1,50 +1,70 @@
 # Todoloo
-Todoloo is your friendly in-game task management assistant, making sure you've never forget your mount runs, transmog runs, profession tasks, and so much more.
+Todoloo is your friendly in-game task management assistant, helping you remember mount runs, transmog runs, profession tasks, and more.
 
 ## ✨ Key features
-* Create character specific tasks that automatically reset daily, weekly, or manually
-* Organize your tasks in custom made groups
-* Blizzard styled task manager to create, update, delete and reorganize groups and tasks
-* Blizzard styled floating task tracker or task tracker attached to the overall objective tracker, to visualize your tasks
-* Hide completed tasks and groups from the task tracker
+* Create tasks for individual characters, with daily, weekly, or manual resets
+* Organize tasks into custom groups
+* Set repetition counts for tasks that require multiple steps, displayed as progress such as `5/10 Kill wolves`
+* Add custom task descriptions and review them by hovering over tasks in either tracker
+* Edit task titles, descriptions, reset intervals, and repetition counts in a dedicated details pane
+* Track tasks in a Blizzard-style floating tracker or alongside the objective tracker
+* Hide completed tasks and groups, or move completed tasks to the bottom
+* Manage tasks across your characters using filters and search
 
 ## ❓ Getting started
 ### Task Tracker
-* `Shift` + `Left-Click` on tasks in the task tracker to complete or add one repetition
-* `Ctrl` + `Left-Click` on tasks in the task tracker to clear completion or subtract one repetition
-* Toggle between floating task tracker and task trakcer attached to the objective tracker
-* Click and drag the floating task tracker around, to place the it as you see fit
-* Toggle whether the floating task tracker should automatically hide in combat and show out of combat
-* Toggle whether you want to see completed tasks and/or completed groups, in Todoloo settings (_`Right-Click` on the minimap icon, or via the options_)
+* `Shift` + `Left-Click` a task to complete it or add one repetition
+* `Ctrl` + `Left-Click` a task to undo completion or subtract one repetition
+* Hover over a task to read its custom description, if one has been added
+* Choose between the floating tracker and the attached tracker in Todoloo settings
+* Click and drag the floating tracker to reposition it
+* Optionally hide the floating tracker during combat
+* Choose whether completed tasks and groups remain visible in the settings
+
+Open Todoloo settings: `Right-Click` the minimap icon or use `/tdl settings`.
 
 ### Task Manager
-* Use the in-game help guide by clicking on the info icon in the task manager
-* Manage your tasks account-wide using the task manager, by `Left-Click` on the minimap icon
-* Toggle characters by using the "Filter" button
+`Left-Click` the minimap icon or use `/tdl tm` to open the task manager.
+
+* Use the **Filter** button to choose which characters appear
+* Search for tasks and groups by name
+* Click the info icon to open the in-game help guide
 
 #### Characters
-* `Right-Click` on the characters to add new groups
-* `Shift` + `Left-Click` on groups to minimize all character groups and tasks
+* `Left-Click` a character header to collapse or expand its groups and tasks
+* `Right-Click` a character header to add a group
 
 #### Groups
-* Drag and drop groups to reorder as you see fit
-* `Right-Click` on groups to set group reset interval, add new tasks, or delete the group
+* Use **Create group** to add a group for your current character
+* `Double-Click` a group to rename it
+* `Shift` + `Left-Click` a group to collapse or expand it
+* Drag and drop groups to change their order within the same character
+* `Right-Click` a group to change its reset interval, add a task, or delete it
+
+When a group defines a reset interval, its tasks inherit that interval. Set the group's reset interval to **None** to configure resets separately for each task.
 
 #### Tasks
-* Drag and drop tasks to reorder within the same group, or move between groups
-* `Shift` + `Left-Click` on tasks to complete or add one repetition
-* `Ctrl` + `Left-Click` on tasks to clear completion or subtract one repetition
-* `Right-Click` on tasks to configure reset interval or repetition count, or delete the task
+* `Left-Click` a task to open its details editor
+* Edit its title, optional description, reset interval, and repetition count
+* Click **Save** to apply your edits
+* Click **Reset** to discard your edits and restore the task's saved settings
+* Selecting another task with unsaved edits prompts you before discarding them
+* Drag and drop tasks to reorder them or move them between groups belonging to the same character
+* `Shift` + `Left-Click` a task to complete it or add one repetition
+* `Ctrl` + `Left-Click` a task to undo completion or subtract one repetition
+* `Right-Click` a task to delete it
+
+A repetition count of `1` behaves as a regular checkbox task. Higher counts display progress until the target is reached (_for example, `5/10 Kill wolves`_).
 
 ## 📧 Commands
-Commands should either start with `/tdl` or `/todoloo`. The following commands are available:
+Commands start with `/tdl` or `/todoloo`. The following commands are available:
 * `tm`, `task-manager`: Open the task manager
 * `tt`, `task-tracker`: Toggle the floating task tracker
 * `s`, `settings`: Open Todoloo settings
 
 ## 📣 Feedback
 ### Bug
-Bugs can be reported in the [issues page](https://github.com/Todoloo-WoW/Todoloo/issues).
+Report bugs on the [GitHub issues page](https://github.com/Todoloo-WoW/Todoloo/issues).
 
 ### Feature requests
-Features can be requested by adding a new issue on the [issues page](https://github.com/Todoloo-WoW/Todoloo/issues).
+Suggest features on the [GitHub issues page](https://github.com/Todoloo-WoW/Todoloo/issues).
