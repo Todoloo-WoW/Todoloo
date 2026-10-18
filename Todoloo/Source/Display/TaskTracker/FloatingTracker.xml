@@ -14,7 +14,7 @@ https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/FrameXML/UI
 				</Texture>
 			</Layer>
 			<Layer level="ARTWORK">
-				<FontString parentKey="Text" inherits="ObjectiveTrackerHeaderFont" mixin="AutoScalingFontStringMixin" maxLines="1" justifyH="LEFT">
+				<FontString parentKey="Text" inherits="TodolooFloatingTrackerHeaderFont" mixin="AutoScalingFontStringMixin" maxLines="1" justifyH="LEFT">
 					<KeyValues>
 						<KeyValue key="minLineHeight" value="12" type="number"/>
 					</KeyValues>
@@ -46,7 +46,7 @@ https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/FrameXML/UI
         <Size x="232" y="10" />
         <Layers>
             <Layer level="ARTWORK">
-				<FontString parentKey="HeaderText" inherits="ObjectiveTrackerLineFont">
+				<FontString parentKey="HeaderText" inherits="TodolooFloatingTrackerLineFont">
 					<Anchors>
 						<Anchor point="TOPLEFT"/>
 						<Anchor point="RIGHT"/>
@@ -60,7 +60,7 @@ https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/FrameXML/UI
 		<Size x="232" y="16"/>
 		<Layers>
 			<Layer level="ARTWORK">
-				<FontString parentKey="Dash" inherits="ObjectiveFont" text="QUEST_DASH">
+				<FontString parentKey="Dash" inherits="TodolooFloatingTrackerLineFont" text="QUEST_DASH">
 					<Anchors>
 						<Anchor point="TOPLEFT" x="0" y="1"/>
 					</Anchors>
@@ -71,7 +71,7 @@ https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/FrameXML/UI
 						<Anchor point="TOPLEFT" x="-10" y="2"/>
 					</Anchors>
 				</Texture>
-				<FontString parentKey="Text" inherits="ObjectiveFont">
+				<FontString parentKey="Text" inherits="TodolooFloatingTrackerLineFont">
 					<Anchors>
 						<Anchor point="TOP"/>
 						<Anchor point="LEFT" relativeKey="$parent.Dash" relativePoint="RIGHT"/>
@@ -162,11 +162,31 @@ https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/FrameXML/UI
 		</Scripts>
 	</Frame>
     
-    <Frame name="TodolooFloatingTrackerFrame" parent="UIParent" movable="true" clampedToScreen="true" frameStrata="LOW" hidden="true">
+    <Frame name="TodolooFloatingTrackerFrame" parent="UIParent" movable="false" clampedToScreen="true" frameStrata="LOW" hidden="true">
         <Size x="235" y="500" />
 		<Anchors>
 			<Anchor point="TOPLEFT" x="100" y="-150" />
 		</Anchors>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString parentKey="OverflowText" inherits="TodolooFloatingTrackerLineFont" text="TODOLOO_L_TASK_TRACKER_MORE_TASKS" maxLines="1" justifyH="CENTER" hidden="true">
+					<Color r="0.7" g="0.7" b="0.7"/>
+					<Anchors>
+						<Anchor point="BOTTOMLEFT" x="7" y="0"/>
+						<Anchor point="BOTTOMRIGHT" x="-7" y="0"/>
+					</Anchors>
+				</FontString>
+
+				<Texture parentKey="OverflowSeparator" hidden="true">
+					<Size y="1"/>
+					<Color r="1" g="1" b="1" a="0.2"/>
+					<Anchors>
+						<Anchor point="BOTTOMLEFT" relativeKey="$parent.OverflowText" relativePoint="TOPLEFT" x="0" y="8"/>
+						<Anchor point="BOTTOMRIGHT" relativeKey="$parent.OverflowText" relativePoint="TOPRIGHT" x="0" y="8"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
         <Frames>
             <Frame parentKey="NineSlice" useParentLevel="true" inherits="NineSlicePanelTemplate">
 				<KeyValues>
@@ -207,8 +227,6 @@ https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/FrameXML/UI
 			<OnUpdate function="TodolooTracker_OnUpdate"/>
 			<OnShow function="TodolooTracker_OnShow"/>
 			<OnHide function="TodolooTracker_OnHide"/>
-			<OnDragStart function="TodolooTracker_OnDragStart" />
-			<OnDragStop function="TodolooTracker_OnDragStop" />
 		</Scripts>
     </Frame>
 </Ui>

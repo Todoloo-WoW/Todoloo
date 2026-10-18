@@ -194,8 +194,68 @@ local function TodolooTaskTracker_DoTasks(self, group, groupCompleted, existingG
     return completing
 end
 
----Update single group and underlying tasks
----@param groupInfo GroupInfo Group info
+function TODOLOO_TASK_TRACKER_MODULE:FitGroupToHeight(group)
+    local header = self.Header
+    if header and header.added then
+        header = nil
+    end
+
+    -- Keep the entire group when it already fits.
+    if TodolooTracker_CanFitGroup(group, header) then
+        return true, false
+    end
+
+    local originalHeight = group.height
+    local visibleHeight = group.HeaderText:GetHeight()
+
+    group.height = visibleHeight
+
+    -- Even the group title must fit.
+    if not TodolooTracker_CanFitGroup(group, header) then
+        group.height = originalHeight
+        return false, true
+    end
+
+    local lastVisibleTask
+    local overflow = false
+    local needsRefresh = false
+
+    for _, task in ipairs(group.layoutTasks) do
+        if not overflow then
+            group.height = visibleHeight
+                + task:GetHeight()
+                + self.taskSpacing
+
+            if TodolooTracker_CanFitGroup(group, header) then
+                visibleHeight = group.height
+                lastVisibleTask = task
+            else
+                overflow = true
+            end
+        end
+
+        if overflow then
+            task.used = nil
+
+            -- Freeing these rows stops their animations. Request another
+            -- layout so completion summaries can advance without them.
+            if task.state == TODOLOO_TRACKER_TASK_STATE_COMPLETING
+                or task.state == TODOLOO_TRACKER_TASK_STATE_FADING then
+                needsRefresh = true
+            end
+        end
+    end
+
+    group.height = visibleHeight
+    group.currentTask = lastVisibleTask
+
+    if needsRefresh then
+        TodolooTracker_Update()
+    end
+
+    return true, overflow
+end
+
 function TODOLOO_TASK_TRACKER_MODULE:UpdateSingle(groupInfo)
     -- we're not adding groups without a name
     if groupInfo.name == "" then
@@ -234,12 +294,20 @@ function TODOLOO_TASK_TRACKER_MODULE:UpdateSingle(groupInfo)
         TodolooTaskTracker_DoTasks(self, group, isComplete, existingGroup, useFullHeight)
     end
 
+    local fits, overflow = self:FitGroupToHeight(group)
+
     group:SetHeight(group.height)
 
-    if TodolooTracker_AddGroup(group) then
+    if fits and TodolooTracker_AddGroup(group) then
         group:Show()
         self:FreeUnusedTasks(group)
+
+        if overflow then
+            self.hasOverflow = true
+            return true
+        end
     else
+        self.hasOverflow = true
         group.used = false
         return true
     end

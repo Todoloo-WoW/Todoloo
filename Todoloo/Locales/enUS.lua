@@ -103,6 +103,9 @@ TODOLOO_LOCALES.enUS = function()
 
     -- Task tracker
     L["TASK_TRACKER_GROUP_COMPLETE"] = "Group tasks done";
+    L["TASK_TRACKER_MORE_TASKS"] = "Additional tasks hidden";
+    L["TASK_TRACKER_EDIT_MODE_HEIGHT"] = "Height";
+    L["TASK_TRACKER_EDIT_MODE_TEXT_SIZE"] = "Text Size";
 
     -- Reset manager
     L["RESET_MANAGER_GROUP"] = "Group";

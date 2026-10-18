@@ -2,11 +2,15 @@ package-as: Todoloo
 
 ignore:
     - README.md
+    - docs
 
 externals:
     Todoloo/Libs/LibStub: https://repos.wowace.com/wow/libstub/trunk
     Todoloo/Libs/LibDataBroker-1.1: https://github.com/tekkub/libdatabroker-1-1
     Todoloo/Libs/LibDBIcon-1.0: https://repos.wowace.com/wow/libdbicon-1-0/trunk/LibDBIcon-1.0
+    Todoloo/Libs/LibEditMode:
+        url: https://github.com/p3lim-wow/LibEditMode
+        tag: latest
 
 move-folders:
     Todoloo/Todoloo: Todoloo

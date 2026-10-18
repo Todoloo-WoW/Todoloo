@@ -1,5 +1,5 @@
 # Todoloo
-Todoloo is your friendly in-game task management assistant, helping you remember mount runs, transmog runs, profession tasks, and more.
+Todoloo is your friendly in-game task management assistant, helping you remember mount runs, transmog runs, profession tasks, and more. This addon is developed with the philosophy that it should feel like part of World of Warcraft, with a familiar look and controls that feel natural to use.
 
 ## ✨ Key features
 * Create tasks for individual characters, with daily, weekly, or manual resets
@@ -11,17 +11,27 @@ Todoloo is your friendly in-game task management assistant, helping you remember
 * Hide completed tasks and groups, or move completed tasks to the bottom
 * Manage tasks across your characters using filters and search
 
+![Todoloo task manager and task details](docs/images/task-manager.png)
+
 ## ❓ Getting started
 ### Task Tracker
 * `Shift` + `Left-Click` a task to complete it or add one repetition
 * `Ctrl` + `Left-Click` a task to undo completion or subtract one repetition
 * Hover over a task to read its custom description, if one has been added
 * Choose between the floating tracker and the attached tracker in Todoloo settings
-* Click and drag the floating tracker to reposition it
 * Optionally hide the floating tracker during combat
 * Choose whether completed tasks and groups remain visible in the settings
 
 Open Todoloo settings: `Right-Click` the minimap icon or use `/tdl settings`.
+
+#### Customizing the floating tracker
+Open World of Warcraft's **Edit Mode**, then select the floating tracker to reposition it or adjust its **Height** and **Text Size**. Use Edit Mode's save and revert controls to keep or discard your changes.
+
+These settings are saved separately for each character and Edit Mode layout. The floating tracker can only be moved while Edit Mode is active.
+
+When tasks exceed the available space, the tracker displays **Additional tasks hidden** beneath a separator. Increase its height or reduce its text size to display more tasks.
+
+![Todoloo Edit Mode integration](docs/images/edit-mode.png)
 
 ### Task Manager
 `Left-Click` the minimap icon or use `/tdl tm` to open the task manager.

@@ -1,3 +1,78 @@
+local _, addonNamespace = ...
+local LibEditMode = addonNamespace.LibEditMode
+
+local function CreateTrackerFont(name, size)
+    local font = CreateFont(name)
+    font:SetFont(STANDARD_TEXT_FONT, size, "")
+    font:SetTextColor(1, 1, 1)
+    font:SetShadowColor(0, 0, 0, 1)
+    font:SetShadowOffset(1, -1)
+    font:SetJustifyH("LEFT")
+    font:SetJustifyV("TOP")
+
+    return font
+end
+
+local headerFont = CreateTrackerFont(
+    "TodolooFloatingTrackerHeaderFont",
+    14
+)
+
+headerFont:SetTextColor(
+    NORMAL_FONT_COLOR.r,
+    NORMAL_FONT_COLOR.g,
+    NORMAL_FONT_COLOR.b
+)
+
+local lineFont = CreateTrackerFont("TodolooFloatingTrackerLineFont", 12)
+
+local function GetFloatingTrackerTextSize()
+    local size = tonumber(TodolooFloatingTrackerFrame.editModeTextSize)
+        or tonumber(Todoloo.Config.Get(
+            Todoloo.Config.Options.TASK_TRACKER_TEXT_SIZE
+        ))
+        or 12
+
+    return math.max(12, math.min(20, math.floor(size + 0.5)))
+end
+
+local function ApplyFloatingTrackerTextSize(tracker)
+    local size = GetFloatingTrackerTextSize()
+
+    if tracker.appliedTextSize == size then
+        return
+    end
+
+    lineFont:SetFont(STANDARD_TEXT_FONT, size, "")
+    headerFont:SetFont(STANDARD_TEXT_FONT, size + 2, "")
+
+    -- Measure the dash independently of visible task rows.
+    if not tracker.dashMeasurement then
+        tracker.dashMeasurement = tracker:CreateFontString(
+            nil,
+            "ARTWORK",
+            "TodolooFloatingTrackerLineFont"
+        )
+        tracker.dashMeasurement:SetText(QUEST_DASH)
+        tracker.dashMeasurement:Hide()
+    end
+
+    TODOLOO_TRACKER_DASH_WIDTH =
+        tracker.dashMeasurement:GetStringWidth()
+
+    tracker.appliedTextSize = size
+end
+
+local function GetFloatingTrackerHeight()
+    local height = tonumber(TodolooFloatingTrackerFrame.editModeHeight)
+        or tonumber(Todoloo.Config.Get(
+            Todoloo.Config.Options.TASK_TRACKER_HEIGHT
+        ))
+        or 500
+
+    return math.max(100, math.min(1000, height))
+end
+
 TODOLOO_DEFAULT_TRACKER_MODULE = {}
 
 function TODOLOO_DEFAULT_TRACKER_MODULE:OnLoad(friendlyName, defaultTemplate)
@@ -16,7 +91,7 @@ function TODOLOO_DEFAULT_TRACKER_MODULE:OnLoad(friendlyName, defaultTemplate)
 
     self.groupsFrame = TodolooFloatingTrackerFrame.GroupsFrame
 
-    TODOLOO_DEFAULT_TRACKER_MODULE.AddGroupOffset(self, self.groupTemplate, 0, -10)
+    TODOLOO_DEFAULT_TRACKER_MODULE.AddGroupOffset(self, self.groupTemplate, TODOLOO_TRACKER_CONTENT_INSET, -10)
 end
 
 function TodolooTracker_GetModuleInfoTable(friendlyName, baseModule, defaultTemplate)
@@ -30,6 +105,7 @@ function TODOLOO_DEFAULT_TRACKER_MODULE:BeginLayout()
     self.firstGroup = nil
     self.lastGroup = nil
     self.contentsHeight = 0
+    self.hasOverflow = false
 
     self.Header:Hide()
     self:MarkGroupsUnused()
@@ -72,6 +148,10 @@ function TODOLOO_DEFAULT_TRACKER_MODULE:FreeGroup(group)
     end
 
     group.tasks = {}
+
+    if group.layoutTasks then
+        wipe(group.layoutTasks)
+    end
 
     -- free the group
     self.usedGroups[group.groupTemplate][group.id] = nil
@@ -183,9 +263,11 @@ function TODOLOO_DEFAULT_TRACKER_MODULE:GetGroup(id, overrideType, overrideTempl
     end
 
     group.used = true
-    group:SetWidth(TodolooFloatingTrackerFrame:GetWidth())
+    group:SetWidth(math.max(1, TodolooFloatingTrackerFrame:GetWidth() - TODOLOO_TRACKER_CONTENT_INSET))
     group.height = 0
     group.currentTask = nil
+    group.layoutTasks = group.layoutTasks or {}
+    wipe(group.layoutTasks)
 
     if group.tasks then
         for _, task in pairs(group.tasks) do
@@ -236,6 +318,7 @@ end
 
 function TODOLOO_DEFAULT_TRACKER_MODULE:AddTask(group, taskIndex, text, taskType, useFullHeight, dashStyle, colorStyle)
     local task = self:GetTask(group, taskIndex, taskType)
+    task.TaskButton:EnableMouse(not LibEditMode:IsInEditMode())
     
     task:SetWidth(group:GetWidth())
     
@@ -284,6 +367,8 @@ function TODOLOO_DEFAULT_TRACKER_MODULE:AddTask(group, taskIndex, text, taskType
     end
 
     group.currentTask = task
+    table.insert(group.layoutTasks, task)
+
     return task
 end
 
@@ -379,6 +464,7 @@ function TODOLOO_DEFAULT_TRACKER_MODULE:SetStringText(fontString, text, useFullH
         fontString:SetMaxLines(2)
     end
 
+    fontString:SetHeight(0)
     fontString:SetText(text)
 
     local stringHeight = fontString:GetHeight()
@@ -544,14 +630,12 @@ end
 function TodolooTracker_OnLoad(self)
     TODOLOO_DEFAULT_TRACKER_MODULE.OnLoad(self, "TODOLOO_DEFAULT_TRACKER_MODULE")
 
-    self:RegisterForDrag("LeftButton")
-
     -- get measurements
     local task = CreateFrame("Frame", nil, self, self.taskTemplate)
     task.Text:SetText("Double line|ntest")
     tinsert(self.freeTasks, task)
     TODOLOO_TRACKER_DASH_WIDTH = task.Dash:GetWidth()
-    TODOLOO_TRACKER_TEXT_WIDTH = TODOLOO_TRACKER_TASK_WIDTH - TODOLOO_TRACKER_DASH_WIDTH - 12
+    TODOLOO_TRACKER_TEXT_WIDTH = math.max(1, TODOLOO_TRACKER_WIDTH - TODOLOO_TRACKER_CONTENT_INSET - TODOLOO_TRACKER_DASH_WIDTH)
     task.Text:SetWidth(TODOLOO_TRACKER_TEXT_WIDTH)
 
     -- set header menu frame level
@@ -599,16 +683,366 @@ function TodolooTracker_OnHide(self)
     end
 end
 
+local function GetFloatingTrackerLayouts()
+    local characterGUID = UnitGUID("player")
+    if not characterGUID then
+        return
+    end
+
+    local layouts = Todoloo.Config.Get(
+        Todoloo.Config.Options.TASK_TRACKER_LAYOUTS
+    )
+
+    if not layouts then
+        layouts = {}
+
+        Todoloo.Config.Set(
+            Todoloo.Config.Options.TASK_TRACKER_LAYOUTS,
+            layouts
+        )
+    end
+
+    if not layouts[characterGUID] then
+        layouts[characterGUID] = {}
+    end
+
+    return layouts[characterGUID]
+end
+
+local function LoadFloatingTrackerLayout(frame, layoutName)
+    if not layoutName then
+        return
+    end
+
+    local layouts = GetFloatingTrackerLayouts()
+    if not layouts then
+        return
+    end
+
+    local settings = layouts[layoutName] or {}
+    frame.editModeDirty = nil
+
+    frame.editModeLayoutName = layoutName
+
+    frame.editModeHeight = settings.height
+        or Todoloo.Config.Get(
+            Todoloo.Config.Options.TASK_TRACKER_HEIGHT
+        )
+
+    frame.editModeTextSize = settings.textSize
+        or Todoloo.Config.Get(
+            Todoloo.Config.Options.TASK_TRACKER_TEXT_SIZE
+        )
+
+    frame.editModePosition = {
+        layoutName = layoutName,
+        point = settings.point or "TOPLEFT",
+        x = settings.x or 100,
+        y = settings.y or -150,
+    }
+
+    -- Set height before anchoring, particularly for bottom anchors.
+    frame:SetHeight(GetFloatingTrackerHeight())
+    frame:ClearAllPoints()
+    frame:SetPoint(
+        frame.editModePosition.point,
+        UIParent,
+        frame.editModePosition.point,
+        frame.editModePosition.x,
+        frame.editModePosition.y
+    )
+
+    TodolooTracker_Update()
+end
+
+local function CaptureFloatingTrackerLayout(frame)
+    local position = frame.editModePosition or {}
+
+    return {
+        point = position.point or "TOPLEFT",
+        x = position.x or 100,
+        y = position.y or -150,
+        height = GetFloatingTrackerHeight(),
+        textSize = GetFloatingTrackerTextSize(),
+    }
+end
+
+local function SaveFloatingTrackerLayout(frame, layoutName, settings)
+    local layouts = GetFloatingTrackerLayouts()
+    if not layouts or not layoutName then
+        return
+    end
+
+    layouts[layoutName] = CopyTable(
+        settings or CaptureFloatingTrackerLayout(frame)
+    )
+
+    if layoutName == frame.editModeLayoutName then
+        frame.editModeDirty = nil
+    end
+end
+
+local function MarkFloatingTrackerLayoutDirty(frame)
+    if not frame.editModeLayoutName
+        or not EditModeManagerFrame:IsEditModeActive() then
+        return
+    end
+
+    frame.editModeDirty = true
+
+    securecallfunction(
+        EditModeManagerFrame.SetHasActiveChanges,
+        EditModeManagerFrame,
+        true
+    )
+end
+
+local function RestoreFloatingTrackerLayout(frame, layoutName)
+    LoadFloatingTrackerLayout(
+        frame,
+        layoutName
+            or LibEditMode:GetActiveLayoutName()
+            or frame.editModeLayoutName
+    )
+
+    if EditModeManagerFrame:IsEditModeActive() then
+        securecallfunction(
+            EditModeManagerFrame.CheckForSystemActiveChanges,
+            EditModeManagerFrame
+        )
+    end
+
+    LibEditMode:RefreshFrameSettings(frame)
+end
+
+function TodolooTracker_InitializeEditMode(self)
+    if self.editModeRegistered then
+        return
+    end
+
+    local defaultPosition = {
+        point = "TOPLEFT",
+        x = 100,
+        y = -150
+    }
+
+    LibEditMode:AddFrame(
+        self,
+        function(frame, layoutName, point, x, y)
+            frame.editModePosition = {
+                layoutName = layoutName,
+                point = point,
+                x = x,
+                y = y
+            }
+            MarkFloatingTrackerLayoutDirty(self)
+        end,
+        defaultPosition,
+        "Todoloo"
+    )
+
+    LibEditMode:AddFrameSettings(self, {
+        {
+            kind = LibEditMode.SettingType.Slider,
+            name = TODOLOO_L_TASK_TRACKER_EDIT_MODE_HEIGHT,
+            default = 500,
+            minValue = 100,
+            maxValue = 1000,
+            valueStep = 10,
+
+            get = function()
+                return GetFloatingTrackerHeight()
+            end,
+
+            set = function(_, value)
+                self.editModeHeight = math.max(
+                    100,
+                    math.min(1000, math.floor(value + 0.5))
+                )
+
+                MarkFloatingTrackerLayoutDirty(self)
+                TodolooTracker_Update()
+            end,
+        },
+        {
+            kind = LibEditMode.SettingType.Slider,
+            name = TODOLOO_L_TASK_TRACKER_EDIT_MODE_TEXT_SIZE,
+            default = 12,
+            minValue = 12,
+            maxValue = 20,
+            valueStep = 1,
+
+            get = function()
+                return GetFloatingTrackerTextSize()
+            end,
+
+            set = function(_, value)
+                self.editModeTextSize = math.max(
+                    12,
+                    math.min(20, math.floor(value + 0.5))
+                )
+
+                MarkFloatingTrackerLayoutDirty(self)
+                TodolooTracker_Update()
+            end,
+        },
+    })
+
+    -- Preserve Todoloo's dirty state when Blizzard recalculates its buttons.
+    hooksecurefunc(
+        EditModeManagerFrame,
+        "SetHasActiveChanges",
+        function(manager, hasActiveChanges)
+            if not hasActiveChanges
+                and self.editModeDirty
+                and manager:IsEditModeActive() then
+                securecallfunction(
+                    manager.SetHasActiveChanges,
+                    manager,
+                    true
+                )
+            end
+        end
+    )
+
+    -- A preset must be saved as a new layout. Preserve its draft before
+    -- Blizzard reverts the original layout during creation.
+    hooksecurefunc(
+        EditModeManagerFrame,
+        "ShowNewLayoutDialog",
+        function(manager, sourceLayout)
+            local activeLayout = manager:GetActiveLayoutInfo()
+            local source = sourceLayout or activeLayout
+
+            if source == activeLayout then
+                self.editModeNewLayoutSettings =
+                    CaptureFloatingTrackerLayout(self)
+            else
+                local layouts = GetFloatingTrackerLayouts()
+                local settings = layouts
+                    and source
+                    and layouts[source.layoutName]
+
+                self.editModeNewLayoutSettings =
+                    CopyTable(settings or {})
+            end
+        end
+    )
+
+    EditModeLayoutDialog:HookScript("OnHide", function()
+        self.editModeNewLayoutSettings = nil
+    end)
+
+    -- Commit before Blizzard emits its saved event.
+    hooksecurefunc(
+        EditModeManagerFrame,
+        "PrepareSystemsForSave",
+        function()
+            if self.editModeNewLayoutSettings
+                and EditModeLayoutDialog:IsShown() then
+                local name = EditModeLayoutDialog:GetEditBoxText()
+
+                if name and name ~= "" then
+                    SaveFloatingTrackerLayout(
+                        self,
+                        name,
+                        self.editModeNewLayoutSettings
+                    )
+                end
+            elseif self.editModeDirty then
+                SaveFloatingTrackerLayout(
+                    self,
+                    self.editModeLayoutName
+                )
+            end
+        end
+    )
+
+    hooksecurefunc(
+        EditModeManagerFrame,
+        "RevertAllChanges",
+        function()
+            RestoreFloatingTrackerLayout(self)
+        end
+    )
+
+    LibEditMode:RegisterCallback("create", function(
+        layoutName,
+        _,
+        sourceLayoutName
+    )
+        local layouts = GetFloatingTrackerLayouts()
+        if not layouts or layouts[layoutName] then
+            return
+        end
+
+        local source = sourceLayoutName
+            and layouts[sourceLayoutName]
+
+        layouts[layoutName] = CopyTable(source or {})
+    end)
+
+    LibEditMode:RegisterCallback("rename", function(oldName, newName)
+        local layouts = GetFloatingTrackerLayouts()
+        if not layouts then
+            return
+        end
+
+        layouts[newName] = layouts[oldName]
+        layouts[oldName] = nil
+
+        if self.editModeLayoutName == oldName then
+            self.editModeLayoutName = newName
+
+            if self.editModePosition then
+                self.editModePosition.layoutName = newName
+            end
+        end
+    end)
+
+    LibEditMode:RegisterCallback("delete", function(layoutName)
+        local layouts = GetFloatingTrackerLayouts()
+        if layouts then
+            layouts[layoutName] = nil
+        end
+    end)
+
+    LibEditMode:RegisterCallback("layout", function(layoutName)
+        RestoreFloatingTrackerLayout(self, layoutName)
+    end)
+
+    LibEditMode:RegisterCallback("enter", function()
+        TodolooTracker_Update()
+    end)
+
+    LibEditMode:RegisterCallback("exit", function()
+        self:StopMovingOrSizing()
+        self:SetMovable(false)
+
+        -- LibEditMode also reports temporary hides, such as keybinding mode.
+        if not EditModeManagerFrame:IsEditModeActive() then
+            RestoreFloatingTrackerLayout(self)
+            self.editModeNewLayoutSettings = nil
+        end
+
+        TodolooTracker_Update()
+    end)
+
+    self.editModeRegistered = true
+end
+
 function TodolooTracker_Initialize(self)
     self.MODULES = { TODOLOO_TASK_TRACKER_MODULE }
 
     self.initialized = true
 
     -- set width and height based on Todoloo config
-    self:SetWidth(Todoloo.Config.Get(Todoloo.Config.Options.TASK_TRACKER_WIDTH))
-    self:SetHeight(Todoloo.Config.Get(Todoloo.Config.Options.TASK_TRACKER_HEIGHT))
+    self:SetWidth(TODOLOO_TRACKER_WIDTH)
+    self:SetScale(1)
+    self:SetHeight(GetFloatingTrackerHeight())
 
     TodolooTracker_UpdateBackground()
+    TodolooTracker_InitializeEditMode(self)
 end
 
 function TodolooTracker_OnEvent(self, event, ...)
@@ -659,6 +1093,44 @@ function TodolooTracker_UpdateBackground()
     TodolooFloatingTrackerFrame.NineSlice:Hide()
 end
 
+local function LayoutFloatingTrackerModules(tracker, maxHeight)
+    local groupsFrame = tracker.GroupsFrame
+
+    groupsFrame.maxHeight = maxHeight
+    groupsFrame.currentGroup = nil
+    groupsFrame.contentsHeight = 0
+
+    for _, module in ipairs(tracker.MODULES) do
+        module.taskWidth = TODOLOO_TRACKER_TEXT_WIDTH
+
+        if module.Header then
+            module.Header.added = nil
+            module.Header.enabled = nil
+
+            local headerWidth = tracker:GetWidth()
+                - TODOLOO_TRACKER_HEADER_OFFSET_X
+
+            module.Header:SetWidth(headerWidth)
+            module.Header.Background:SetWidth(headerWidth)
+            module.Header.Text:SetWidth(
+                math.max(1, headerWidth - 14)
+            )
+        end
+    end
+
+    local hasOverflow = false
+
+    for _, module in ipairs(tracker.MODULES) do
+        module:Update()
+
+        if module.hasOverflow then
+            hasOverflow = true
+        end
+    end
+
+    return hasOverflow
+end
+
 function TodolooTracker_Refresh()
     local tracker = TodolooFloatingTrackerFrame
 
@@ -666,80 +1138,61 @@ function TodolooTracker_Refresh()
         tracker.isUpdateDirty = true
         return
     end
-    tracker.isUpdating = true
 
     if not tracker.initialized then
-        tracker.isUpdating = false
         return
     end
 
-    local trackerWidth = math.max(1, tonumber(Todoloo.Config.Get(Todoloo.Config.Options.TASK_TRACKER_WIDTH)) or 235)
-
-    tracker:SetWidth(trackerWidth)
-
-    TODOLOO_TRACKER_TEXT_WIDTH = math.max(1, trackerWidth - TODOLOO_TRACKER_DASH_WIDTH - 12)
-
-    tracker.GroupsFrame.maxHeight = math.max(
-        1,
-        tonumber(Todoloo.Config.Get(
-            Todoloo.Config.Options.TASK_TRACKER_HEIGHT
-        )) or TODOLOO_TRACKER_MAX_HEIGHT
-    )
-
+    tracker.isUpdating = true
     tracker.isUpdateDirty = false
 
-    tracker.GroupsFrame.currentGroup = nil
-    tracker.GroupsFrame.contentsHeight = 0
+    local trackerWidth = TODOLOO_TRACKER_WIDTH
+    local trackerHeight = GetFloatingTrackerHeight()
 
-    for _, module in ipairs(tracker.MODULES) do
-        if module.Header then
-            module.Header.added = nil
+    tracker:SetWidth(trackerWidth)
+    tracker:SetScale(1)
+    ApplyFloatingTrackerTextSize(tracker)
+
+    TODOLOO_TRACKER_TEXT_WIDTH = math.max(
+        1,
+        trackerWidth
+            - TODOLOO_TRACKER_CONTENT_INSET
+            - TODOLOO_TRACKER_DASH_WIDTH
+    )
+
+    tracker.OverflowText:Hide()
+    tracker.OverflowSeparator:Hide()
+
+    -- First try using the entire available height.
+    local hasOverflow = LayoutFloatingTrackerModules(tracker, trackerHeight)
+
+    if hasOverflow then
+        -- Eight units above the text, one for the divider,
+        -- and four between the divider and the list.
+        local footerHeight = tracker.OverflowText:GetStringHeight() + 13
+
+        hasOverflow = LayoutFloatingTrackerModules(tracker, math.max(1, trackerHeight - footerHeight))
+
+        -- Animation cleanup can remove completed rows between passes.
+        -- Recover the full area on the next refresh if overflow cleared.
+        if not hasOverflow then
+            TodolooTracker_Update()
         end
     end
 
-    for _, module in ipairs(tracker.MODULES) do
-        if module.Header then
-            module.Header.enabled = nil
-        end
-    end
-
-    for _, module in ipairs(tracker.MODULES) do
-        module.taskWidth = TODOLOO_TRACKER_TEXT_WIDTH
-
-        if module.Header then
-            local headerWidth = trackerWidth - TODOLOO_TRACKER_HEADER_OFFSET_X
-
-            module.Header:SetWidth(headerWidth)
-            module.Header.Background:SetWidth(headerWidth)
-            module.Header.Text:SetWidth(math.max(1, headerWidth - 14))
-        end
-
-        module:Update()
-    end
-
-    if tracker.GroupsFrame.currentGroup then
-        tracker.HeaderMenu:Show()
-    else
-        tracker.HeaderMenu:Hide()
-    end
+    tracker.OverflowText:SetShown(hasOverflow)
+    tracker.OverflowSeparator:SetShown(hasOverflow)
+    tracker.HeaderMenu:SetShown(tracker.GroupsFrame.currentGroup ~= nil)
 
     TodolooTracker_UpdateBackground()
 
     tracker.currentGroup = nil
-    tracker:SetHeight(math.max(1, tracker.GroupsFrame.contentsHeight))
+    tracker:SetHeight(trackerHeight)
     tracker.isUpdating = false
 end
 
 function TodolooTracker_Update()
     TodolooFloatingTrackerFrame.isUpdateDirty = true
-end
-
-function TodolooTracker_OnDragStart(self)
-    self:StartMoving()
-end
-
-function TodolooTracker_OnDragStop(self)
-    self:StopMovingOrSizing()
 end
 
 function TodolooTrackerTask_OnLoad(self)
