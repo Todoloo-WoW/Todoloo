@@ -15,90 +15,32 @@ TODOLOO_DEFAULT_RESET_INTERVAL = TODOLOO_RESET_INTERVALS.Manually
 ---These are some what irrelevant, but will show the player some hints for usage.
 TODLOO_FIRST_TIME_SETUP_TASKS = {
     {
-        name = "Mounts",
+        name = "Getting started",
         tasks = {
             {
-                name = "Invincible's Reins",
-                description = "Icecornw - Lich King",
-                reset = 3,
+                name = "Plan your next adventure",
+                description = nil,
+                reset = TODOLOO_RESET_INTERVALS.Manually,
+                progress = 0,
+                target = 1,
                 completed = false
             },
             {
-                name = "Cartel Master's Gearglider",
+                name = "Complete world quests",
                 description = nil,
-                reset = 1,
+                reset = TODOLOO_RESET_INTERVALS.Daily,
+                progress = 0,
+                target = 3,
                 completed = false
             },
             {
-                name = "Swift White Hawkstrider",
+                name = "Run dungeons",
                 description = nil,
-                reset = 2,
-                completed = false
-            },
-            {
-                name = "Reins of the Raven Lord",
-                description = nil,
-                reset = 2,
-                completed = false
-            },
-            {
-                name = "Swift Zulian Panther",
-                description = nil,
-                reset = 2,
+                reset = TODOLOO_RESET_INTERVALS.Weekly,
+                progress = 0,
+                target = 2,
                 completed = false
             }
-        }
-    },
-    {
-        name = "Transmog runs",
-        tasks = {
-            {
-                name = "Antorus, the Burning Throne",
-                description = nil,
-                reset = 3,
-                completed = false
-            },
-            {
-                name = "Dragon Soul",
-                description = nil,
-                reset = 3,
-                completed = false
-            },
-            {
-                name = "Firelands",
-                description = nil,
-                reset = 3,
-                completed = false
-            },
-            {
-                name = "Ny'alotha, the Waking City",
-                description = nil,
-                reset = 3,
-                completed = false
-            }
-        }
-    },
-    {
-        name = "Profession stuff",
-        tasks = {
-            {
-                name = "Blacksmithing weeklies",
-                description = nil,
-                reset = 3,
-                completed = false
-            },
-            {
-                name = "Mining weeklies",
-                description = nil,
-                reset = 3,
-                completed = false
-            },
-            {
-                name = "Check barting boulder quests",
-                description = nil,
-                reset = 3,
-                completed = false
-            }   
         }
     }
 }
@@ -396,6 +338,7 @@ function TodolooTaskManagerMixin:ResetGroup(index, characterFullName)
     local tasks = TODOLOO_TASKS[characterFullName].groups[index].tasks
 
     for _, task in ipairs(tasks) do
+        task.progress = 0
         task.completed = false
     end
 
@@ -441,6 +384,8 @@ end
 ---@field name string Name of the task
 ---@field description string|nil Optional description of the task
 ---@field reset reset Reset interval for automatic reapperances in the task manager
+---@field target integer Target repetitions before completion
+---@field progress integer Current progress towards target
 ---@field completed boolean Whether or not this task has been completed
 
 ---Get specific task in group by index
@@ -471,11 +416,13 @@ end
 ---@param groupIndex integer Index of the group in the task table
 ---@param name string Name/title of the task
 ---@param description string? Optional description of the task
+---@param target integer Target repetitions before completion
+---@param progress integer Current progress towards target
 ---@param reset reset? Reset interval (if the task group has a reset interval defined, this value is ignored. If not, and the value is not provided, the default reset interval will be set)
 ---@param characterFullName string? Full character name in format "player-realm" (defaults to the currently logged in character)
 ---@return Task # The newly created task
 ---@return integer # Index of the newly created task
-function TodolooTaskManagerMixin:AddTask(groupIndex, name, description, reset, characterFullName)
+function TodolooTaskManagerMixin:AddTask(groupIndex, name, description, target, progress, reset, characterFullName)
     assert(groupIndex)
     assert(name)
 
@@ -490,10 +437,12 @@ function TodolooTaskManagerMixin:AddTask(groupIndex, name, description, reset, c
         reset = reset or TODOLOO_DEFAULT_RESET_INTERVAL
     end
 
-    local  task = {
+    local task = {
         name = name,
         description = description,
         reset = reset,
+        target = target,
+        progress = math.max(0, math.min(progress, target)),
         completed = false
     }
     
@@ -528,15 +477,89 @@ function TodolooTaskManagerMixin:UpdateTask(groupIndex, index, name, description
         assert(reset)
     end
 
-    local completed = TODOLOO_TASKS[characterFullName].groups[groupIndex].tasks[index].completed
-    TODOLOO_TASKS[characterFullName].groups[groupIndex].tasks[index] = {
-        name = name,
-        description = description,
-        reset = reset,
-        completed = completed
-    }
+    local task = group.tasks[index]
+    assert(task, "Task not found.")
+
+    task.name = name
+    task.description = description
+    task.reset = reset
     
     Todoloo.EventBus:TriggerEvent(self, Todoloo.Tasks.Events.TASK_UPDATED, groupIndex, index)
+end
+
+---Set progress for a task
+---@param groupIndex integer Index of the group within the table
+---@param index integer Index of the task within the group
+---@param progress integer New progress towards target
+---@param characterFullName string? Full character name in format "player-realm" (defaults to the currently logged in character)
+function TodolooTaskManagerMixin:SetTaskProgress(groupIndex, index, progress, characterFullName)
+    assert(
+        type(progress) == "number" and progress % 1 == 0,
+        "Progress must be a whole number"
+    )
+
+    characterFullName = characterFullName or Todoloo.Utils.GetCharacterFullName()
+
+    local task = self:GetTask(groupIndex, index, characterFullName)
+    assert(task, "Task not found.")
+
+    local newProgress = math.max(0, math.min(progress, task.target))
+    local completed = newProgress >= task.target
+
+    if task.progress == newProgress and task.completed == completed then
+        return
+    end
+
+    task.progress = newProgress
+    task.completed = completed
+
+    Todoloo.EventBus:TriggerEvent(self, Todoloo.Tasks.Events.TASK_UPDATED, groupIndex, index, characterFullName)
+end
+
+---Adjust progress for a task by a given amount
+---@param groupIndex integer Index of the group within the table
+---@param index integer Index of the task within the group
+---@param amount integer Amount to add to the current progress
+---@param characterFullName string? Full character name in format "player-realm" (defaults to the currently logged in character)
+function TodolooTaskManagerMixin:AdjustTaskProgress(groupIndex, index, amount, characterFullName)
+    assert(
+        type(amount) == "number" and amount % 1 == 0,
+        "Adjustment must be a whole number."
+    )
+
+    characterFullName = characterFullName or Todoloo.Utils.GetCharacterFullName()
+
+    local task = self:GetTask(groupIndex, index, characterFullName)
+    assert(task, "Task not found.")
+
+    self:SetTaskProgress(groupIndex, index, task.progress + amount, characterFullName)
+end
+
+---Set new repitition target for a task
+---@param groupIndex integer Index of the group within the table
+---@param index integer Index of the task within the group
+---@param target integer New repitition target
+---@param characterFullName string? Full character name in format "player-realm" (defaults to the currently logged in character)
+function TodolooTaskManagerMixin:SetTaskTarget(groupIndex, index, target, characterFullName)
+    assert(
+        type(target) == "number" and target % 1 == 0 and target >= 1,
+        "Target must be a whole number of at least 1."
+    )
+
+    characterFullName = characterFullName or Todoloo.Utils.GetCharacterFullName()
+
+    local task = self:GetTask(groupIndex, index, characterFullName)
+    assert(task, "Task not found.")
+
+    if task.target == target then
+        return
+    end
+
+    task.target = target
+    task.progress = math.max(0, math.min(task.progress, target))
+    task.completed = task.progress >= target
+
+    Todoloo.EventBus:TriggerEvent(self, Todoloo.Tasks.Events.TASK_UPDATED, groupIndex, index, characterFullName)
 end
 
 ---Remove task
@@ -563,7 +586,12 @@ function TodolooTaskManagerMixin:SetTaskCompletion(groupIndex, index, completed,
     assert(index)
     
     characterFullName = characterFullName or Todoloo.Utils.GetCharacterFullName()
-    TODOLOO_TASKS[characterFullName].groups[groupIndex].tasks[index].completed = completed
+
+    local task = self:GetTask(groupIndex, index, characterFullName)
+    assert(task, "Task not found.")
+
+    task.progress = completed and task.target or 0
+    task.completed = completed
 
     Todoloo.EventBus:TriggerEvent(self, Todoloo.Tasks.Events.TASK_COMPLETION_SET, groupIndex, index)
 end
@@ -577,7 +605,12 @@ function TodolooTaskManagerMixin:ResetTask(groupIndex, index, characterFullName)
     assert(index)
 
     characterFullName = characterFullName or Todoloo.Utils.GetCharacterFullName()
-    TODOLOO_TASKS[characterFullName].groups[groupIndex].tasks[index].completed = false
+
+    local task = self:GetTask(groupIndex, index, characterFullName)
+    assert(task, "Task not found.")
+
+    task.progress = 0
+    task.completed = false
 
     Todoloo.EventBus:TriggerEvent(self, Todoloo.Tasks.Events.TASK_RESET, groupIndex, index)
 end

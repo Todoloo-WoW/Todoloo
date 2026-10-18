@@ -13,7 +13,7 @@
 ## X-Wago-ID: mNwQDBKo
 ## X-WoWI-ID: 26696
 
-## SavedVariables: TODOLOO_CONFIG, TODOLOO_TASKS
+## SavedVariables: TODOLOO_CONFIG, TODOLOO_TASKS, TODOLOO_DATA_VERSION
 
 Libs.xml
 

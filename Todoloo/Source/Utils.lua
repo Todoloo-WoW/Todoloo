@@ -35,6 +35,14 @@ function Todoloo.Utils.StringArrayIndexOf(array, value)
     return nil;
 end
 
+function Todoloo.Utils.GetTaskDisplayText(task)
+    if task.target > 1 then
+        return string.format("%d/%d %s", task.progress, task.target, task.name)
+    end
+
+    return task.name
+end
+
 ---Get the player name including realm (will return in form "Detílium-ShatteredHand")
 ---@return string characterFullName In format "Player-Realm"
 function Todoloo.Utils.GetCharacterFullName()
@@ -58,10 +66,35 @@ end
 
 function Todoloo.Utils.Slice(array, start, count)
     local result = {}
-  
+
     for index = start, math.min(#array, start + count - 1) do
       table.insert(result, array[index])
     end
-  
+
     return result
-  end
+end
+
+function Todoloo.Utils.ShowTaskTooltip(owner, task)
+    Todoloo.Utils.HideTaskTooltip(owner)
+
+    local description = task and task.description
+    if not description or not description:find("%S") then
+        return
+    end
+
+    if not owner.todolooTaskTooltipHooked then
+        owner:HookScript("OnHide", Todoloo.Utils.HideTaskTooltip)
+        owner.todolooTaskTooltipHooked = true
+    end
+
+    GameTooltip:SetOwner(owner, "ANCHOR_LEFT")
+    GameTooltip_SetTitle(GameTooltip, task.name, NORMAL_FONT_COLOR, true)
+    GameTooltip:AddLine(description, 1, 1, 1, true)
+    GameTooltip:Show()
+end
+
+function Todoloo.Utils.HideTaskTooltip(owner)
+    if GameTooltip:GetOwner() == owner then
+        GameTooltip:Hide()
+    end
+end

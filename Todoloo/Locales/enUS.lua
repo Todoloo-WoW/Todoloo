@@ -47,6 +47,11 @@ TODOLOO_LOCALES.enUS = function()
 
     L["TASK_MANAGER_CHARACTER_ADD_NEW_GROUP"] = "Add new group";
 
+    L["TASK_MANAGER_DEFAULT_GROUP_NAME"] = "New group";
+    L["TASK_MANAGER_DEFAULT_TASK_NAME"] = "New task";
+
+    L["TASK_MANAGER_NO_RESULTS"] = "No results";
+
     L["TASK_MANAGER_GROUP_RESET_INTERVAL_LABEL"] = "Reset interval";
     L["TASK_MANAGER_GROUP_RESET_INTERVAL_NONE"] = "None";
     L["TASK_MANAGER_GROUP_RESET_INTERVAL_MANUALLY"] = "Manually";
@@ -55,6 +60,7 @@ TODOLOO_LOCALES.enUS = function()
     L["TASK_MANAGER_GROUP_ACTIONS_LABEL"] = "Group actions";
     L["TASK_MANAGER_GROUP_ACTIONS_ADD_NEW_TASK"] = "Add new task";
     L["TASK_MANAGER_GROUP_ACTIONS_DELETE"] = "Delete";
+    L["TASK_MANAGER_GROUP_DELETE_CONFIRMATION"] = "Are you sure you want to delete '%s'?";
 
     L["TASK_MANAGER_TASK_RESET_INTERVAL_LABEL"] = "Reset interval";
     L["TASK_MANAGER_TASK_RESET_INTERVAL_CONTROLLED_BY_GROUP"] = "Reset interval is controlled by the parent group";
@@ -64,11 +70,36 @@ TODOLOO_LOCALES.enUS = function()
     L["TASK_MANAGER_TASK_ACTION_LABEL"] = "Task actions";
     L["TASK_MANAGER_TASK_ACTION_DELETE"] = "Delete";
 
+    -- TASK_MANAGER_DELETE_GROUP_DIALOG_QUESTION IS DEPRECATED
     L["TASK_MANAGER_DELETE_GROUP_DIALOG_QUESTION"] = "Are you sure you want to delete"
 
     L["TASK_MANAGER_HELP_CREATE_GROUP_HELP"] = "Create a new group to get started with your task management!";
-    L["TASK_MANAGER_HELP_FILTER_TIP"] = "Tip: Search for a specific task or group to find the item you are looking for more easily.";
-    L["TASK_MANAGER_HELP_TASK_LIST_HELP"] = "This is your overview of all your current groups and tasks.\n\n[Double-Click] on groups and tasks to change the name.\n\n[Shift]+[Left-Click] on groups to collapse.\n\n[Right-Click] on groups to add tasks, set group reset interval, and delete.\n\n[Shift]+[Left-Click] on tasks to toggle completion.\n\n[Right-Click] on tasks to set reset interval and delete."
+    L["TASK_MANAGER_HELP_FILTERS"] = "Search for tasks or groups by name. Use the filter menu to choose which characters appear."
+    L["TASK_MANAGER_HELP_TASK_LIST_INTERACTIONS"] = "Select a task to open its editor.\n\n"
+        .. "[Double-Click] a group to rename it. [Shift-Click] a group to collapse or expand it. [Click] a character header to collapse or expand that character.\n\n"
+        .. "[Right-Click] a group to add tasks, change its reset interval, or delete it. [Right-Click] a task to delete it.\n\n"
+        .. "[Shift-Click] a task to add progress. [Ctrl-Click] to subtract progress."
+    L["TASK_MANAGER_HELP_TASK_DETAILS"] = "Edit the selected task's title, description, reset interval, and repetition count here.\n\n"
+        .. "When the parent group defines a reset interval, the task inherits it and its reset controls are disabled."
+    L["TASK_MANAGER_HELP_SAVE_RESET"] = "Save applies your changes to the selected task. Reset restores its saved settings."
+
+    -- Task details form
+    L["TASK_DETAILS_FORM_SUMMARY"] = "%s\nProgress: %d/%d";
+    L["TASK_DETAILS_FORM_EMPTY_STATE"] = "Select or create a task to get started.";
+    L["TASK_DETAILS_FORM_TITLE_LABEL"] = "Title";
+    L["TASK_DETAILS_FORM_DESCRIPTION_LABEL"] = "Description";
+    L["TASK_DETAILS_FORM_DESCRIPTION_PLACEHOLDER"] = "Custom task description (optional)";
+    L["TASK_DETAILS_FORM_RESET_INTERVAL_LABEL"] = "Reset Interval";
+    L["TASK_DETAILS_FORM_RESET_INTERVAL_MANUALLY"] = "Manually";
+    L["TASK_DETAILS_FORM_RESET_INTERVAL_DAILY"] = "Daily";
+    L["TASK_DETAILS_FORM_RESET_INTERVAL_WEEKLY"] = "Weekly";
+    L["TASK_DETAILS_FORM_TARGET_REPITITION_LABEL"] = "Repetition count";
+    L["TASK_DETAILS_FORM_SAVE_BUTTON_LABEL"] = "Save";
+    L["TASK_DETAILS_FORM_RESET_BUTTON_LABEL"] = "Reset";
+    L["TASK_DETAILS_UNSAVED_CHANGES_DIALOG_DESCRIPTION"] = "This task has unsaved changes. Continue without saving?";
+    L["TASK_DETAILS_UNSAVED_CHANGES_DIALOG_CONFIRM_BUTTON"] = "Discard changes";
+    L["TASK_DETAILS_FORM_ERROR_TITLE_REQUIRED"] = "Enter a title for the task.";
+    L["TASK_DETAILS_FORM_ERROR_TARGET_INVALID"] = "Repetition count must be a whole number of at least 1.";
 
     -- Task tracker
     L["TASK_TRACKER_GROUP_COMPLETE"] = "Group tasks done";

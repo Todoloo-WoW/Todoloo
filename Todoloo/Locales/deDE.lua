@@ -61,7 +61,9 @@ TODOLOO_LOCALES.deDE = function()
     L["TASK_MANAGER_DELETE_GROUP_DIALOG_QUESTION"] = "Bist du sicher, dass du löschen möchtest";
     
     L["TASK_MANAGER_HELP_CREATE_GROUP_HELP"] = "Erstelle eine neue Gruppe, um mit der Aufgabenverwaltung zu beginnen!";
+    -- TASK_MANAGER_HELP_FILTER_TIP IS DEPRECATED
     L["TASK_MANAGER_HELP_FILTER_TIP"] = "Tipp: Suche nach einer bestimmten Aufgabe oder Gruppe, um sie schneller zu finden.";
+    -- TASK_MANAGER_HELP_TASK_LIST_HELP IS DEPRECATED
     L["TASK_MANAGER_HELP_TASK_LIST_HELP"] = "Dies ist deine Übersicht über alle aktuellen Gruppen und Aufgaben.\n\n[Doppelklick] auf Gruppen und Aufgaben, um den Namen zu ändern.\n\n[Umschalt]+[Linksklick] auf Gruppen zum Ein-/Ausklappen.\n\n[Rechtsklick] auf Gruppen, um Aufgaben hinzuzufügen, das Zurücksetzintervall festzulegen oder zu löschen.\n\n[Umschalt]+[Linksklick] auf Aufgaben, um den Abschlussstatus umzuschalten.\n\n[Rechtsklick] auf Aufgaben, um das Zurücksetzintervall festzulegen oder sie zu löschen.";
     
     -- Aufgabenverfolgung

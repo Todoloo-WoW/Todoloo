@@ -26,9 +26,9 @@ else
     currentLocale = TODOLOO_LOCALES["enUS"]();
 end
 
+FillMissingTranslations(currentLocale, GetLocale())
 ConvertLineBreaks(currentLocale);
 
---Export translations to global scope for access through frames.
 for key, value in pairs(currentLocale) do
     _G["TODOLOO_L_"..key] = value;
 end

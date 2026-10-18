@@ -4,7 +4,7 @@ local function OnAddonLoaded()
     -- toggle task management frame
     Todoloo.ToggleTaskManager = function()
         if TodolooTaskManagerFrame:IsVisible() then
-            HideUIPanel(TodolooTaskManagerFrame);
+            TodolooTaskManagerFrame:RequestClose()
         else
             ShowUIPanel(TodolooTaskManagerFrame);
         end

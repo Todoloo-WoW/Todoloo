@@ -349,10 +349,7 @@ function TODOLOO_DEFAULT_TRACKER_MODULE:OnGroupHeaderLeave(group)
     end
 end
 
----Set color style on the task on mouse hover
----@param task Frame
 function TODOLOO_DEFAULT_TRACKER_MODULE:OnTaskEnter(task)
-    -- if we're currently showing group complete, do nothing
     if task.id == "GroupComplete" then
         return
     end
@@ -367,12 +364,15 @@ function TODOLOO_DEFAULT_TRACKER_MODULE:OnTaskEnter(task)
             task.Text:SetTextColor(textColorStyle.r, textColorStyle.g, textColorStyle.b)
         end
     end
+
+    local group = Todoloo.TaskManager:GetGroup(task:GetParent().id)
+    local taskInfo = group and group.tasks[task.id]
+
+    Todoloo.Utils.ShowTaskTooltip(task, taskInfo)
 end
 
----Set color style on the task on mouse leave
----@param task Frame
 function TODOLOO_DEFAULT_TRACKER_MODULE:OnTaskLeave(task)
-    -- if we're currently showing group complete, do nothing on click
+    Todoloo.Utils.HideTaskTooltip(task)
     if task.id == "GroupComplete" then
         return
     end
@@ -393,25 +393,30 @@ end
 ---@param task Frame
 ---@param mouseButton string
 function TODOLOO_DEFAULT_TRACKER_MODULE:OnTaskClick(task, mouseButton)
-    if IsShiftKeyDown() then
-        -- if we're currently showing group complete, do nothing
-        if task.id == "GroupComplete" then
-            return
-        end
-
-        -- we have to wait for it to finish completing
-        if task.state and task.state == TODOLOO_TRACKER_TASK_STATE_COMPLETING then
-            return
-        end
-
-        -- complete the task
-        local group = task:GetParent()
-        local groupId = group.id
-        local id = task.id
-
-        local taskInfo = Todoloo.TaskManager:GetTask(groupId, id)
-        Todoloo.TaskManager:SetTaskCompletion(groupId, id, not taskInfo.completed)
+    if mouseButton ~= "LeftButton" then
+        return
     end
+
+    local amount
+    if IsControlKeyDown() then
+        amount = -1
+    elseif IsShiftKeyDown() then
+        amount = 1
+    else
+        return
+    end
+
+    if task.id == "GroupComplete" then
+        return
+    end
+
+    if task.state == TODOLOO_TRACKER_TASK_STATE_COMPLETING then
+        return
+    end
+
+    local groupId = task:GetParent().id
+
+    Todoloo.TaskManager:AdjustTaskProgress(groupId, task.id, amount)
 end
 
 ---Set text and style on the given font string element

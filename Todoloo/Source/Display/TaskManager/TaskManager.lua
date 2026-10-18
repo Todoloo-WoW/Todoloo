@@ -1,19 +1,11 @@
--- *****************************************************************************************************
--- ***** TASK MANAGER
--- *****************************************************************************************************
-
 TodolooTaskManagerFrameMixin = {}
 
 function TodolooTaskManagerFrameMixin:OnLoad()
     self:SetPortraitTextureRaw([[Interface\AddOns\Todoloo\Images\Logo]])
-end
 
-function TodolooTaskManagerFrameMixin:ApplyDesiredWidth()
-    local pageWidth = self.ManagementPage:GetDesiredPageWidth()
-
-    self.currentPageWidth = pageWidth
-    self:SetWidth(self.currentPageWidth)
-    UpdateUIPanelPositions(self)
+    self.CloseButton:SetScript("OnClick", function()
+        self:RequestClose()
+    end)
 end
 
 function TodolooTaskManagerFrameMixin:Refresh(taskManagerInfo)
@@ -28,4 +20,10 @@ end
 
 function TodolooTaskManagerFrameMixin:OnHide()
     PlaySound(SOUNDKIT.UI_PROFESSIONS_WINDOW_CLOSE);
+end
+
+function TodolooTaskManagerFrameMixin:RequestClose()
+    self.ManagementPage:ConfirmDiscardChanges(function()
+        HideUIPanel(self)
+    end)
 end

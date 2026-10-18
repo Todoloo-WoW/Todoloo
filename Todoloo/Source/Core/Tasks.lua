@@ -114,44 +114,41 @@ function Todoloo.Tasks.InitFilterMenu(dropdown)
     end)
 end
 
-local function GetFilteredTasks(characters, searchCriteria)
+local function BuildTaskListEntries(characters, searchCriteria)
     local result = {}
-    
+    local searchText = searchCriteria and string.lower(searchCriteria)
+
     for characterFullName, character in pairs(characters) do
-        local characterMatch = false
         local characterEntry = {
             groups = {}
         }
 
-        for _, group in pairs(character.groups) do
-            local match = false
+        for groupId, group in ipairs(character.groups) do
             local groupEntry = {
-                name = group.name,
+                id = groupId,
+                groupRef = group,
                 tasks = {}
             }
 
-            for _, task in pairs(group.tasks) do
-                if string.find(string.lower(task.name), string.lower(searchCriteria)) then
-                    table.insert(groupEntry.tasks, task)
-                    match = true
-                    characterMatch = true
+            for taskId,  task in ipairs(group.tasks) do
+                local matches = not searchText or string.find(string.lower(task.name), searchText, 1, true)
+
+                if matches then
+                    table.insert(groupEntry.tasks, {
+                        id = taskId,
+                        taskRef = task
+                    })
                 end
             end
 
-            if not match then
-                if string.find(string.lower(group.name), string.lower(searchCriteria)) then
-                    match = true
-                    characterMatch = true
-                end
-            end
+            local groupMatches = not searchText or string.find(string.lower(group.name), searchText, 1, true)
 
-            if match then
+            if groupMatches or #groupEntry.tasks > 0 then
                 table.insert(characterEntry.groups, groupEntry)
             end
         end
 
-        -- only add the character if we've found matches on either tasks or groups
-        if characterMatch then
+        if not searchText or #characterEntry.groups > 0 then
             result[characterFullName] = characterEntry
         end
     end
@@ -192,9 +189,12 @@ function Todoloo.Tasks.GenerateTaskDataProvider(searching)
         characters[characterFullName] = character
     end
 
+    local searchCriteria
     if searching then
-        characters = GetFilteredTasks(characters, filters.TaskNameFilter)
+        searchCriteria = filters.TaskNameFilter
     end
+
+    local characterEntries = BuildTaskListEntries(characters, searchCriteria)
 
     local currentCharacter = Todoloo.Utils.GetCharacterFullName()
     local dataProvider = CreateTreeDataProvider()
@@ -204,37 +204,65 @@ function Todoloo.Tasks.GenerateTaskDataProvider(searching)
     local skipSort = false
     node:SetSortComparator(SortCharacterData, affectChildren, skipSort)
 
-    for characterFullName, character in pairs(characters) do
-        local characterInfo = { name = characterFullName }
-        local isCurrentCharacter = characterFullName == currentCharacter
-        local characterNode = node:Insert({ characterInfo = characterInfo, character = characterFullName, isCurrentCharacter = isCurrentCharacter })
+    for characterFullName, characterEntry in pairs(characterEntries) do
+        local characterInfo = {
+            name = characterFullName
+        }
 
-        for groupIndex, group in pairs(character.groups) do
+        local characterNode = node:Insert({
+            characterInfo = characterInfo,
+            character = characterFullName,
+            isCurrentCharacter = characterFullName == currentCharacter
+        })
+
+        for _, groupEntry in ipairs(characterEntry.groups) do
+            local group = groupEntry.groupRef
+
             local groupInfo = {
                 character = characterFullName,
-                id = groupIndex,
+                id = groupEntry.id,
                 name = group.name,
-                reset = group.reset
+                reset = group.reset,
+                groupRef = group
             }
-            local groupNode = characterNode:Insert({ groupInfo = groupInfo, character = characterFullName })
+
+            local groupNode = characterNode:Insert({
+                groupInfo = groupInfo,
+                character = characterFullName
+            })
     
-            groupNode:Insert({ topPadding = true, order = -1 })
+            groupNode:Insert({
+                topPadding = true,
+                order = -1
+            })
     
-            for taskIndex, task in pairs(group.tasks) do
+            for _, taskEntry in ipairs(groupEntry.tasks) do
+                local task = taskEntry.taskRef
+
                 local taskInfo = {
-                    groupId = groupIndex,
+                    groupId = groupEntry.id,
                     character = characterFullName,
-                    id = taskIndex,
+                    id = taskEntry.id,
                     name = task.name,
                     description = task.description,
                     reset = task.reset,
-                    completed = task.completed
+                    target = task.target,
+                    progress = task.progress,
+                    completed = task.completed,
+                    taskRef = task
                 }
     
-                groupNode:Insert({ taskInfo = taskInfo, character = characterFullName, order = 0 })
+                groupNode:Insert({
+                    taskInfo = taskInfo,
+                    character = characterFullName,
+                    order = 0
+                })
             end
     
-            groupNode:Insert({ bottomPadding = true, order = 1 })
+            groupNode:Insert({
+                bottomPadding = true,
+                order = 1
+            })
         end
     end
 
