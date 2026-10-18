@@ -1,0 +1,115 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/FrameXML/UI_shared.xsd">
+
+    <Frame name="TodolooTaskDetailsForm" mixin="TodolooTaskDetailsFormMixin" inherits="InsetFrameTemplate" virtual="true">
+        <Layers>
+            <Layer level="ARTWORK">
+                <FontString parentKey="Header" inherits="GameFontNormalLarge" justifyH="LEFT">
+                    <Anchors>
+                        <Anchor point="TOPLEFT" x="27" y="-20" />
+                    </Anchors>
+                </FontString>
+                <FontString parentKey="Summary" inherits="GameFontHighlight" justifyH="LEFT">
+                    <Anchors>
+                        <Anchor point="TOPLEFT" relativeKey="$parent.Header" relativePoint="BOTTOMLEFT" y="-12" />
+                    </Anchors>
+                </FontString>
+
+                <FontString parentKey="NameLabel" inherits="GameFontNormalLeft" justifyH="LEFT" text="TODOLOO_L_TASK_DETAILS_FORM_TITLE_LABEL">
+                    <Size x="325" />
+                    <Anchors>
+                        <Anchor point="TOPLEFT" relativeKey="$parent.Summary" y="-50" />
+                    </Anchors>
+                </FontString>
+                <FontString parentKey="DescriptionLabel" inherits="GameFontNormalLeft" justifyH="LEFT" text="TODOLOO_L_TASK_DETAILS_FORM_DESCRIPTION_LABEL">
+                    <Size x="325" />
+                    <Anchors>
+                        <Anchor point="TOPLEFT" relativeKey="$parent.NameLabel" y="-50" />
+                    </Anchors>
+                </FontString>
+                <FontString parentKey="ResetIntervalLabel" inherits="GameFontNormalLeft" justifyH="LEFT" text="TODOLOO_L_TASK_DETAILS_FORM_RESET_INTERVAL_LABEL">
+                    <Anchors>
+                        <Anchor point="TOPLEFT" relativeKey="$parent.NameLabel" relativePoint="TOPRIGHT" x="25" />
+                    </Anchors>
+                </FontString>
+                <FontString parentKey="TargetLabel" inherits="GameFontNormalLeft" justifyH="LEFT" text="TODOLOO_L_TASK_DETAILS_FORM_TARGET_REPITITION_LABEL">
+                    <Anchors>
+                        <Anchor point="TOPLEFT" relativeKey="$parent.ResetIntervalLabel" y="-100" />
+                    </Anchors>
+                </FontString>
+            </Layer>
+        </Layers>
+        <Frames>
+            <EditBox parentKey="Name" inherits="InputBoxTemplate" autoFocus="false">
+                <Size x="325" y="22" />
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeKey="$parent.NameLabel" relativePoint="BOTTOMLEFT" y="-5" />
+                </Anchors>
+            </EditBox>
+
+            <ScrollFrame parentKey="Description" inherits="InputScrollFrameTemplate">
+                <Size x="320" y="126" />
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeKey="$parent.DescriptionLabel" relativePoint="BOTTOMLEFT" y="-10" />
+                </Anchors>
+                <KeyValues>
+                    <KeyValue key="hideCharCount" value="true" type="boolean" />
+                </KeyValues>
+            </ScrollFrame>
+
+            <CheckButton parentKey="Manual" inherits="UIRadioButtonTemplate">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeKey="$parent.ResetIntervalLabel" relativePoint="BOTTOMLEFT" y="-8" />
+                </Anchors>
+                <Layers>
+                    <Layer level="ARTWORK">
+                        <FontString parentKey="Text" inherits="GameFontHighlight" text="TODOLOO_L_TASK_DETAILS_FORM_RESET_INTERVAL_MANUALLY">
+                            <Anchors>
+                                <Anchor point="LEFT" relativePoint="RIGHT" x="1" y="1"/>
+                            </Anchors>
+                        </FontString>
+                    </Layer>
+                </Layers>
+            </CheckButton>
+            <CheckButton parentKey="Daily" inherits="UIRadioButtonTemplate">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeKey="$parent.Manual" relativePoint="BOTTOMLEFT" y="-5" />
+                </Anchors>
+                <Layers>
+                    <Layer level="ARTWORK">
+                        <FontString parentKey="Text" inherits="GameFontHighlight" text="TODOLOO_L_TASK_DETAILS_FORM_RESET_INTERVAL_DAILY">
+                            <Anchors>
+                                <Anchor point="LEFT" relativePoint="RIGHT" x="1" y="1"/>
+                            </Anchors>
+                        </FontString>
+                    </Layer>
+                </Layers>
+            </CheckButton>
+            <CheckButton parentKey="Weekly" inherits="UIRadioButtonTemplate">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeKey="$parent.Daily" relativePoint="BOTTOMLEFT" y="-5" />
+                </Anchors>
+                <Layers>
+                    <Layer level="ARTWORK">
+                        <FontString parentKey="Text" inherits="GameFontHighlight" text="TODOLOO_L_TASK_DETAILS_FORM_RESET_INTERVAL_WEEKLY">
+                            <Anchors>
+                                <Anchor point="LEFT" relativePoint="RIGHT" x="1" y="1"/>
+                            </Anchors>
+                        </FontString>
+                    </Layer>
+                </Layers>
+            </CheckButton>
+            <EditBox parentKey="Target" inherits="NumericInputSpinnerTemplate" autoFocus="false" numeric="true" letters="0">
+                <Size x="80" y="22" />
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeKey="$parent.TargetLabel" relativePoint="BOTTOMLEFT" x="29" y="-5" />
+                </Anchors>
+            </EditBox>
+        </Frames>
+        <Scripts>
+            <OnLoad method="OnLoad" />
+            <OnShow method="OnShow" />
+        </Scripts>
+    </Frame>
+
+</Ui>

@@ -62,7 +62,9 @@ TODOLOO_LOCALES.ruRU = function()
     L["TASK_MANAGER_DELETE_GROUP_DIALOG_QUESTION"] = "Вы уверены, что хотите удалить";
 
     L["TASK_MANAGER_HELP_CREATE_GROUP_HELP"] = "Создайте новую группу, чтобы начать управлять задачами!";
+    -- TASK_MANAGER_HELP_FILTER_TIP IS DEPRECATED
     L["TASK_MANAGER_HELP_FILTER_TIP"] = "Совет: Ищите конкретную задачу или группу, чтобы легче найти нужный элемент.";
+    -- TASK_MANAGER_HELP_TASK_LIST_HELP IS DEPRECATED
     L["TASK_MANAGER_HELP_TASK_LIST_HELP"] = "Это обзор всех ваших текущих групп и задач.\n\n[Двойной клик] по группам и задачам для изменения названия.\n\n[Shift]+[ЛКМ] по группам для сворачивания.\n\n[ПКМ] по группам для добавления задач, установки интервала сброса группы и удаления.\n\n[Shift]+[ЛКМ] по задачам для переключения статуса завершения.\n\n[ПКМ] по задачам для установки интервала сброса и удаления.";
 
     -- Task tracker

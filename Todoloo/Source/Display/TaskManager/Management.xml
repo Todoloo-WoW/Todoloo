@@ -1,7 +1,6 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
 https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/FrameXML/UI_shared.xsd">
 
-    <!--Todoloo task manager management tab page-->
     <Frame name="TodolooManagementPageTemplate" parent="TodolooTaskManagerFrame" mixin="TodolooManagementPageMixin" setAllPoints="true" virtual="true">
         <Frames>
             <Button parentKey="HelpButton" inherits="MainHelpPlateButton">
@@ -11,9 +10,10 @@ https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/FrameXML/UI
             </Button>
             
             <Frame parentKey="TaskList" inherits="TodolooTaskListTemplate">
+                <Size x="274" />
                 <Anchors>
                     <Anchor point="TOPLEFT" x="5" y="-72" />
-                    <Anchor point="BOTTOMRIGHT" x="-5" y="8" />
+                    <Anchor point="BOTTOMLEFT" x="5" y="8" />
                 </Anchors>
             </Frame>
 
@@ -22,12 +22,36 @@ https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/FrameXML/UI
                 <Anchors>
                     <Anchor point="BOTTOMRIGHT" relativeKey="$parent.TaskList" relativePoint="TOPRIGHT" y="5" />
                 </Anchors>
-                <Scripts>
-                    <OnClick>
-                        self:GetParent():CreateButtonGroup_OnClick()
-                    </OnClick>
-                </Scripts>
 			</Button>
+
+            <Frame parentKey="Details" inherits="TodolooTaskDetailsForm">
+				<KeyValues>
+					<KeyValue key="layoutType" value="InsetFrameTemplate" type="string"/>
+				</KeyValues>
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeKey="$parent.TaskList" relativePoint="TOPRIGHT" x="2" y="0" />
+                    <Anchor point="BOTTOMRIGHT" x="-6" y="33" />
+                </Anchors>
+                <Layers>
+                    <Layer level="BACKGROUND">
+                        <Texture parentKey="Background" setAllPoints="true" hidden="true" />
+                    </Layer>
+                </Layers>
+            </Frame>
+
+            <Button parentKey="SaveButton" inherits="UIPanelButtonTemplate" text="TODOLOO_L_TASK_DETAILS_FORM_SAVE_BUTTON_LABEL">
+                <Size x="80" y="22" />
+                <Anchors>
+                    <Anchor point="BOTTOMRIGHT" x="-9" y="7" />
+                </Anchors>
+            </Button>
+
+            <Button parentKey="ResetButton" inherits="UIPanelButtonTemplate" text="TODOLOO_L_TASK_DETAILS_FORM_RESET_BUTTON_LABEL">
+                <Size x="80" y="22" />
+                <Anchors>
+                    <Anchor point="RIGHT" relativeKey="$parent.SaveButton" relativePoint="LEFT" x="-5" />
+                </Anchors>
+            </Button>
         </Frames>
         <Scripts>
             <OnLoad method="OnLoad" />

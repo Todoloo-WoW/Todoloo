@@ -349,10 +349,7 @@ function TODOLOO_DEFAULT_TRACKER_MODULE:OnGroupHeaderLeave(group)
     end
 end
 
----Set color style on the task on mouse hover
----@param task Frame
 function TODOLOO_DEFAULT_TRACKER_MODULE:OnTaskEnter(task)
-    -- if we're currently showing group complete, do nothing
     if task.id == "GroupComplete" then
         return
     end
@@ -367,12 +364,15 @@ function TODOLOO_DEFAULT_TRACKER_MODULE:OnTaskEnter(task)
             task.Text:SetTextColor(textColorStyle.r, textColorStyle.g, textColorStyle.b)
         end
     end
+
+    local group = Todoloo.TaskManager:GetGroup(task:GetParent().id)
+    local taskInfo = group and group.tasks[task.id]
+
+    Todoloo.Utils.ShowTaskTooltip(task, taskInfo)
 end
 
----Set color style on the task on mouse leave
----@param task Frame
 function TODOLOO_DEFAULT_TRACKER_MODULE:OnTaskLeave(task)
-    -- if we're currently showing group complete, do nothing on click
+    Todoloo.Utils.HideTaskTooltip(task)
     if task.id == "GroupComplete" then
         return
     end

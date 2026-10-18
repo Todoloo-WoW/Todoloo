@@ -69,7 +69,9 @@ TODOLOO_LOCALES.zhTW = function()
     L["TASK_MANAGER_DELETE_GROUP_DIALOG_QUESTION"] = "您確定要刪除嗎？";
 
     L["TASK_MANAGER_HELP_CREATE_GROUP_HELP"] = "建立一個新任務組來開始管理您的任務！";
+    -- TASK_MANAGER_HELP_FILTER_TIP IS DEPRECATED
     L["TASK_MANAGER_HELP_FILTER_TIP"] = "提示：搜尋特定任務或任務組可以更輕鬆地找到您要找的項目。";
+    -- TASK_MANAGER_HELP_TASK_LIST_HELP IS DEPRECATED
     L["TASK_MANAGER_HELP_TASK_LIST_HELP"] = "這是您目前所有任務組和任務的概覽。\n\n[雙擊]任務組和任務可以更改名稱。\n\n[Shift]+[左鍵點擊]任務組可以摺疊。\n\n[右鍵點擊]任務組可以新增任務、設定組重置間隔和刪除。\n\n[Shift]+[左鍵點擊]任務可以切換完成狀態。\n\n[右鍵點擊]任務可以設定重置間隔和刪除。";
 
     -- Task tracker

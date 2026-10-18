@@ -17,11 +17,11 @@ https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/FrameXML/UI
         <Size y="1" />
         <Layers>
             <Layer level="BACKGROUND">
-                <Texture atlas="Options_HorizontalDivider">
+                <Texture atlas="Options_HorizontalDivider" setAllPoints="true">
                     <Size y="1"/>
                     <Color color="NORMAL_FONT_COLOR"/>
                 </Texture>
-                <Texture atlas="Options_HorizontalDivider" alphaMode="ADD">
+                <Texture atlas="Options_HorizontalDivider" alphaMode="ADD" setAllPoints="true">
                     <Size y="1"/>
                     <Color color="NORMAL_FONT_COLOR" a=".5"/>
                 </Texture>

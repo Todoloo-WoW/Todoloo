@@ -69,7 +69,9 @@ TODOLOO_LOCALES.zhCN = function()
     L["TASK_MANAGER_DELETE_GROUP_DIALOG_QUESTION"] = "您确定要删除吗？";
 
     L["TASK_MANAGER_HELP_CREATE_GROUP_HELP"] = "创建一个新任务组来开始管理您的任务！";
+    -- TASK_MANAGER_HELP_FILTER_TIP IS DEPRECATED
     L["TASK_MANAGER_HELP_FILTER_TIP"] = "提示：搜索特定任务或任务组可以更轻松地找到您要找的项目。";
+    -- TASK_MANAGER_HELP_TASK_LIST_HELP IS DEPRECATED
     L["TASK_MANAGER_HELP_TASK_LIST_HELP"] = "这是您当前所有任务组和任务的概览。\n\n[双击]任务组和任务可以更改名称。\n\n[Shift]+[左键点击]任务组可以折叠。\n\n[右键点击]任务组可以添加任务、设置组重置间隔和删除。\n\n[Shift]+[左键点击]任务可以切换完成状态。\n\n[右键点击]任务可以设置重置间隔和删除。";
 
     -- Task tracker

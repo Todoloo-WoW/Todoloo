@@ -243,9 +243,16 @@ function TodolooObjectiveTaskMixin:OnEnter()
 
     local textColorStyle = OBJECTIVE_TRACKER_COLOR["NormalHighlight"];
     self.Text:SetTextColor(textColorStyle.r, textColorStyle.g, textColorStyle.b);
+
+    local group = Todoloo.TaskManager:GetGroup(self.parentBlock.id)
+    local taskInfo = group and group.tasks[self.objectiveKey]
+
+    Todoloo.Utils.ShowTaskTooltip(self, taskInfo)
 end
 
 function TodolooObjectiveTaskMixin:OnLeave()
+    Todoloo.Utils.HideTaskTooltip(self)
+
     if self.objectiveKey == "GROUP_COMPLETE" then
         return
     end
