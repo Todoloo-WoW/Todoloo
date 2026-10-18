@@ -2,9 +2,23 @@ local addonName, _ = ...
 
 local Main = {};
 
--- We cannot be certain that the Objective Tracker exists until the next OnUpdate event
--- hence why we're creating this temp frame.
-local initFrame = CreateFrame("Frame");
+local function ShouldUseAttachedTracker()
+    return Todoloo.Config.Get(Todoloo.Config.Options.SHOW_TASK_TRACKER)
+        and Todoloo.Config.Get(Todoloo.Config.Options.ATTACH_TASK_TRACKER_TO_OBJECTIVE_TRACKER)
+end
+
+function Todoloo.UpdateAttachedTracker()
+    local container = TodolooAttachedTrackerContainer
+
+    if not ShouldUseAttachedTracker() then
+        container:Hide()
+        return
+    end
+
+    container:Initialize()
+    container:MarkDirty()
+    container:Show()
+end
 
 function Main:OnAddonLoaded(addon)
     if addon ~= addonName then
@@ -37,15 +51,7 @@ function Main:OnPlayerEnteringWorld(isInitialLogin, isReloadingUi)
         TodolooFloatingTrackerFrame:Show();
     end
 
-    -- We need to wait until next update rolls out, to be sure the Objective tracker has been initialized
-    initFrame:SetScript("OnUpdate", function(self)
-        if not ObjectiveTrackerManager:HasAnyModules() then
-            return;
-        end
-
-        ObjectiveTrackerManager:SetModuleContainer(TodolooObjectiveTracker, ObjectiveTrackerFrame);
-        self:SetScript("OnUpdate", nil);
-    end);
+    Todoloo.UpdateAttachedTracker()
 end
 
 EventRegistry:RegisterFrameEventAndCallback("ADDON_LOADED", Main.OnAddonLoaded, Main);

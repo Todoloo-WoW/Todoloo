@@ -3,8 +3,9 @@ https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/FrameXML/UI
 
 	<Script file="AttachedTracker.lua" />
 
-	<!-- [NEW] Todoloo objective task template - Our task objective -->
-	 <Frame name="TodolooObjectiveTaskTemplate" inherits="ObjectiveTrackerAnimLineTemplate" mixin="TodolooObjectiveTaskMixin" hidden="true" virtual="true">
+	<Frame name="TodolooObjectiveBlockTemplate" inherits="ObjectiveTrackerAnimBlockTemplate" mixin="TodolooObjectiveBlockMixin" hidden="true" virtual="true" />
+
+	<Frame name="TodolooObjectiveTaskTemplate" inherits="ObjectiveTrackerAnimLineTemplate" mixin="TodolooObjectiveTaskMixin" hidden="true" virtual="true">
 		<Frames>
 			<Button>
 				<Anchors>
@@ -18,8 +19,14 @@ https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/FrameXML/UI
 				</Scripts>
 			</Button>
 		</Frames>
-	 </Frame>
+	</Frame>
 
-	<!-- [NEW] Todoloo objective tracker - Our main tracker frame -->
+	<Frame name="TodolooAttachedTrackerContainer" parent="UIParent" mixin="TodolooAttachedTrackerContainerMixin" frameStrata="LOW" hidden="true">
+		<Size x="260" y="1" />
+		<Scripts>
+			<OnUpdate method="OnUpdate" />
+		</Scripts>
+	</Frame>
+
 	 <Frame name="TodolooObjectiveTracker" mixin="TodolooObjectiveTrackerMixin" inherits="ObjectiveTrackerModuleTemplate"></Frame>
 </Ui>

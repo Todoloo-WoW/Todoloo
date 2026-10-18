@@ -282,3 +282,77 @@ end
 function Todoloo.Tasks.GetTaskListSearchText()
     return filters.TaskNameFilter
 end
+
+function Todoloo.Tasks.BuildTrackerGroupInfos()
+    local infos = {}
+    local showCompleted = Todoloo.Config.Get(Todoloo.Config.Options.SHOW_COMPLETED_GROUPS)
+
+    for groupId, group in ipairs(Todoloo.TaskManager:GetAllGroups()) do
+        local numTasks = #group.tasks
+        local numCompletedTasks = 0
+
+        for _, task in ipairs(group.tasks) do
+            if task.completed then
+                numCompletedTasks = numCompletedTasks + 1
+            end
+        end
+
+        local isComplete = numCompletedTasks == numTasks
+
+        if showCompleted or not isComplete then
+            table.insert(infos, {
+                id = groupId,
+                name = group.name,
+                groupRef = group,
+                numTasks = numTasks,
+                numCompletedTasks = numCompletedTasks,
+                isComplete = isComplete
+            })
+        end
+    end
+
+    return infos
+end
+
+function Todoloo.Tasks.BuildTrackerTaskInfos(groupId)
+    local infos = {}
+    local orderByCompletion = Todoloo.Config.Get(Todoloo.Config.Options.ORDER_BY_COMPLETION)
+    local completedInfos = orderByCompletion and {} or nil
+
+    for taskId, task in ipairs(Todoloo.TaskManager:GetGroupTasks(groupId)) do
+        local info = {
+            id = taskId,
+            taskRef = task,
+            name = task.name,
+            completed = task.completed,
+            progress = task.progress,
+            target = task.target
+        }
+
+        if completedInfos and task.completed then
+            table.insert(completedInfos, info)
+        else
+            table.insert(infos, info)
+        end
+    end
+
+    if completedInfos then
+        for _, info in ipairs(completedInfos) do
+            table.insert(infos, info)
+        end
+    end
+
+    return infos
+end
+
+function Todoloo.Tasks.ResolveTrackerTask(groupId, taskId, taskRef)
+    if not groupId or not taskId or not taskRef then
+        return
+    end
+
+    local group = Todoloo.TaskManager:GetGroup(groupId)
+
+    if group and group.tasks[taskId] == taskRef then
+        return taskRef
+    end
+end

@@ -52,7 +52,7 @@ EventUtil.ContinueOnAddOnLoaded("Todoloo", function()
                 TodolooFloatingTrackerFrame:Hide();
             end
 
-            ObjectiveTrackerManager:UpdateModule(TodolooObjectiveTracker);
+            Todoloo.UpdateAttachedTracker()
         end);
     end
 
@@ -92,7 +92,7 @@ EventUtil.ContinueOnAddOnLoaded("Todoloo", function()
                 TodolooFloatingTrackerFrame:Show();
             end
 
-            ObjectiveTrackerManager:UpdateModule(TodolooObjectiveTracker);
+            Todoloo.UpdateAttachedTracker()
         end);
     end
 
@@ -112,7 +112,7 @@ EventUtil.ContinueOnAddOnLoaded("Todoloo", function()
 
         setting:SetValueChangedCallback(function(setting, value)
             TodolooTracker_Update();
-            ObjectiveTrackerManager:UpdateModule(TodolooObjectiveTracker);
+            Todoloo.UpdateAttachedTracker()
         end);
     end
 
@@ -132,7 +132,7 @@ EventUtil.ContinueOnAddOnLoaded("Todoloo", function()
 
         setting:SetValueChangedCallback(function(setting, value)
             TodolooTracker_Update();
-            ObjectiveTrackerManager:UpdateModule(TodolooObjectiveTracker);
+            Todoloo.UpdateAttachedTracker()
         end);
     end
 
@@ -152,7 +152,7 @@ EventUtil.ContinueOnAddOnLoaded("Todoloo", function()
 
         setting:SetValueChangedCallback(function(setting, value)
             TodolooTracker_Update();
-            ObjectiveTrackerManager:UpdateModule(TodolooObjectiveTracker);
+            Todoloo.UpdateAttachedTracker()
         end);
     end
 
@@ -172,7 +172,7 @@ EventUtil.ContinueOnAddOnLoaded("Todoloo", function()
 
         setting:SetValueChangedCallback(function(setting, value)
             TodolooTracker_Update();
-            ObjectiveTrackerManager:UpdateModule(TodolooObjectiveTracker);
+            Todoloo.UpdateAttachedTracker()
         end);
     end
 

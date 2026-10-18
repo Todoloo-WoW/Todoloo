@@ -4,10 +4,12 @@ TODOLOO_TASK_TRACKER_MODULE = TodolooTracker_GetModuleInfoTable("TODOLOO_TASK_TR
 TODOLOO_TASK_TRACKER_MODULE:SetHeader(TodolooFloatingTrackerFrame.GroupsFrame.TaskHeader, "Todoloo's")
 
 ---@class GroupInfo
----@field name string Name of the group
 ---@field id integer Index of the group
+---@field name string Name of the group
+---@field groupRef Group Original saved group
 ---@field numTasks integer The total number of tasks in the group
 ---@field numCompletedTasks integer The total number of completed tasks in the group
+---@field isComplete boolean Whether every task is complete
 
 local TASK_TYPE = { template = "TodolooTrackerTaskTemplate", freeTasks = {} }
 
@@ -24,7 +26,7 @@ local TASK_TYPE = { template = "TodolooTrackerTaskTemplate", freeTasks = {} }
 ---@param numCompletedTasks integer The total number of completed tasks in the group
 function TODOLOO_TASK_TRACKER_MODULE:SetGroupHeader(group, text, id, showGroupProgress, numTasks, numCompletedTasks)
     group.rightButton = nil
-    group.lineWidth = TODOLOO_TRACKER_TEXT_WIDTH
+    group.lineWidth = group:GetWidth()
 
     -- set text
     group.HeaderText:SetWidth(group.lineWidth)
@@ -39,26 +41,8 @@ function TODOLOO_TASK_TRACKER_MODULE:SetGroupHeader(group, text, id, showGroupPr
     group.height = height
 end
 
----Build info tables of all groups
----@return GroupInfo[] groupInfos
 function TODOLOO_TASK_TRACKER_MODULE:BuildGroupInfos()
-    local infos = {}
-
-    for index, group in pairs(Todoloo.TaskManager:GetAllGroups()) do
-        if self:ShouldDisplayGroup(group) then
-            local numCompletedTasks = 0
-            for _, task in ipairs(group.tasks) do
-                if task.completed then
-                    numCompletedTasks = numCompletedTasks + 1
-                end
-            end
-
-            table.insert(infos, { name = group.name, id = index, numTasks = #group.tasks, numCompletedTasks = numCompletedTasks})
-        end
-    end
-
-    --TODO: Sort table?
-    return infos
+    return Todoloo.Tasks.BuildTrackerGroupInfos()
 end
 
 ---TODO: Add documentation
@@ -82,35 +66,51 @@ end
 local function TodolooTaskTracker_DoTasks(self, group, groupCompleted, existingGroup, useFullHeight)
     local completing = false
 
-    local tasks = Todoloo.TaskManager:GetGroupTasks(group.id)
-    local iterTasks = {}
-    for index, task in ipairs(tasks) do
-        task["id"] = index
-        table.insert(iterTasks, task)
-    end
+    local iterTasks = Todoloo.Tasks.BuildTrackerTaskInfos(group.id)
 
-    if Todoloo.Config.Get(Todoloo.Config.Options.ORDER_BY_COMPLETION) then
-        table.sort(iterTasks, function(first, second) return not first.completed and second.completed end)
-    end
+    local showCompletedTasks = Todoloo.Config.Get(Todoloo.Config.Options.SHOW_COMPLETED_TASKS)
 
-    for _, taskInfo in pairs(iterTasks) do
+    for _, taskInfo in ipairs(iterTasks) do
         -- we're intentionally skipping tasks without a name, as we do not want to show these
         if taskInfo and taskInfo.name ~= "" then
             local displayText = Todoloo.Utils.GetTaskDisplayText(taskInfo)
             local task = group.tasks[taskInfo.id]
+
+            if task and task.taskRef ~= taskInfo.taskRef then
+                self:FreeTask(group, task)
+                task = nil
+            end
+
+            if task
+                and taskInfo.completed
+                and showCompletedTasks
+                and task.state == TODOLOO_TRACKER_TASK_STATE_FADING then
+                
+                self:ResetTaskVisuals(task)
+
+                task.state = TODOLOO_TRACKER_TASK_STATE_COMPLETED
+                task.Check:Show()
+            end
+
             -- if the entire group is completed
             if groupCompleted then
                 if task then
                     -- process existing tasks
                     task = self:AddTask(group, taskInfo.id, displayText, TASK_TYPE, useFullHeight, TODOLOO_TRACKER_DASH_STYLE_HIDE, TODOLOO_TRACKER_COLOR["Complete"])
-                    if not task.state or  task.state == TODOLOO_TRACKER_TASK_STATE_PRESENT then
-                        -- this task has not yet been market as completed
+                    if not task.state
+                        or task.state == TODOLOO_TRACKER_TASK_STATE_PRESENT
+                        or task.state == TODOLOO_TRACKER_TASK_STATE_ADDING then
+
+                        task.Glow.Anim:Stop()
+                        task.Sheen.Anim:Stop()
+                        
                         task.group = group
+                        task.state = TODOLOO_TRACKER_TASK_STATE_COMPLETING
+
                         task.Check:Show()
                         task.Sheen.Anim:Play()
                         task.Glow.Anim:Play()
                         task.CheckFlash.Anim:Play()
-                        task.state = TODOLOO_TRACKER_TASK_STATE_COMPLETING
                     end
                 elseif Todoloo.Config.Get(Todoloo.Config.Options.SHOW_COMPLETED_TASKS) then
                     -- if the player want to display completed tasks, add those which are not yet displayed
@@ -123,14 +123,20 @@ local function TodolooTaskTracker_DoTasks(self, group, groupCompleted, existingG
                 if taskInfo.completed then
                     if task then
                         task = self:AddTask(group, taskInfo.id, displayText, TASK_TYPE, useFullHeight, TODOLOO_TRACKER_DASH_STYLE_HIDE, TODOLOO_TRACKER_COLOR["Complete"])
-                        if not task.state or task.state == TODOLOO_TRACKER_TASK_STATE_PRESENT then
-                            -- task is shown in the task tracker - begin completion animation
+                        if not task.state
+                            or task.state == TODOLOO_TRACKER_TASK_STATE_PRESENT
+                            or task.state == TODOLOO_TRACKER_TASK_STATE_ADDING then
+
+                            task.Glow.Anim:Stop()
+                            task.Sheen.Anim:Stop()
+                            
                             task.group = group
+                            task.state = TODOLOO_TRACKER_TASK_STATE_COMPLETING
+
                             task.Check:Show()
                             task.Sheen.Anim:Play()
                             task.Glow.Anim:Play()
                             task.CheckFlash.Anim:Play()
-                            task.state = TODOLOO_TRACKER_TASK_STATE_COMPLETING
                         end
                     elseif Todoloo.Config.Get(Todoloo.Config.Options.SHOW_COMPLETED_TASKS) then
                         -- task is not shown in the task tracker - add it without animation
@@ -147,18 +153,25 @@ local function TodolooTaskTracker_DoTasks(self, group, groupCompleted, existingG
                         task.Glow.Anim:Play()
                         task.state = TODOLOO_TRACKER_TASK_STATE_ADDING
                     elseif task then
-                        -- task is already shown - add the task
+                        if task.state ~= TODOLOO_TRACKER_TASK_STATE_PRESENT
+                            and task.state ~= TODOLOO_TRACKER_TASK_STATE_ADDING then
+                            self:ResetTaskVisuals(task)
+                        end
+
                         task = self:AddTask(group, taskInfo.id, displayText, TASK_TYPE, useFullHeight)
+                        
                         task.Check:Hide()
-                        task.state = TODOLOO_TRACKER_TASK_STATE_PRESENT
                     else
                         -- group not existing - add the task
-                        task = self:AddTask(group, taskInfo.id, displayText, nil, useFullHeight)
+                        task = self:AddTask(group, taskInfo.id, displayText, TASK_TYPE, useFullHeight)
                     end
                 end
             end
             if task then
                 task.group = group
+                task.taskRef = taskInfo.taskRef
+                self:UpdateTaskHighlight(task)
+
                 if task.state == TODOLOO_TRACKER_TASK_STATE_COMPLETING then
                     completing = true
                 end
@@ -190,9 +203,19 @@ function TODOLOO_TASK_TRACKER_MODULE:UpdateSingle(groupInfo)
     end
 
     local useFullHeight = true -- always use full height
+    
     local existingGroup = self:GetExistingGroup(groupInfo.id)
-    local isComplete = Todoloo.TaskManager:IsGroupComplete(groupInfo.id)
+
+    if existingGroup and existingGroup.groupRef ~= groupInfo.groupRef then
+        self:FreeGroup(existingGroup)
+        existingGroup = nil
+    end
+
+    local isComplete = groupInfo.isComplete
     local group = self:GetGroup(groupInfo.id)
+
+    group.groupRef = groupInfo.groupRef
+
     local showGroupProgress = Todoloo.Config.Get(Todoloo.Config.Options.SHOW_GROUP_PROGRESS_TEXT)
 
     self:SetGroupHeader(group, groupInfo.name, groupInfo.id, showGroupProgress, groupInfo.numTasks, groupInfo.numCompletedTasks)
@@ -228,24 +251,4 @@ function TODOLOO_TASK_TRACKER_MODULE:Update()
     self:EnumGroupData(self.UpdateSingle)
 
     self:EndLayout()
-end
-
----Should the group be displayed in the task tracker?
----@param group Group Group in question
----@return boolean display Whether or not the group should be displayed 
-function TODOLOO_TASK_TRACKER_MODULE:ShouldDisplayGroup(group)
-    -- if player configuration should always display completed tasks
-    if Todoloo.Config.Get(Todoloo.Config.Options.SHOW_COMPLETED_GROUPS) then
-        return true
-    end
-
-    -- if any of the tasks have not yet been completed, show the group
-    for _, task in pairs(group.tasks) do
-        if not task.completed then
-            return true
-        end
-    end
-
-    -- if none of the above, hide the group
-    return false
 end

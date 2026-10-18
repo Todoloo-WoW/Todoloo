@@ -1,6 +1,3 @@
--- *****************************************************************************************************
--- ***** MODULE
--- *****************************************************************************************************
 TODOLOO_DEFAULT_TRACKER_MODULE = {}
 
 function TODOLOO_DEFAULT_TRACKER_MODULE:OnLoad(friendlyName, defaultTemplate)
@@ -16,68 +13,40 @@ function TODOLOO_DEFAULT_TRACKER_MODULE:OnLoad(friendlyName, defaultTemplate)
     self.fromHeaderOffsetY = -10
     self.fromModuleOffsetY = -10
     self.contentsHeight = 0
-    self.contentsAnimHeight = 0
-    self.oldContentsHeight = 0
-    self.hasSkippedGroups = false
-    self.userProgressBars = {}
-    self.freeProgressBars = {}
-    self.updateReasonModule = 0
-    self.updateReasonEvents = 0
 
     self.groupsFrame = TodolooFloatingTrackerFrame.GroupsFrame
 
     TODOLOO_DEFAULT_TRACKER_MODULE.AddGroupOffset(self, self.groupTemplate, 0, -10)
 end
 
----Build custom module info
----@param friendlyName string Friendly name of the module
----@param baseModule table Base module to derive from
----@param defaultTemplate string Default template to use for group frames
----@return table info Module info
 function TodolooTracker_GetModuleInfoTable(friendlyName, baseModule, defaultTemplate)
 	local info = CreateFromMixins(baseModule or TODOLOO_DEFAULT_TRACKER_MODULE);
 	info:OnLoad(friendlyName, defaultTemplate);
 	return info;
 end
 
----Begin building new layout
----@param staticReanchor boolean|nil
-function TODOLOO_DEFAULT_TRACKER_MODULE:BeginLayout(staticReanchor)
+function TODOLOO_DEFAULT_TRACKER_MODULE:BeginLayout()
     self.topGroup = nil
     self.firstGroup = nil
     self.lastGroup = nil
-    self.oldContentsHeight = self.contentsHeight
     self.contentsHeight = 0
-    self.contentsAnimHeight = 0
-    self.potentialGroupsAddedThisLayout = 0
-    if not staticReanchor then
-        self.hasSkippedGroup = false
-        self.Header:Hide()
-    end
 
+    self.Header:Hide()
     self:MarkGroupsUnused()
 end
 
----End build new layout
----@param isStaticReanchor boolean|nil
-function TODOLOO_DEFAULT_TRACKER_MODULE:EndLayout(isStaticReanchor)
+function TODOLOO_DEFAULT_TRACKER_MODULE:EndLayout()
     self.lastGroup = self.groupsFrame.currentGroup
     self:FreeUnusedGroups()
 end
 
----Set the header of the module
----@param group Frame Header frame
----@param text string String value to display in the header
----@param animateReason any
-function TODOLOO_DEFAULT_TRACKER_MODULE:SetHeader(group, text, animateReason)
+function TODOLOO_DEFAULT_TRACKER_MODULE:SetHeader(group, text)
     group.module = self
     group.isHeader = true
     group.Text:SetText(text)
-    group.animateReason = animateReason or 0
     self.Header = group
 end
 
----Mark all groups as unused
 function TODOLOO_DEFAULT_TRACKER_MODULE:MarkGroupsUnused()
     for _, groupTable in pairs(self.usedGroups) do
         for _, group in pairs(groupTable) do
@@ -86,7 +55,6 @@ function TODOLOO_DEFAULT_TRACKER_MODULE:MarkGroupsUnused()
     end
 end
 
----Free up all unused groups and nested tasks
 function TODOLOO_DEFAULT_TRACKER_MODULE:FreeUnusedGroups()
     for _, groupTable in pairs(self.usedGroups) do
         for _, group in pairs(groupTable) do
@@ -97,8 +65,6 @@ function TODOLOO_DEFAULT_TRACKER_MODULE:FreeUnusedGroups()
     end
 end
 
----Free up the group and all nested tasks
----@param group Frame
 function TODOLOO_DEFAULT_TRACKER_MODULE:FreeGroup(group)
     -- free all tasks
     for _, task in pairs(group.tasks) do
@@ -109,11 +75,14 @@ function TODOLOO_DEFAULT_TRACKER_MODULE:FreeGroup(group)
 
     -- free the group
     self.usedGroups[group.groupTemplate][group.id] = nil
+    
+    group.groupRef = nil
+    group.isHighlighted = nil
+    group.currentTask = nil
+
     self.poolCollection:Release(group)
 end
 
----Free up all unused tasks
----@param group Frame Group frame
 function TODOLOO_DEFAULT_TRACKER_MODULE:FreeUnusedTasks(group)
     for _, task in pairs(group.tasks) do
         if not task.used then
@@ -122,21 +91,56 @@ function TODOLOO_DEFAULT_TRACKER_MODULE:FreeUnusedTasks(group)
     end
 end
 
----TODO: Add documentation
----@param group any
----@param task any
-function TODOLOO_DEFAULT_TRACKER_MODULE:FreeTask(group, task)
-    group.tasks[task.id] = nil
-    local freeTasks = task.type and task.type.freeTasks or self.freeTasks
-    tinsert(freeTasks, task)
+function TODOLOO_DEFAULT_TRACKER_MODULE:ResetTaskVisuals(task)
+    task.FadeOutAnim:Stop()
+    task.CheckFlash.Anim:Stop()
+    task.Glow.Anim:Stop()
+    task.Sheen.Anim:Stop()
 
-    task:Hide()
+    task:SetAlpha(1)
+
+    task.Check:Hide()
+    task.Check:SetAlpha(1)
+    task.CheckFlash:SetAlpha(0)
+    task.Glow:SetAlpha(0)
+    task.Sheen:SetAlpha(0)
+
+    task.Dash:Show()
+    task.Dash:SetText(QUEST_DASH)
+
+    task.state = TODOLOO_TRACKER_TASK_STATE_PRESENT
+    task.dashStyle = nil
+    task.width = nil
+    task.Text.colorStyle = nil
+
+    task:ClearAllPoints()
 end
 
----Get existing group frame
----@param id integer Group ID
----@param overrideTemplate any
----@return unknown
+function TODOLOO_DEFAULT_TRACKER_MODULE:FreeTask(group, task)
+    if not task.id or group.tasks[task.id] ~= task then
+        return
+    end
+
+    local freeTasks = task.type and task.type.freeTasks or self.freeTasks
+
+    group.tasks[task.id] = nil
+
+    task:Hide()
+    
+    Todoloo.Utils.HideTaskTooltip(task)
+    task.isHighlighted = nil
+
+    self:ResetTaskVisuals(task)
+
+    task.id = nil
+    task.group = nil
+    task.module = nil
+    task.taskRef = nil
+    task.used = nil
+
+    table.insert(freeTasks, task)
+end
+
 function TODOLOO_DEFAULT_TRACKER_MODULE:GetExistingGroup(id, overrideTemplate)
     local template = overrideTemplate or self.groupTemplate
     assert(template)
@@ -150,11 +154,6 @@ function TODOLOO_DEFAULT_TRACKER_MODULE:GetExistingGroup(id, overrideTemplate)
     return nil
 end
 
----Get or create group
----@param id integer Group ID
----@param overrideType any
----@param overrideTemplate any
----@return Frame
 function TODOLOO_DEFAULT_TRACKER_MODULE:GetGroup(id, overrideType, overrideTemplate)
     local groupType = overrideType or self.groupType
     local groupTemplate = overrideTemplate or self.groupTemplate
@@ -184,6 +183,7 @@ function TODOLOO_DEFAULT_TRACKER_MODULE:GetGroup(id, overrideType, overrideTempl
     end
 
     group.used = true
+    group:SetWidth(TodolooFloatingTrackerFrame:GetWidth())
     group.height = 0
     group.currentTask = nil
 
@@ -196,10 +196,6 @@ function TODOLOO_DEFAULT_TRACKER_MODULE:GetGroup(id, overrideType, overrideTempl
     return group
 end
 
----TODO: Add documentation
----@param group Frame
----@param taskIndex integer
----@param taskType any --TODO: Add documentation
 function TODOLOO_DEFAULT_TRACKER_MODULE:GetTask(group, taskIndex, taskType)
     local task = group.tasks[taskIndex]
 
@@ -214,42 +210,40 @@ function TODOLOO_DEFAULT_TRACKER_MODULE:GetTask(group, taskIndex, taskType)
     end
 
     local freeTasks = taskType and taskType.freeTasks or self.freeTasks
-    local numFreeTasks = #freeTasks
-    if numFreeTasks > 0 then
-        -- get a free task
-        task = freeTasks[numFreeTasks]
-        tremove(freeTasks, numFreeTasks)
-        task:SetParent(group)
-        task:Show()
+
+    if #freeTasks > 0 then
+        task = table.remove(freeTasks)
     else
-        -- create new task
         task = CreateFrame("Frame", nil, group, taskType and taskType.template or self.taskTemplate)
-        task.type = taskType
-        task.module = self
     end
 
-    group.tasks[taskIndex] = task
+    self:ResetTaskVisuals(task)
+    task.isHighlighted = nil
+
+    task:SetParent(group)
+    task.type = taskType
+    task.module = self
+    task.group = group
     task.id = taskIndex
     task.used = true
+
+    group.tasks[taskIndex] = task
+
+    task:Show()
 
     return task
 end
 
----Add new task frame
----@param group Frame Group the task should be added to
----@param taskIndex integer|string The index of the task or string if not relevant
----@param text string Name/title of the task
----@param taskType any --TODO: Add documentation
----@param useFullHeight boolean Whether or not to use full height
----@param dashStyle integer The dash style to use fo the task
----@param colorStyle table|nil The color style to use for the task
 function TODOLOO_DEFAULT_TRACKER_MODULE:AddTask(group, taskIndex, text, taskType, useFullHeight, dashStyle, colorStyle)
     local task = self:GetTask(group, taskIndex, taskType)
     
+    task:SetWidth(group:GetWidth())
+    
     -- width
-    if group.taskWidth ~= task.width then
-        task.Text:SetWidth(group.taskWidth or self.taskWidth)
-        task.width = group.taskWidth
+    local width = group.taskWidth or self.taskWidth
+    if task.width ~= width then
+        task.Text:SetWidth(width)
+        task.width = width
     end
 
     -- dash
@@ -293,59 +287,32 @@ function TODOLOO_DEFAULT_TRACKER_MODULE:AddTask(group, taskIndex, text, taskType
     return task
 end
 
----Set color style on the group and underlying tasks on mouse hover
----@param group Frame
-function TODOLOO_DEFAULT_TRACKER_MODULE:OnGroupHeaderEnter(group)
-    group.isHighlighted = true
-    if group.HeaderText then
-        local headerColorStyle = TODOLOO_TRACKER_COLOR["HeaderHighlight"]
-        group.HeaderText:SetTextColor(headerColorStyle.r, headerColorStyle.g, headerColorStyle.b)
-        group.HeaderText.colorStyle = headerColorStyle
+function TODOLOO_DEFAULT_TRACKER_MODULE:UpdateTaskHighlight(task)
+    if task.id == "GroupComplete" then
+        return
     end
 
-    for _, task in pairs(group.tasks) do
-        -- if we're currently showing group complete, do nothing on click
-        if task.id == "GroupComplete" then
-            return
-        end
+    local completed = task.taskRef and task.taskRef.completed
+    local highlighted = task.isHighlighted
+        or (task.group and task.group.isHighlighted)
 
-        task.isHighligthed = true
-        local colorStyle = task.Text.colorStyle.reverse
-        if colorStyle then
-            task.Text:SetTextColor(colorStyle.r, colorStyle.g, colorStyle.b)
-            task.Text.colorStyle = colorStyle
-            if task.Dash then
-                task.Dash:SetTextColor(TODOLOO_TRACKER_COLOR["NormalHighlight"].r, TODOLOO_TRACKER_COLOR["NormalHighlight"].g, TODOLOO_TRACKER_COLOR["NormalHighlight"].b)
-            end
-        end
-    end
-end
+    local colorStyle = TODOLOO_TRACKER_COLOR[
+        completed and "Complete" or "Normal"
+    ]
 
----Set color style on the group and underlying tasks on mouse leave
----@param group Frame
-function TODOLOO_DEFAULT_TRACKER_MODULE:OnGroupHeaderLeave(group)
-    group.isHighlighted = nil
-    if group.HeaderText then
-        local headerColorStyle = TODOLOO_TRACKER_COLOR["Header"]
-        group.HeaderText:SetTextColor(headerColorStyle.r, headerColorStyle.g, headerColorStyle.b)
-        group.HeaderText.colorStyle = headerColorStyle
+    if highlighted and colorStyle.reverse then
+        colorStyle = colorStyle.reverse
     end
 
-    for _, task in pairs(group.tasks) do
-        -- if we're currently showing group complete, do nothing on click
-        if task.id == "GroupComplete" then
-            return
-        end
-        
-        task.isHighligthed = nil
-        local colorStyle = task.Text.colorStyle.reverse
-        if colorStyle then
-            task.Text:SetTextColor(colorStyle.r, colorStyle.g, colorStyle.b)
-            task.Text.colorStyle = colorStyle
-            if task.Dash then
-                task.Dash:SetTextColor(TODOLOO_TRACKER_COLOR["Normal"].r, TODOLOO_TRACKER_COLOR["Normal"].g, TODOLOO_TRACKER_COLOR["Normal"].b)
-            end
-        end
+    task.Text:SetTextColor(colorStyle.r, colorStyle.g, colorStyle.b)
+    task.Text.colorStyle = colorStyle
+
+    if task.Dash then
+        local dashColor = TODOLOO_TRACKER_COLOR[
+            highlighted and "NormalHighlight" or "Normal"
+        ]
+
+        task.Dash:SetTextColor(dashColor.r, dashColor.g, dashColor.b)
     end
 end
 
@@ -355,43 +322,24 @@ function TODOLOO_DEFAULT_TRACKER_MODULE:OnTaskEnter(task)
     end
 
     task.isHighlighted = true
-    if task.Text then
-        if task.state == TODOLOO_TRACKER_TASK_STATE_COMPLETED or task.state == TODOLOO_TRACKER_TASK_STATE_COMPLETING then
-            local textColorStyle = TODOLOO_TRACKER_COLOR["CompleteHighlight"]
-            task.Text:SetTextColor(textColorStyle.r, textColorStyle.g, textColorStyle.b)
-        else
-            local textColorStyle = TODOLOO_TRACKER_COLOR["NormalHighlight"]
-            task.Text:SetTextColor(textColorStyle.r, textColorStyle.g, textColorStyle.b)
-        end
-    end
+    self:UpdateTaskHighlight(task)
 
-    local group = Todoloo.TaskManager:GetGroup(task:GetParent().id)
-    local taskInfo = group and group.tasks[task.id]
+    local taskInfo = Todoloo.Tasks.ResolveTrackerTask(
+        task:GetParent().id,
+        task.id,
+        task.taskRef
+    )
 
     Todoloo.Utils.ShowTaskTooltip(task, taskInfo)
 end
 
 function TODOLOO_DEFAULT_TRACKER_MODULE:OnTaskLeave(task)
     Todoloo.Utils.HideTaskTooltip(task)
-    if task.id == "GroupComplete" then
-        return
-    end
 
     task.isHighlighted = nil
-    if task.Text then
-        if task.state == TODOLOO_TRACKER_TASK_STATE_COMPLETED or task.state == TODOLOO_TRACKER_TASK_STATE_COMPLETING then
-            local textColorStyle = TODOLOO_TRACKER_COLOR["Complete"]
-            task.Text:SetTextColor(textColorStyle.r, textColorStyle.g, textColorStyle.b)
-        else
-            local textColorStyle = TODOLOO_TRACKER_COLOR["Normal"]
-            task.Text:SetTextColor(textColorStyle.r, textColorStyle.g, textColorStyle.b)
-        end
-    end
+    self:UpdateTaskHighlight(task)
 end
 
----Mark the task as completed
----@param task Frame
----@param mouseButton string
 function TODOLOO_DEFAULT_TRACKER_MODULE:OnTaskClick(task, mouseButton)
     if mouseButton ~= "LeftButton" then
         return
@@ -416,16 +364,14 @@ function TODOLOO_DEFAULT_TRACKER_MODULE:OnTaskClick(task, mouseButton)
 
     local groupId = task:GetParent().id
 
+    if not Todoloo.Tasks.ResolveTrackerTask(groupId, task.id, task.taskRef) then
+        TodolooTracker_Update()
+        return
+    end
+
     Todoloo.TaskManager:AdjustTaskProgress(groupId, task.id, amount)
 end
 
----Set text and style on the given font string element
----@param fontString FontString Font string element
----@param text string Value to display
----@param useFullHeight boolean Whether or not to use full height
----@param colorStyle table|nil The color style to use for the font string
----@param useHighlight boolean Whether or not to highlight the text
----@return integer height The resulting height of the font string element
 function TODOLOO_DEFAULT_TRACKER_MODULE:SetStringText(fontString, text, useFullHeight, colorStyle, useHighlight)
     if useFullHeight then
         fontString:SetMaxLines(0)
@@ -452,7 +398,7 @@ function TODOLOO_DEFAULT_TRACKER_MODULE:IsCollapsed()
     return self.collapsed
 end
 
-function GetGroupTemplate(group)
+local function GetGroupTemplate(group)
     return group.groupTemplate or group.module.groupTemplate
 end
 
@@ -465,9 +411,6 @@ function TodolooTracker_GetGroupOffset(group)
     return 0, 0
 end
 
----@param group any
----@param anchorGroup any
----@param checkFit any
 local function AnchorGroup(group, anchorGroup, checkFit)
     local module = group.module
     local groupsFrame = module.groupsFrame
@@ -513,10 +456,6 @@ local function InternalAddGroup(group)
     local groupsFrame = module.groupsFrame
     group.nextGroup = nil
 
-    if not group.isHeader then
-        module.potentialGroupsAddedThisLayout = (module.potentialGroupsAddedThisLayout or 0) + 1
-    end
-
     if not group.isHeader and module:IsCollapsed() then
         return false
     end
@@ -537,8 +476,8 @@ local function InternalAddGroup(group)
     end
     module.groupsFrame.currentGroup = group
     module.groupsFrame.contentsHeight = module.groupsFrame.contentsHeight + group.height - offsetY
-    module.contentsAnimHeight = module.contentsHeight + group.height
     module.contentsHeight = module.contentsHeight + group.height - offsetY
+
     return true
 end
 
@@ -564,18 +503,9 @@ function TodolooTracker_AddGroup(group)
         end
     end
 
-    -- if there's not room for the group, mark on the module that we have skipped some groups
-    if not groupAdded then
-        group.module.hasSkippedGroup = true
-    end
-
     return groupAdded
 end
 
----Check if this group can fit into the tracker frame
----@param group Frame
----@param header Frame
----@return boolean canFit True if there's room, otherwise false
 function TodolooTracker_CanFitGroup(group, header)
     local module = group.module
     local groupsFrame = module.groupsFrame
@@ -596,18 +526,9 @@ function TodolooTracker_CanFitGroup(group, header)
         totalHeight = group.height - offsetY
     end
 
-    return (groupsFrame.contentsHeight + totalHeight) <= TODOLOO_TRACKER_MAX_HEIGHT
+    return (groupsFrame.contentsHeight + totalHeight) <= groupsFrame.maxHeight
 end
 
--- *****************************************************************************************************
--- ***** MODULE CUSTOMIZATION
--- *****************************************************************************************************
-
----Add customization data to the given module
----@param module any
----@param customizationKey any
----@param template any
----@param data any
 local function TodolooTracker_AddCustomizationData(module, customizationKey, template, data)
     if not module[customizationKey] then
         module[customizationKey] = {}
@@ -620,12 +541,6 @@ function TODOLOO_DEFAULT_TRACKER_MODULE:AddGroupOffset(template, x, y)
     TodolooTracker_AddCustomizationData(self, "groupOffset", template, { x or 0, y or 0 })
 end
 
--- *****************************************************************************************************
--- ***** FRAME HANDLERS
--- *****************************************************************************************************
-
----On main frame load
----@param self Frame Main frame
 function TodolooTracker_OnLoad(self)
     TODOLOO_DEFAULT_TRACKER_MODULE.OnLoad(self, "TODOLOO_DEFAULT_TRACKER_MODULE")
 
@@ -647,10 +562,8 @@ function TodolooTracker_OnLoad(self)
     self:RegisterEvent("PLAYER_ENTERING_WORLD")
     self:RegisterEvent("PLAYER_REGEN_DISABLED")
     self:RegisterEvent("PLAYER_REGEN_ENABLED")
-end
 
-function TodolooTracker_OnShow(self)
-    Todoloo.EventBus:RegisterEvents(self, {
+    self.trackerEvents = {
         Todoloo.Tasks.Events.GROUP_ADDED,
         Todoloo.Tasks.Events.GROUP_REMOVED,
         Todoloo.Tasks.Events.GROUP_RESET,
@@ -664,15 +577,30 @@ function TodolooTracker_OnShow(self)
         Todoloo.Tasks.Events.TASK_MOVED,
         Todoloo.Reset.Events.RESET_PERFORMED,
         Todoloo.Config.Events.CONFIG_CHANGED
-    }, TodolooTracker_ReceiveEvent)
-    
-    --TODO: Set max height based on Todoloo config
-    --TodolooTracker_UpdateHeight()
+    }
+end
+
+function TodolooTracker_OnShow(self)
+    if not self.eventsRegistered then
+        Todoloo.EventBus:RegisterEvents(self, self.trackerEvents, TodolooTracker_ReceiveEvent)
+
+        self.eventsRegistered = true
+    end
+
+    if self.initialized then
+        TodolooTracker_Update()
+    end
+end
+
+function TodolooTracker_OnHide(self)
+    if self.eventsRegistered then
+        Todoloo.EventBus:UnregisterEvents(self, self.trackerEvents)
+        self.eventsRegistered = false
+    end
 end
 
 function TodolooTracker_Initialize(self)
     self.MODULES = { TODOLOO_TASK_TRACKER_MODULE }
-    self.MODULES_UI_ORDER = { TODOLOO_TASK_TRACKER_MODULE }
 
     self.initialized = true
 
@@ -680,14 +608,9 @@ function TodolooTracker_Initialize(self)
     self:SetWidth(Todoloo.Config.Get(Todoloo.Config.Options.TASK_TRACKER_WIDTH))
     self:SetHeight(Todoloo.Config.Get(Todoloo.Config.Options.TASK_TRACKER_HEIGHT))
 
-    TodolooTracker_UpdateResizeButton()
     TodolooTracker_UpdateBackground()
 end
 
----Event handling
----@param self Frame Main frame
----@param event string Event type
----@param ... unknown
 function TodolooTracker_OnEvent(self, event, ...)
     if event == "PLAYER_ENTERING_WORLD" then
         if not self.initialized then
@@ -710,180 +633,114 @@ function TodolooTracker_OnEvent(self, event, ...)
     end
 end
 
----Event handling (custom Todoloo events)
-function TodolooTracker_ReceiveEvent(event, ...)
-    TodolooTracker_Update();
+function TodolooTracker_ReceiveEvent(self, event, ...)
+    TodolooTracker_Update()
 end
 
 function TodolooTracker_OnSizeChanged(self)
+    if self.isUpdating then
+        return
+    end
+
     TodolooTracker_Update()
 end
 
 function TodolooTracker_OnUpdate(self)
-    if self.isUpdateDirty then
-        TodolooTracker_Update()
+    if not self.initialized
+        or not self:IsVisible()
+        or not self.isUpdateDirty then
+        return
     end
+
+    TodolooTracker_Refresh()
 end
 
----Set the opacity of the background based on Todoloo config
---TODO: Awaiting implementation
-function TodolooTracker_UpdateOpacity()
-    local self = TodolooFloatingTrackerFrame
-    local alpha = Todoloo.Config.Get(Todoloo.Config.Options.TASK_TRACKER_BACKGROUND_OPACITY) / 100
-    self.NineSlice:SetAlpha(alpha)
-end
-
----Update the background
---TODO: Awaiting implementation
 function TodolooTracker_UpdateBackground()
     TodolooFloatingTrackerFrame.NineSlice:Hide()
-    --TODO: Implement
-
-    -- if lastGroup and not TodolooFloatingTrackerFrame.collapsed then
-    --     TodolooFloatingTrackerFrame.NineSlice:Show()
-    --     TodolooFloatingTrackerFrame.NineSlice:SetPoint("BOTTOM", lastGroup, "BOTTOM", 0, -10)
-    -- else
-    --     TodolooFloatingTrackerFrame.NineSlice:Hide()
-    -- end
 end
 
---TODO: Add resizing logic
-function TodolooTracker_UpdateResizeButton()
-    -- local tracker = TodolooFloatingTrackerFrame
-
-    -- if tracker.resizing then
-    --     return;
-    -- end
-
-    -- local lastGroup
-    -- if tracker.initialized then
-    --     for _, module in ipairs_reverse(tracker.MODULES_UI_ORDER) do
-    --         if module.topGroup then
-    --             lastGroup = module.lastGroup
-    --         end
-    --     end
-    -- end
-
-
-    -- if lastGroup and not TodolooFloatingTrackerFrame.collapsed then
-    --     TodolooFloatingTrackerFrame.ResizeButton:Show()
-    --     TodolooFloatingTrackerFrame.ResizeButton:SetPoint("BOTTOMRIGHT", lastGroup, "BOTTOMRIGHT", 0, -10)
-    -- else
-    --     TodolooFloatingTrackerFrame.ResizeButton:Hide()
-    -- end
-end
-
----Get currently visible headers across all modules
-function TodolooTracker_GetVisibleHeaders()
-    local headers = {}
-    for _, module in ipairs(TodolooFloatingTrackerFrame.MODULES) do
-        local header = module.Header
-        if header.added and header:IsVisible() then
-            headers[header] = true
-        end
-    end
-
-    return headers
-end
-
-function TodolooTracker_Update(reason, id, subInfo)
+function TodolooTracker_Refresh()
     local tracker = TodolooFloatingTrackerFrame
 
-    if not reason then
-        --TODO: See line 1404 in Blizzard_ObjectiveTracker.lua. Is this necessary?
-    end
-
-    -- we're already updating, try again next frame
     if tracker.isUpdating then
         tracker.isUpdateDirty = true
         return
     end
     tracker.isUpdating = true
 
-    -- we can't update before we've initialized
     if not tracker.initialized then
         tracker.isUpdating = false
         return
     end
 
-    tracker.GroupsFrame.maxHeight = TODOLOO_TRACKER_MAX_HEIGHT
-    if tracker.GroupsFrame.maxHeight == 0 then
-        tracker.isUpdating = false
-        return
-    end
+    local trackerWidth = math.max(1, tonumber(Todoloo.Config.Get(Todoloo.Config.Options.TASK_TRACKER_WIDTH)) or 235)
+
+    tracker:SetWidth(trackerWidth)
+
+    TODOLOO_TRACKER_TEXT_WIDTH = math.max(1, trackerWidth - TODOLOO_TRACKER_DASH_WIDTH - 12)
+
+    tracker.GroupsFrame.maxHeight = math.max(
+        1,
+        tonumber(Todoloo.Config.Get(
+            Todoloo.Config.Options.TASK_TRACKER_HEIGHT
+        )) or TODOLOO_TRACKER_MAX_HEIGHT
+    )
 
     tracker.isUpdateDirty = false
 
     tracker.GroupsFrame.currentGroup = nil
     tracker.GroupsFrame.contentsHeight = 0
 
-    -- headers
-    local currentHeaders = TodolooTracker_GetVisibleHeaders()
-
-    -- mark headers unused
     for _, module in ipairs(tracker.MODULES) do
         if module.Header then
             module.Header.added = nil
         end
     end
 
-    -- run update
     for _, module in ipairs(tracker.MODULES) do
         if module.Header then
             module.Header.enabled = nil
         end
     end
 
-    for i = 1, #tracker.MODULES do
-        local module = tracker.MODULES[i]
+    for _, module in ipairs(tracker.MODULES) do
+        module.taskWidth = TODOLOO_TRACKER_TEXT_WIDTH
+
+        if module.Header then
+            local headerWidth = trackerWidth - TODOLOO_TRACKER_HEADER_OFFSET_X
+
+            module.Header:SetWidth(headerWidth)
+            module.Header.Background:SetWidth(headerWidth)
+            module.Header.Text:SetWidth(math.max(1, headerWidth - 14))
+        end
+
         module:Update()
     end
-    
+
     if tracker.GroupsFrame.currentGroup then
         tracker.HeaderMenu:Show()
     else
         tracker.HeaderMenu:Hide()
     end
 
-    TodolooTracker_UpdateResizeButton()
     TodolooTracker_UpdateBackground()
-    
+
     tracker.currentGroup = nil
+    tracker:SetHeight(math.max(1, tracker.GroupsFrame.contentsHeight))
     tracker.isUpdating = false
-    tracker:SetHeight(tracker.GroupsFrame.contentsHeight)
 end
 
----On main frame being moving
----@param self Frame Main frame
+function TodolooTracker_Update()
+    TodolooFloatingTrackerFrame.isUpdateDirty = true
+end
+
 function TodolooTracker_OnDragStart(self)
     self:StartMoving()
 end
 
----On main frame stop moving
----@param self Frame Main frame
 function TodolooTracker_OnDragStop(self)
     self:StopMovingOrSizing()
 end
-
---TODO: Add resizing logic
-function TodolooTracker_ResizeButton_OnMouseDown(self)
-    local tracker = self:GetParent()
-    tracker.resizing = true
-    tracker:StartSizing("BOTTOMRIGHT")
-    tracker:SetUserPlaced(true)
-end
-
---TODO: Add resizing logic
-function TodolooTracker_ResizeButton_OnMouseup(self)
-    local tracker = self:GetParent()
-    tracker.resizing = nil
-    tracker:StopMovingOrSizing()
-    TodolooTracker_Update()
-end
-
--- *****************************************************************************************************
--- ***** TASK HANDLERS
--- *****************************************************************************************************
 
 function TodolooTrackerTask_OnLoad(self)
     self:RegisterForClicks("LeftButtonUp", "RightButtonDown")
@@ -904,133 +761,65 @@ function TodolooTrackerTask_OnLeave(self)
     task.module:OnTaskLeave(task)
 end
 
--- *****************************************************************************************************
--- ***** ANIMATIONS
--- *****************************************************************************************************
-
----TODO: Add documentation
----@param task any
 function TaskTracker_FinishGlowAnim(task)
+    local group = task.group
+
+    if not group or group.tasks[task.id] ~= task then
+        return
+    end
+
     if task.state == TODOLOO_TRACKER_TASK_STATE_ADDING then
         task.state = TODOLOO_TRACKER_TASK_STATE_PRESENT
-    elseif not Todoloo.Config.Get(Todoloo.Config.Options.SHOW_COMPLETED_TASKS) then
-        task.FadeOutAnim:Play()
-        task.state = TODOLOO_TRACKER_TASK_STATE_FADING
-    else
+        return
+    end
+
+    if task.state ~= TODOLOO_TRACKER_TASK_STATE_COMPLETING then
+        return
+    end
+
+    local taskInfo = Todoloo.Tasks.ResolveTrackerTask(group.id, task.id, task.taskRef)
+
+    if not taskInfo or not taskInfo.completed then
+        TodolooTracker_Update()
+        return
+    end
+
+    if Todoloo.Config.Get(Todoloo.Config.Options.SHOW_COMPLETED_TASKS)  then
         task.state = TODOLOO_TRACKER_TASK_STATE_COMPLETED
+    else
+        task.state = TODOLOO_TRACKER_TASK_STATE_FADING
+        task.FadeOutAnim:Play()
     end
 end
 
----TODO: Add documentation
----@param task any
 function TaskTracker_FinishFadeOutAnim(task)
     local group = task.group
-    
-    -- only free the task if we wish to remove the task from the tracker
-    if not Todoloo.Config.Get(Todoloo.Config.Options.SHOW_COMPLETED_TASKS) then
-        group.module:FreeTask(group, task)
+
+    if not group or group.tasks[task.id] ~= task then
+        return
     end
 
+    if task.state ~= TODOLOO_TRACKER_TASK_STATE_FADING then
+        return
+    end
+
+    group.module:FreeTask(group, task)
+
     for _, otherTask in pairs(group.tasks) do
-        -- if other tasks are fading, we want to wait with the update until all tasks are done fading
         if otherTask.state == TODOLOO_TRACKER_TASK_STATE_FADING then
             return
         end
     end
 
-    --TODO: Add reason
     TodolooTracker_Update()
 end
 
--- *****************************************************************************************************
--- ***** PROGRESS BARS
--- *****************************************************************************************************
---TODO: Implement as Todoloo setting: "Show group task bars?"
-
----TODO: Add documentation
----@param self any
----@param percent any
-function TodolooTrackerProgressBar_SetValue(self, percent)
-    self.Bar:SetValue(percent)
-    self.Bar.Label:SetFormattedText(PERCENTAGE_STRING, percent)
-end
-
----TODO: Add documentation
----@param self any
----@param percent any
-function TodolooTrackerProgressBar_OnEvent(self, percent)
-    TodolooTrackerProgressBar_SetValue(self, TodolooTracker_GetGroupProgressBarPercent(self.groupIndex))
-end
-
----Get percentage left on group based on tasks
----@param groupIndex integer Index of the group
----@return integer percentage Percentage left in a value between 0 and 100
-function TodolooTracker_GetGroupProgressBarPercent(groupIndex)
-    --TODO: Implement - See line 771 in Blizzard_ObjectiveTracker.lua
-    return 47
-end
-
--- *****************************************************************************************************
--- ***** BUTTONS
--- *****************************************************************************************************
-TodolooTrackerMinimizeButtonMixin = {}
-
-function TodolooTrackerMinimizeButtonMixin:OnLoad()
-    local collapsed = false
-    self:SetAtlases(collapsed)
-end
-
----Set textures (atlases) based on whether or not the module is collapsed
----@param collapsed boolean Is the module collapsed?
-function TodolooTrackerMinimizeButtonMixin:SetAtlases(collapsed)
-    local normalTexture = self:GetNormalTexture()
-    local pushedTexture = self:GetPushedTexture()
-
-    if self.buttonType == "module" then
-		if collapsed then
-			normalTexture:SetAtlas("UI-QuestTrackerButton-Expand-Section", true);
-			pushedTexture:SetAtlas("UI-QuestTrackerButton-Expand-Section-Pressed", true);
-		else
-			normalTexture:SetAtlas("UI-QuestTrackerButton-Collapse-Section", true);
-			pushedTexture:SetAtlas("UI-QuestTrackerButton-Collapse-Section-Pressed", true);
-		end
-	else
-		if collapsed then
-			normalTexture:SetAtlas("UI-QuestTrackerButton-Expand-All", true);
-			pushedTexture:SetAtlas("UI-QuestTrackerButton-Expand-All-Pressed", true);
-		else
-			normalTexture:SetAtlas("UI-QuestTrackerButton-Collapse-All", true);
-			pushedTexture:SetAtlas("UI-QuestTrackerButton-Collapse-All-Pressed", true);
-		end
-	end
-end
-
----Collaps or open this module
----@param collapsed boolean Should the module collapse?
-function TodolooTrackerMinimizeButtonMixin:SetCollapsed(collapsed)
-    self:SetAtlases(collapsed)
-end
-
-function TodolooTracker_MinimizeButton_OnClick()
-    --TODO: Implement - See line 1077 in Blizzard_ObjectiveTracker.lua
-end
-
-function TodolooTracker_MinimizeModuleButton_OnClick(self)
-    --TODO: Implement - See line 1087 in Blizzard_ObjectiveTracker.lua
-end
-
--- *****************************************************************************************************
--- ***** TRACKER HEADER MIXIN
--- *****************************************************************************************************
 TodolooTrackerHeaderMixin = {}
 
 function TodolooTrackerHeaderMixin:OnLoad()
     self.height = TODOLOO_TRACKER_HEADER_HEIGHT
 end
 
--- *****************************************************************************************************
--- ***** TASK MIXIN
--- *****************************************************************************************************
 TodolooTrackerTaskMixin = {}
 
 function TodolooTrackerTaskMixin:OnLoad()

@@ -25,6 +25,7 @@ local CORE_EVENTS = {
     "ADDON_LOADED",
     "PLAYER_ENTERING_WORLD"
 };
+
 local coreFrame = CreateFrame("Frame");
 
 FrameUtil.RegisterFrameForEvents(coreFrame, CORE_EVENTS);
