@@ -10,6 +10,7 @@ Todoloo is your friendly in-game task management assistant, helping you remember
 * Track tasks in a Blizzard-style floating tracker or alongside the objective tracker
 * Hide completed tasks and groups, or move completed tasks to the bottom
 * Manage tasks across your characters using filters and search
+* Attach loot items to tasks and automatically advance progress when you collect them
 
 ![Todoloo task manager and task details](docs/images/task-manager.png)
 
@@ -65,6 +66,23 @@ When a group defines a reset interval, its tasks inherit that interval. Set the 
 * `Right-Click` a task to delete it
 
 A repetition count of `1` behaves as a regular checkbox task. Higher counts display progress until the target is reached (_for example, `5/10 Kill wolves`_).
+
+#### Automatic loot tracking
+
+Attach items to a task to advance its progress automatically when you loot them.
+
+1. Select a task in the task manager.
+2. Set its repetition count to the total quantity you want to collect.
+3. In **Attached items**, enter an item ID and click **Add**. The preview helps you confirm the item.
+4. Repeat to attach more items, then click **Save**.
+
+All attached items contribute to the same progress counter. For example, looting two of one attached item and three of another adds five progress. Looted stacks count their full quantity, up to the task's repetition target.
+
+Tracking applies to the current character's saved tasks. Items already in your inventory do not count, and using or selling items does not subtract progress. Manual progress adjustments remain available.
+
+Click **Remove** beside an item, then **Save**, to stop tracking it. Adding or removing attachments preserves existing progress.
+
+Daily and weekly task resets clear progress while keeping attached items.
 
 ## 📧 Commands
 Commands start with `/tdl` or `/todoloo`. The following commands are available:
