@@ -3,6 +3,7 @@ https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/FrameXML/UI
 
     <Script file="Tasks.lua" />
     <Script file="TaskManager.lua" />
+    <Script file="LootTracking.lua" />
     <Script file="MigrationManager.lua" />
     <Script file="ResetManager.lua" />
 

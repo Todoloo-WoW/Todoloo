@@ -1,6 +1,37 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
 https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/FrameXML/UI_shared.xsd">
 
+    <Frame name="TodolooLootItemRowTemplate" virtual="true">
+        <Size y="30" />
+
+        <Layers>
+            <Layer level="ARTWORK">
+                <Texture parentKey="Icon">
+                    <Size x="24" y="24" />
+                    <Anchors>
+                        <Anchor point="LEFT" />
+                    </Anchors>
+                </Texture>
+
+                <FontString parentKey="Name" inherits="GameFontHighlightSmall" justifyH="LEFT">
+                    <Anchors>
+                        <Anchor point="LEFT" relativeKey="$parent.Icon" relativePoint="RIGHT" x="6" />
+                        <Anchor point="RIGHT" x="-83" />
+                    </Anchors>
+                </FontString>
+            </Layer>
+        </Layers>
+
+        <Frames>
+            <Button parentKey="Remove" inherits="UIPanelButtonTemplate" text="TODOLOO_L_TASK_DETAILS_FORM_LOOT_ITEM_REMOVE">
+                <Size x="75" y="22" />
+                <Anchors>
+                    <Anchor point="RIGHT" />
+                </Anchors>
+            </Button>
+        </Frames>
+    </Frame>
+
     <Frame name="TodolooTaskDetailsForm" mixin="TodolooTaskDetailsFormMixin" inherits="InsetFrameTemplate" virtual="true">
         <Layers>
             <Layer level="ARTWORK">
@@ -27,16 +58,8 @@ https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/FrameXML/UI
                         <Anchor point="TOPLEFT" relativeKey="$parent.NameLabel" y="-50" />
                     </Anchors>
                 </FontString>
-                <FontString parentKey="ResetIntervalLabel" inherits="GameFontNormalLeft" justifyH="LEFT" text="TODOLOO_L_TASK_DETAILS_FORM_RESET_INTERVAL_LABEL">
-                    <Anchors>
-                        <Anchor point="TOPLEFT" relativeKey="$parent.NameLabel" relativePoint="TOPRIGHT" x="25" />
-                    </Anchors>
-                </FontString>
-                <FontString parentKey="TargetLabel" inherits="GameFontNormalLeft" justifyH="LEFT" text="TODOLOO_L_TASK_DETAILS_FORM_TARGET_REPITITION_LABEL">
-                    <Anchors>
-                        <Anchor point="TOPLEFT" relativeKey="$parent.ResetIntervalLabel" y="-100" />
-                    </Anchors>
-                </FontString>
+                <FontString parentKey="ResetIntervalLabel" inherits="GameFontNormalLeft" justifyH="LEFT" text="TODOLOO_L_TASK_DETAILS_FORM_RESET_INTERVAL_LABEL"></FontString>
+                <FontString parentKey="TargetLabel" inherits="GameFontNormalLeft" justifyH="LEFT" text="TODOLOO_L_TASK_DETAILS_FORM_TARGET_REPITITION_LABEL"></FontString>
             </Layer>
         </Layers>
         <Frames>
@@ -105,6 +128,106 @@ https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/FrameXML/UI
                     <Anchor point="TOPLEFT" relativeKey="$parent.TargetLabel" relativePoint="BOTTOMLEFT" x="29" y="-5" />
                 </Anchors>
             </EditBox>
+            <Frame parentKey="LootItem">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeKey="$parent.NameLabel" relativePoint="TOPRIGHT" x="22" />
+                    <Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="-18" y="20" />
+                </Anchors>
+
+                <Layers>
+                    <Layer level="BACKGROUND">
+                        <Texture parentKey="BackgroundTop" atlas="Professions-QualityPane-bg-top">
+                            <Size y="100" />
+                            <Anchors>
+                                <Anchor point="TOPLEFT" />
+                                <Anchor point="TOPRIGHT" />
+                            </Anchors>
+                        </Texture>
+
+                        <Texture parentKey="BackgroundBottom" atlas="Professions-QualityPane-bg-bottom">
+                            <Size y="100" />
+                            <Anchors>
+                                <Anchor point="BOTTOMLEFT" />
+                                <Anchor point="BOTTOMRIGHT" />
+                            </Anchors>
+                        </Texture>
+
+                        <Texture parentKey="BackgroundMiddle" atlas="Professions-QualityPane-bg-middle">
+                            <Anchors>
+                                <Anchor point="TOPLEFT" relativeKey="$parent.BackgroundTop" relativePoint="BOTTOMLEFT" />
+                                <Anchor point="BOTTOMRIGHT" relativeKey="$parent.BackgroundBottom" relativePoint="TOPRIGHT" />
+                            </Anchors>
+                        </Texture>
+                    </Layer>
+                    <Layer level="ARTWORK">
+                        <FontString parentKey="Label" inherits="GameFontHighlight" justifyH="CENTER" text="TODOLOO_L_TASK_DETAILS_FORM_LOOT_ITEM_LABEL">
+                            <Anchors>
+                                <Anchor point="TOPLEFT" x="18" y="-25" />
+                                <Anchor point="TOPRIGHT" x="-18" y="-25" />
+                            </Anchors>
+                        </FontString>
+
+                        <Texture parentKey="Divider" atlas="Professions-QualityPane-Divider" useAtlasSize="true">
+                            <Anchors>
+                                <Anchor point="TOP" relativeKey="$parent.Label" relativePoint="BOTTOM" y="-8" />
+                            </Anchors>
+                        </Texture>
+
+                        <FontString parentKey="Help" inherits="GameFontHighlightSmall" justifyH="LEFT" text="TODOLOO_L_TASK_DETAILS_FORM_LOOT_ITEM_HELP">
+                            <Anchors>
+                                <Anchor point="TOP" relativeKey="$parent.Divider" relativePoint="BOTTOM" y="-12" />
+                            </Anchors>
+                        </FontString>
+
+                        <Texture parentKey="Icon" hidden="true">
+                            <Size x="24" y="24" />
+                        </Texture>
+
+                        <FontString parentKey="ItemName" inherits="GameFontHighlightSmall" justifyH="LEFT">
+                            <Size y="22" />
+                        </FontString>
+                    </Layer>
+                </Layers>
+                <Frames>
+                    <Button parentKey="Add" inherits="UIPanelButtonTemplate" text="TODOLOO_L_TASK_DETAILS_FORM_LOOT_ITEM_ADD">
+                        <Size x="60" y="22" />
+                        <Anchors>
+                            <Anchor point="TOPRIGHT" relativeKey="$parent.Help" relativePoint="BOTTOMRIGHT" y="-12" />
+                        </Anchors>
+                    </Button>
+
+                    <EditBox parentKey="Input" inherits="InputBoxTemplate" autoFocus="false">
+                        <Size y="22" />
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativeKey="$parent.Help" relativePoint="BOTTOMLEFT" x="5" y="-12" />
+                            <Anchor point="RIGHT" relativeKey="$parent.Add" relativePoint="LEFT" x="-8" />
+                        </Anchors>
+                    </EditBox>
+
+                    <Frame parentKey="List">
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativeKey="$parent.Icon" relativePoint="BOTTOMLEFT" x="-18" y="-14" />
+                            <Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="-5" y="35" />
+                        </Anchors>
+
+                        <Frames>
+                            <Frame parentKey="ScrollBox" inherits="WowScrollBoxList">
+                                <Anchors>
+                                    <Anchor point="TOPLEFT" x="5" y="-5" />
+                                    <Anchor point="BOTTOMRIGHT" x="-20" y="5" />
+                                </Anchors>
+                            </Frame>
+
+                            <EventFrame parentKey="ScrollBar" inherits="MinimalScrollBar">
+                                <Anchors>
+                                    <Anchor point="TOPLEFT" relativeKey="$parent.ScrollBox" relativePoint="TOPRIGHT" />
+                                    <Anchor point="BOTTOMLEFT" relativeKey="$parent.ScrollBox" relativePoint="BOTTOMRIGHT" />
+                                </Anchors>
+                            </EventFrame>
+                        </Frames>
+                    </Frame>
+                </Frames>
+            </Frame>
         </Frames>
         <Scripts>
             <OnLoad method="OnLoad" />
