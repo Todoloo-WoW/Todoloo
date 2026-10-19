@@ -90,6 +90,13 @@ function TodolooTaskDetailsFormMixin:OnLoad()
         editBox:ClearFocus()
     end)
 
+    local function UpdateLootHelpWidth(panel)
+        panel.Help:SetWidth(math.max(1, panel:GetWidth() - 36))
+    end
+
+    self.LootItem:HookScript("OnSizeChanged", UpdateLootHelpWidth)
+    UpdateLootHelpWidth(self.LootItem)
+
     self.LootItem.Input:SetScript("OnEscapePressed", function(editBox)
         editBox:ClearFocus()
     end)
@@ -135,15 +142,25 @@ function TodolooTaskDetailsFormMixin:OnLoad()
         self:AddDraftLootItem()
     end)
 
-    self.LootItem.Icon:ClearAllPoints()
-    self.LootItem.Icon:SetSize(20, 20)
-    self.LootItem.Icon:SetPoint("LEFT", self.LootItem.Add, "RIGHT", 10, 0)
+     self.LootItem.Icon:ClearAllPoints()
+     self.LootItem.Icon:SetSize(20, 20)
+     self.LootItem.Icon:SetPoint("TOPLEFT", self.LootItem.Input, "BOTTOMLEFT", 0, -12)
 
-    self.LootItem.ItemName:ClearAllPoints()
-    self.LootItem.ItemName:SetPoint("LEFT", self.LootItem.Icon, "RIGHT", 6, 0)
-    self.LootItem.ItemName:SetPoint("RIGHT", self.LootItem, "RIGHT", -4, 0)
+     self.LootItem.ItemName:ClearAllPoints()
+     self.LootItem.ItemName:SetHeight(20)
+     self.LootItem.ItemName:SetPoint("LEFT", self.LootItem.Icon, "RIGHT", 6, 0)
+     self.LootItem.ItemName:SetPoint("RIGHT", self.LootItem, "RIGHT", -18, 0)
 
     self:InitializeLootItemList()
+
+    -- Repetitions beneath the description.
+    self.TargetLabel:ClearAllPoints()
+    self.TargetLabel:SetPoint("TOPLEFT", self.Description, "BOTTOMLEFT", 0, -22)
+
+    -- Reset interval beneath the repetition spinner.
+    -- Offset compensates for the spinner's existing 29-pixel inset.
+    self.ResetIntervalLabel:ClearAllPoints()
+    self.ResetIntervalLabel:SetPoint("TOPLEFT", self.Target, "BOTTOMLEFT", -29, -22)
 end
 
 function TodolooTaskDetailsFormMixin:InitializeLootItemList()
