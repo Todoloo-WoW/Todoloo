@@ -46,6 +46,9 @@ function Main:OnPlayerEnteringWorld(isInitialLogin, isReloadingUi)
     -- Reset all relevant groups and tasks
     Todoloo.Reset.ResetManager.PerformReset();
 
+    -- Initialixe loot tracker
+    Todoloo.LootTracking.Initialize()
+
     -- Load appropriate task tracker based on player configuration
     if Todoloo.Config.Get(Todoloo.Config.Options.SHOW_TASK_TRACKER) and not Todoloo.Config.Get(Todoloo.Config.Options.ATTACH_TASK_TRACKER_TO_OBJECTIVE_TRACKER) then
         TodolooFloatingTrackerFrame:Show();

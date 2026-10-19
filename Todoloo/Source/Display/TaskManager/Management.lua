@@ -413,6 +413,13 @@ function TodolooManagementPageMixin:Save()
             target,
             taskInfo.character
         )
+
+        Todoloo.TaskManager:SetTaskLootItems(
+            groupId,
+            taskId,
+            draft.lootItemIDs,
+            taskInfo.character
+        )
     end)
 
     self.isSaving = nil

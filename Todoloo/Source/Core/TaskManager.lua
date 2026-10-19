@@ -387,6 +387,7 @@ end
 ---@field target integer Target repetitions before completion
 ---@field progress integer Current progress towards target
 ---@field completed boolean Whether or not this task has been completed
+---@field lootItemIDs integer[]? Items whose loot advances task progress
 
 ---Get specific task in group by index
 ---@param groupIndex integer Index of the group within the task table
@@ -560,6 +561,66 @@ function TodolooTaskManagerMixin:SetTaskTarget(groupIndex, index, target, charac
     task.completed = task.progress >= target
 
     Todoloo.EventBus:TriggerEvent(self, Todoloo.Tasks.Events.TASK_UPDATED, groupIndex, index, characterFullName)
+end
+
+---Replace the items that automatically advance a task.
+---@param groupIndex integer
+---@param index integer
+---@param itemIDs integer[] Array of item IDs; empty removes all attachments
+---@param characterFullName string? Defaults to the current character
+function TodolooTaskManagerMixin:SetTaskLootItems(groupIndex, index, itemIDs, characterFullName)
+    assert(type(itemIDs) == "table", "Item IDs must be an array.")
+
+    -- Copy the input so later edits cannot change saved task data.
+    -- Ignore duplicate IDs while preserving their order.
+    local attachedItems = {}
+    local seen = {}
+
+    for _, itemID in ipairs(itemIDs) do
+        assert(
+            type(itemID) == "number"
+                and itemID >= 1
+                and itemID <= 2147483647
+                and itemID % 1 == 0,
+            "Each item ID must be a positive whole number."
+        )
+
+        if not seen[itemID] then
+            seen[itemID] = true
+            table.insert(attachedItems, itemID)
+        end
+    end
+
+    characterFullName = characterFullName or Todoloo.Utils.GetCharacterFullName()
+
+    local task = self:GetTask(groupIndex, index, characterFullName)
+    assert(task, "Task not found.")
+
+    local previousItems = task.lootItemIDs or {}
+    local unchanged = #previousItems == #attachedItems
+
+    if unchanged then
+        for itemIndex, itemID in ipairs(attachedItems) do
+            if previousItems[itemIndex] ~= itemID then
+                unchanged = false
+                break
+            end
+        end
+    end
+
+    if unchanged then
+        return
+    end
+
+    task.lootItemIDs = attachedItems
+
+    Todoloo.EventBus:TriggerEvent(
+        self,
+        Todoloo.Tasks.Events.TASK_UPDATED,
+        groupIndex,
+        index,
+        characterFullName
+    )
 end
 
 ---Remove task
