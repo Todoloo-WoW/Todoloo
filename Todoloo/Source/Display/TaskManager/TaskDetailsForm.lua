@@ -72,6 +72,104 @@ function TodolooTaskDetailsFormMixin:OnLoad()
         editBox:ClearFocus()
     end)
 
+    -- "preview" uses a full GameTooltip.
+    -- "label" shows the link's name; clicking opens Blizzard's normal UI.
+    local supportedLinks = {
+        item = "preview",
+        mount = "preview",
+        quest = "preview",
+        achievement = "preview",
+        spell = "preview",
+        enchant = "preview",          -- Individual crafting recipes
+        trade = "label",              -- Profession links
+        battlepet = "label",
+        worldmap = "label",
+        transmogappearance = "label",
+        transmogillusion = "label",
+    }
+
+    -- Accept either a complete hyperlink or the data passed to link scripts.
+    local function GetSupportedLinkType(link)
+        if type(link) ~= "string" then
+            return nil
+        end
+
+        local linkType = link:match("|H([^:|]+):")
+            or link:match("^([^:|]+):")
+
+        if linkType and supportedLinks[linkType] then
+            return linkType
+        end
+    end
+
+    local function HideDescriptionTooltip(editBox)
+        if GameTooltip:GetOwner() == editBox then
+            GameTooltip:Hide()
+        end
+    end
+
+    self.Description.EditBox:SetHyperlinksEnabled(true)
+
+    -- Keep this guard so initialization cannot register the hook twice.
+    if not self.descriptionLinkInsertionHooked then
+        self.descriptionLinkInsertionHooked = true
+
+        hooksecurefunc(ChatFrameUtil, "InsertLink", function(link)
+            if not self.draft
+                or not self.Description.EditBox:IsShown()
+                or not self.Description.EditBox:HasFocus()
+                or not GetSupportedLinkType(link)
+            then
+                return
+            end
+
+            self.Description.EditBox:Insert(link)
+        end)
+    end
+
+    self.Description.EditBox:SetScript("OnHyperlinkEnter", function(editBox, link, text)
+        HideDescriptionTooltip(editBox)
+
+        local linkType = GetSupportedLinkType(link)
+        if not linkType then
+            return
+        end
+
+        GameTooltip:SetOwner(editBox, "ANCHOR_RIGHT")
+
+        if supportedLinks[linkType] == "preview" then
+            GameTooltip:SetHyperlink(link)
+        else
+            -- These types open specialized interfaces when clicked.
+            local label = text and text:match("|h(.-)|h")
+                or text
+                or link
+
+            GameTooltip:SetText(label, 1, 1, 1, 1, true)
+        end
+
+        GameTooltip:Show()
+    end)
+
+    self.Description.EditBox:SetScript("OnHyperlinkLeave", HideDescriptionTooltip)
+
+    self.Description.EditBox:SetScript(
+        "OnHyperlinkClick",
+        function(editBox, link, text, button)
+            if not GetSupportedLinkType(link) then
+                return
+            end
+
+            HideDescriptionTooltip(editBox)
+            SetItemRef(link, text, button, editBox)
+        end
+    )
+
+    self.Description.EditBox:HookScript("OnHide", function(editBox)
+        editBox:ClearFocus()
+        HideDescriptionTooltip(editBox)
+    end)
+
     self.Target:SetMinMaxValues(1, nil)
     self.Target:HookScript("OnHide", function(spinner)
         spinner:EndIncrement()
