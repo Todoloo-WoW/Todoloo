@@ -176,6 +176,48 @@ EventUtil.ContinueOnAddOnLoaded("Todoloo", function()
         end);
     end
 
+    -- Audio section
+    layout:AddInitializer(CreateSettingsListSectionHeaderInitializer(TODOLOO_L_CONFIG_AUDIO_SECTION_HEADER))
+
+    do
+        local setting = Settings.RegisterAddOnSetting(
+            category,
+            "TODOLOO_TASK_COMPLETION_SOUND",
+            Todoloo.Config.Options.TASK_COMPLETION_SOUND,
+            TODOLOO_CONFIG,
+            Settings.VarType.String,
+            TODOLOO_L_CONFIG_TASK_COMPLETION_SOUND_LABEL,
+            "none"
+        )
+
+        local function GetSoundOptions()
+            local container = Settings.CreateControlTextContainer()
+
+            for _, choice in ipairs(Todoloo.Audio.TaskCompletionSounds) do
+                container:Add(choice.key, choice.label)
+            end
+
+            return container:GetData()
+        end
+
+        Settings.CreateDropdown(
+            category,
+            setting,
+            GetSoundOptions,
+            TODOLOO_L_CONFIG_TASK_COMPLETION_SOUND_TOOLTIP
+        )
+
+        layout:AddInitializer(CreateSettingsButtonInitializer(
+            TODOLOO_L_CONFIG_TASK_COMPLETION_SOUND_PREVIEW_LABEL,
+            TODOLOO_L_CONFIG_TASK_COMPLETION_SOUND_PREVIEW_BUTTON,
+            function()
+                Todoloo.Audio.PlayTaskCompletionSound(true)
+            end,
+            TODOLOO_L_CONFIG_TASK_COMPLETION_SOUND_PREVIEW_TOOLTIP,
+            true
+        ))
+    end
+
     -- Minimap icon section
     layout:AddInitializer(CreateSettingsListSectionHeaderInitializer(TODOLOO_L_CONFIG_MINIMAP_SECTION_HEADER));
 

@@ -511,10 +511,22 @@ function TodolooTaskManagerMixin:SetTaskProgress(groupIndex, index, progress, ch
         return
     end
 
+    local becameComplete = completed and not task.completed
+
     task.progress = newProgress
     task.completed = completed
 
-    Todoloo.EventBus:TriggerEvent(self, Todoloo.Tasks.Events.TASK_UPDATED, groupIndex, index, characterFullName)
+    if becameComplete then
+        Todoloo.Audio.PlayTaskCompletionSound()
+    end
+
+    Todoloo.EventBus:TriggerEvent(
+        self,
+        Todoloo.Tasks.Events.TASK_UPDATED,
+        groupIndex,
+        index,
+        characterFullName
+    )
 end
 
 ---Adjust progress for a task by a given amount
@@ -651,10 +663,21 @@ function TodolooTaskManagerMixin:SetTaskCompletion(groupIndex, index, completed,
     local task = self:GetTask(groupIndex, index, characterFullName)
     assert(task, "Task not found.")
 
+    local becameComplete = completed and not task.completed
+
     task.progress = completed and task.target or 0
     task.completed = completed
 
-    Todoloo.EventBus:TriggerEvent(self, Todoloo.Tasks.Events.TASK_COMPLETION_SET, groupIndex, index)
+    if becameComplete then
+        Todoloo.Audio.PlayTaskCompletionSound()
+    end
+
+    Todoloo.EventBus:TriggerEvent(
+        self,
+        Todoloo.Tasks.Events.TASK_COMPLETION_SET,
+        groupIndex,
+        index
+    )
 end
 
 ---Reset completion state on task

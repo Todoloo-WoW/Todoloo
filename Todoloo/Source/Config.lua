@@ -18,6 +18,7 @@ Todoloo.Config.Options = {
     SHOW_MINIMAP_ICON = "show_minimap_icon",
     MINIMAP_ICON = "minimap_icon",
     MESSENGER = "messenger",
+    TASK_COMPLETION_SOUND = "task_completion_sound",
 
     -- Calculated values
     LAST_RESET_PERFORMED = "last_reset_performed",
@@ -46,6 +47,7 @@ Todoloo.Config.Defaults = {
     [Todoloo.Config.Options.SHOW_MINIMAP_ICON] = false,
     [Todoloo.Config.Options.MINIMAP_ICON] = {},
     [Todoloo.Config.Options.MESSENGER] = false,
+    [Todoloo.Config.Options.TASK_COMPLETION_SOUND] = "none",
 
     -- Calculated values
     [Todoloo.Config.Options.LAST_RESET_PERFORMED] = GetServerTime(),

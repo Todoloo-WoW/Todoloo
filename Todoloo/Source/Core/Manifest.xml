@@ -2,6 +2,7 @@
 https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/FrameXML/UI_shared.xsd">
 
     <Script file="Tasks.lua" />
+    <Script file="Audio.lua" />
     <Script file="TaskManager.lua" />
     <Script file="Sharing.lua" />
     <Script file="LootTracking.lua" />
