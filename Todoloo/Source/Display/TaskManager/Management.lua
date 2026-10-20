@@ -159,8 +159,14 @@ function TodolooManagementPageMixin:OnLoad()
     self.Details.Background:Show()
 
     self.HelpButton:SetScript("OnClick", function() self:ToggleHelp() end)
-    
+
     self.CreateGroupButton:SetTextToFit(TODOLOO_L_TASK_MANAGER_BUTTON_CREATE_GROUP)
+
+    self.ImportButton:SetText(TODOLOO_L_SHARE_IMPORT)
+
+    self.ImportButton:SetScript("OnClick", function()
+        Todoloo.Sharing.ShowDialog(Todoloo.Utils.GetCharacterFullName(), nil, nil, true)
+    end)
 
     self.TaskList.SearchBox:SetScript("OnTextChanged", function(editBox)
         SearchBoxTemplate_OnTextChanged(editBox)
@@ -525,10 +531,10 @@ function TodolooManagementPageMixin:UpdateHelp()
     local pageLeft = self:GetLeft() * pageScale
     local pageTop = self:GetTop() * pageScale
 
-    helpInfo.FramePos = { x = 0, y = 0 }
+    helpInfo.FramePos = { x = 5, y = -22 }
     helpInfo.FrameSize = {
-        width = self:GetWidth() * pageScale / helpScale,
-        height = self:GetHeight() * pageScale / helpScale
+        width = self:GetWidth() * pageScale / helpScale - 5,
+        height = self:GetHeight() * pageScale / helpScale - 22
     }
 
     local function GetRect(frame)
@@ -539,8 +545,8 @@ function TodolooManagementPageMixin:UpdateHelp()
         local scale = frame:GetEffectiveScale()
 
         return {
-            x = (frame:GetLeft() * scale - pageLeft) / helpScale,
-            y = (frame:GetTop() * scale - pageTop) / helpScale,
+            x = (frame:GetLeft() * scale - pageLeft) / helpScale - helpInfo.FramePos.x,
+            y = (frame:GetTop() * scale - pageTop) / helpScale - helpInfo.FramePos.y,
             width = frame:GetWidth() * scale / helpScale,
             height = frame:GetHeight() * scale / helpScale
         }
@@ -574,6 +580,12 @@ function TodolooManagementPageMixin:UpdateHelp()
             ToolTipText = text
         })
     end
+
+    AddHelp(
+        self.ImportButton,
+        TODOLOO_L_TASK_MANAGER_HELP_SHARING,
+        "DOWN"
+    )
 
     AddHelp(
         self.CreateGroupButton,

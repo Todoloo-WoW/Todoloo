@@ -390,8 +390,11 @@ end
 
 function TodolooTaskListMixin:InitializeCharacterContextMenu(dropDown, level)
     local characterInfo = UIDROPDOWNMENU_MENU_VALUE
+
+    Todoloo.Sharing.AddMenu(characterInfo.name, nil, nil, level)
+
     local info = UIDropDownMenu_CreateInfo()
-    
+
     info.notCheckable = true
     info.text = TODOLOO_L_TASK_MANAGER_CHARACTER_ADD_NEW_GROUP
     info.func = function() self:AddNewGroup(characterInfo) end
@@ -400,6 +403,9 @@ end
 
 function TodolooTaskListMixin:InitializeGroupContextMenu(dropDown, level)
     local groupInfo = UIDROPDOWNMENU_MENU_VALUE
+
+    Todoloo.Sharing.AddMenu(groupInfo.character, groupInfo.id, nil, level)
+
     local info = UIDropDownMenu_CreateInfo()
 
     info.isTitle = true
@@ -466,6 +472,8 @@ end
 
 function TodolooTaskListMixin:InitializeTaskContextMenu(dropDown, level)
     local taskInfo = UIDROPDOWNMENU_MENU_VALUE
+    
+    Todoloo.Sharing.AddMenu(taskInfo.character, taskInfo.groupId, taskInfo.id, level)
 
     local info = UIDropDownMenu_CreateInfo()
     info.notCheckable = true

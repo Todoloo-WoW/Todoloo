@@ -24,6 +24,13 @@ https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/FrameXML/UI
                 </Anchors>
 			</Button>
 
+            <Button parentKey="ImportButton" inherits="UIPanelButtonTemplate">
+                <Size x="80" y="22" />
+                <Anchors>
+                    <Anchor point="RIGHT" relativeKey="$parent.CreateGroupButton" relativePoint="LEFT" x="-5" />
+                </Anchors>
+            </Button>
+
             <Frame parentKey="Details" inherits="TodolooTaskDetailsForm">
 				<KeyValues>
 					<KeyValue key="layoutType" value="InsetFrameTemplate" type="string"/>

@@ -13,7 +13,7 @@ TODOLOO_DEFAULT_RESET_INTERVAL = TODOLOO_RESET_INTERVALS.Manually
 
 ---Default example tasks for first time initialization.
 ---These are some what irrelevant, but will show the player some hints for usage.
-TODLOO_FIRST_TIME_SETUP_TASKS = {
+TODOLOO_FIRST_TIME_SETUP_TASKS = {
     {
         name = "Getting started",
         tasks = {
@@ -59,7 +59,7 @@ TodolooTaskManagerMixin = {}
 ---Setup Todoloo tasks for first time use
 ---@param characterFullName string Full character name in format "player-realm"
 function TodolooTaskManagerMixin:FirstTimeSetup(characterFullName)
-    TODOLOO_TASKS[characterFullName] = { groups = TODLOO_FIRST_TIME_SETUP_TASKS }
+    TODOLOO_TASKS[characterFullName] = { groups = TODOLOO_FIRST_TIME_SETUP_TASKS }
 end
 
 ---Reset Todoloo removing all tasks and groups.
@@ -73,7 +73,7 @@ end
 ---Do first time setup on character
 ---@param characterFullName string Character fule name in format "player-realm"
 function TodolooTaskManagerMixin:FirstTimeCharacterSetup(characterFullName)
-    TODOLOO_TASKS[characterFullName] = TODOLOO_EMPTY_CHARACTER_SETUP
+    TODOLOO_TASKS[characterFullName] = { groups = {} }
 end
 
 function TodolooTaskManagerMixin:Init()

@@ -84,6 +84,19 @@ Click **Remove** beside an item, then **Save**, to stop tracking it. Adding or r
 
 Daily and weekly task resets clear progress while keeping attached items.
 
+#### Import and export
+
+Share individual tasks, groups, or a character’s complete task setup with your friends!
+
+* `Right-Click` a character, group, or task and choose **Export**
+* Press `Ctrl+C` to copy the sharing string
+* On the other client, click **Import** to import into your current character, or `Right-Click` another character and choose **Import**
+* Paste the string, review the group and task counts, then click **Import**
+
+Imports add new groups alongside existing ones. Importing the same string again creates another copy. Individual tasks arrive in their own group.
+
+Names, descriptions, ordering, reset intervals, repetition targets, and attached loot items are preserved. Task progress starts at zero. Character identities and tracker settings are not included.
+
 ## 📧 Commands
 Commands start with `/tdl` or `/todoloo`. The following commands are available:
 * `tm`, `task-manager`: Open the task manager
