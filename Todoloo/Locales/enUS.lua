@@ -37,12 +37,19 @@ TODOLOO_LOCALES.enUS = function()
     L["CONFIG_TASK_COMPLETION_SOUND_PREVIEW_TOOLTIP"] = "Play the selected sound using your sound-effects volume.";
 
     -- Sound choices
+    L["AUDIO_SOUND_BOSS_DEFEATED"] = "Boss defeated";
+    L["AUDIO_SOUND_COINS"] = "Coins";
+    L["AUDIO_SOUND_EPIC_LOOT"] = "Epic loot";
+    L["AUDIO_SOUND_LEGENDARY_LOOT"] = "Legendary loot";
+    L["AUDIO_SOUND_MAP_PING"] = "Map ping";
+    L["AUDIO_SOUND_MISSION_COMPLETE"] = "Mission complete";
+    L["AUDIO_SOUND_NEW_RECORD"] = "New record";
     L["AUDIO_SOUND_NONE"] = "None";
     L["AUDIO_SOUND_QUEST_COMPLETE"] = "Quest complete";
-    L["AUDIO_SOUND_WORLD_QUEST_COMPLETE"] = "World quest complete";
-    L["AUDIO_SOUND_EPIC_LOOT"] = "Epic loot";
     L["AUDIO_SOUND_READY_CHECK"] = "Ready check";
-    L["AUDIO_SOUND_MAP_PING"] = "Map ping";
+    L["AUDIO_SOUND_SCENARIO_COMPLETE"] = "Scenario complete";
+    L["AUDIO_SOUND_SCENARIO_STAGE_COMPLETE"] = "Scenario stage complete";
+    L["AUDIO_SOUND_WORLD_QUEST_COMPLETE"] = "World quest complete";
 
     -- Minimap icon settings
     L["CONFIG_MINIMAP_SECTION_HEADER"] = "Minimap Icon";
