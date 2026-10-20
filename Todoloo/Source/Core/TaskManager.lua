@@ -283,6 +283,60 @@ function TodolooTaskManagerMixin:AddGroup(name, characterFullName)
     return group, groupIndex
 end
 
+---Copy a saved group to another known character.
+---@param sourceGroup Group The source group reference
+---@param sourceCharacter string Source character's full name
+---@param destinationCharacter string Destination character's full name
+---@return Group? copiedGroup
+---@return integer? groupIndex
+function TodolooTaskManagerMixin:CopyGroupToCharacter(sourceGroup, sourceCharacter, destinationCharacter)
+    if sourceCharacter == destinationCharacter then
+        return nil
+    end
+
+    local source = self:GetCharacter(sourceCharacter)
+    local destination = self:GetCharacter(destinationCharacter)
+
+    if not source or not destination then
+        return nil
+    end
+
+    -- Ensure the source still exists when the menu action is clicked.
+    local found = false
+
+    for _, group in ipairs(source.groups) do
+        if group == sourceGroup then
+            found = true
+            break
+        end
+    end
+
+    if not found then
+        return nil
+    end
+
+    -- Deep copy keeps tasks and attached item lists independent.
+    local copiedGroup = CopyTable(sourceGroup)
+
+    for _, task in ipairs(copiedGroup.tasks) do
+        task.progress = 0
+        task.completed = false
+    end
+
+    table.insert(destination.groups, copiedGroup)
+
+    local groupIndex = #destination.groups
+
+    Todoloo.EventBus:TriggerEvent(
+        self,
+        Todoloo.Tasks.Events.GROUP_ADDED,
+        groupIndex,
+        destinationCharacter
+    )
+
+    return copiedGroup, groupIndex
+end
+
 ---Update group
 ---@param index integer Index of the group within the task table
 ---@param newName string New name/title of the group

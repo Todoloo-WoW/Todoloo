@@ -85,6 +85,10 @@ TODOLOO_LOCALES.enUS = function()
     L["TASK_MANAGER_GROUP_ACTIONS_ADD_NEW_TASK"] = "Add new task";
     L["TASK_MANAGER_GROUP_ACTIONS_DELETE"] = "Delete";
     L["TASK_MANAGER_GROUP_DELETE_CONFIRMATION"] = "Are you sure you want to delete '%s'?";
+    L["TASK_MANAGER_GROUP_COPY_MENU"] = "Copy to character...";
+    L["TASK_MANAGER_GROUP_COPY_NO_CHARACTERS"] = "No other known characters";
+    L["TASK_MANAGER_GROUP_COPY_SUCCESS"] = "Copied '%s' to '%s'.";
+    L["TASK_MANAGER_GROUP_COPY_FAILED"] = "Unable to copy the group. Please reopen the menu and try again.";
 
     L["TASK_MANAGER_TASK_RESET_INTERVAL_LABEL"] = "Reset interval";
     L["TASK_MANAGER_TASK_RESET_INTERVAL_CONTROLLED_BY_GROUP"] = "Reset interval is controlled by the parent group";
@@ -101,7 +105,8 @@ TODOLOO_LOCALES.enUS = function()
     L["TASK_MANAGER_HELP_FILTERS"] = "Search for tasks or groups by name. Use the filter menu to choose which characters appear."
     L["TASK_MANAGER_HELP_TASK_LIST_INTERACTIONS"] = "Select a task to open its editor.\n\n"
         .. "[Double-Click] a group to rename it. [Shift-Click] a group to collapse or expand it. [Click] a character header to collapse or expand that character.\n\n"
-        .. "[Right-Click] a group to add tasks, change its reset interval, or delete it. [Right-Click] a task to delete it.\n\n"
+        .. "[Right-Click] a group to add tasks, change its reset interval, copy it to another character, or delete it. [Right-Click] a task to delete it.\n\n"
+        .. "Choose \"Copy to character...\" to copy a group and all its tasks to another known character.\n\n"
         .. "[Shift-Click] a task to add progress. [Ctrl-Click] to subtract progress."
     L["TASK_MANAGER_HELP_TASK_DETAILS"] = "Edit the selected task's title, description, reset interval, and repetition count here.\n\n"
         .. "When the parent group defines a reset interval, the task inherits it and its reset controls are disabled."

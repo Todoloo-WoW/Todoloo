@@ -12,6 +12,7 @@ Todoloo is your friendly in-game task management assistant, helping you remember
 * Manage tasks across your characters using filters and search
 * Attach loot items to tasks and automatically advance progress when you collect them
 * Choose a sound to play when a task is completed, manually or through automatic loot tracking
+* Copy entire groups to other characters, preserving task settings and starting with fresh progress
 
 ![Todoloo task manager and task details](docs/images/task-manager.png)
 

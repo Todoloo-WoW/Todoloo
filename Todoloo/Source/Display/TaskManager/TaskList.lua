@@ -402,6 +402,21 @@ function TodolooTaskListMixin:InitializeCharacterContextMenu(dropDown, level)
 end
 
 function TodolooTaskListMixin:InitializeGroupContextMenu(dropDown, level)
+    level = level or 1
+
+    if level ~= 1 then
+        local menuValue = UIDROPDOWNMENU_MENU_VALUE
+
+        if level == 2
+            and type(menuValue) == "table"
+            and menuValue.todolooCopyGroup
+        then
+            self:InitializeGroupCopySubmenu(menuValue, level)
+        end
+
+        return
+    end
+
     local groupInfo = UIDROPDOWNMENU_MENU_VALUE
 
     Todoloo.Sharing.AddMenu(groupInfo.character, groupInfo.id, nil, level)
@@ -446,6 +461,21 @@ function TodolooTaskListMixin:InitializeGroupContextMenu(dropDown, level)
     info.notCheckable = true
     info.text = TODOLOO_L_TASK_MANAGER_GROUP_ACTIONS_LABEL
     UIDropDownMenu_AddButton(info, level)
+
+    local copyInfo = UIDropDownMenu_CreateInfo()
+    copyInfo.text = TODOLOO_L_TASK_MANAGER_GROUP_COPY_MENU
+    copyInfo.notCheckable = true
+    copyInfo.hasArrow = true
+    copyInfo.value = {
+        todolooCopyGroup = true,
+        sourceCharacter = groupInfo.character,
+        sourceGroup = Todoloo.TaskManager:GetGroup(
+            groupInfo.id,
+            groupInfo.character
+        ),
+    }
+
+    UIDropDownMenu_AddButton(copyInfo, level)
     
     info.isTitle = false
     info.disabled = false
@@ -468,6 +498,50 @@ function TodolooTaskListMixin:InitializeGroupContextMenu(dropDown, level)
     end
 
     UIDropDownMenu_AddButton(info, level)
+end
+
+function TodolooTaskListMixin:InitializeGroupCopySubmenu(menuValue, level)
+    local destinations = {}
+
+    for _, character in ipairs(Todoloo.TaskManager:GetAllCharacterNames()) do
+        if character ~= menuValue.sourceCharacter then
+            table.insert(destinations, character)
+        end
+    end
+
+    table.sort(destinations, function(first, second)
+        return strcmputf8i(first, second) < 0
+    end)
+
+    if #destinations == 0 then
+        local info = UIDropDownMenu_CreateInfo()
+        info.text = TODOLOO_L_TASK_MANAGER_GROUP_COPY_NO_CHARACTERS
+        info.notCheckable = true
+        info.disabled = true
+        UIDropDownMenu_AddButton(info, level)
+        return
+    end
+
+    for _, character in ipairs(destinations) do
+        local destinationCharacter = character
+        local info = UIDropDownMenu_CreateInfo()
+
+        info.text = destinationCharacter
+        info.notCheckable = true
+        info.func = function()
+            CloseDropDownMenus()
+
+            local copiedGroup = Todoloo.TaskManager:CopyGroupToCharacter(menuValue.sourceGroup, menuValue.sourceCharacter, destinationCharacter)
+
+            if copiedGroup then
+                Todoloo.Messenger.SlashMessage(string.format(TODOLOO_L_TASK_MANAGER_GROUP_COPY_SUCCESS, copiedGroup.name, destinationCharacter))
+            else
+                UIErrorsFrame:AddMessage(TODOLOO_L_TASK_MANAGER_GROUP_COPY_FAILED, 1, 0.2, 0.2)
+            end
+        end
+
+        UIDropDownMenu_AddButton(info, level)
+    end
 end
 
 function TodolooTaskListMixin:InitializeTaskContextMenu(dropDown, level)
