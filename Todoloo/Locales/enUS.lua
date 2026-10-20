@@ -41,6 +41,15 @@ TODOLOO_LOCALES.enUS = function()
     L["CONFIG_SHOW_MINIMAP_ICON_LABEL"] = "Show minimap icon";
     L["CONFIG_SHOW_MINIMAP_ICON_TOOLTIP_DESCRIPTION"] = "Show/hide the icon on the minimap.";
 
+    -- Sharing
+    L["SHARE_EXPORT"] = "Export"
+    L["SHARE_IMPORT"] = "Import"
+    L["SHARE_EXPORT_HELP"] = "Press Ctrl+C to copy this string and share it with another client. Only saved task settings are exported."
+    L["SHARE_IMPORT_HELP"] = "Paste a Todoloo string. Import adds new groups to this character without replacing existing groups. Task progress starts at zero."
+    L["SHARE_PREVIEW"] = "%d groups, %d tasks ready to import."
+    L["SHARE_EXPORT_ERROR"] = "Unable to export this setup. It may exceed the sharing limits."
+    L["SHARE_IMPORT_ERROR"] = "Invalid, incomplete, unsupported, or oversized Todoloo string."
+
     -- Task manager
     L["TASK_MANAGER_FRAME_HEADER"] = "Todoloo - Task management";
     L["TASK_MANAGER_BUTTON_CREATE_GROUP"] = "Create group";
@@ -82,6 +91,13 @@ TODOLOO_LOCALES.enUS = function()
     L["TASK_MANAGER_HELP_TASK_DETAILS"] = "Edit the selected task's title, description, reset interval, and repetition count here.\n\n"
         .. "When the parent group defines a reset interval, the task inherits it and its reset controls are disabled."
     L["TASK_MANAGER_HELP_SAVE_RESET"] = "Save applies your changes to the selected task. Reset restores its saved settings."
+    L["TASK_MANAGER_HELP_SHARING"] = "Share tasks, groups, or a complete character setup with your friends!\n\n"
+        .. "[Right-Click] a character, group, or task and choose Export. "
+        .. "Press Ctrl+C to copy the string.\n\n"
+        .. "Click Import to paste a string for your current character, or "
+        .. "[Right-Click] another character and choose Import.\n\n"
+        .. "Imported groups are added alongside existing groups. "
+        .. "Task progress starts at zero."
 
     -- Task details form
     L["TASK_DETAILS_FORM_SUMMARY"] = "%s\nProgress: %d/%d";

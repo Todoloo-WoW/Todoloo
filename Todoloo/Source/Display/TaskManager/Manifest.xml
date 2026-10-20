@@ -4,6 +4,8 @@ https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/FrameXML/UI
     <Script file="TaskDetailsForm.lua" />
     <Include file="TaskDetailsForm.xml" />
 
+    <Include file="Sharing/Manifest.xml" />
+
     <Script file="TaskList.lua" />
     <Include file="TaskList.xml" />
 
