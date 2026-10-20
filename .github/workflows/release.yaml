@@ -36,5 +36,12 @@ jobs:
           fetch-depth: 0  # gets entire git history, needed for automatic changelogs
 
       # once cloned, we just run the GitHub Action for the packager project
-      - name: Package and release
+      - name: Package beta or alpha
+        if: contains(github.ref_name, 'beta') || contains(github.ref_name, 'alpha')
+        uses: BigWigsMods/packager@master
+        with:
+          args: -w 0
+
+      - name: Package stable release
+        if: "!contains(github.ref_name, 'beta') && !contains(github.ref_name, 'alpha')"
         uses: BigWigsMods/packager@master
