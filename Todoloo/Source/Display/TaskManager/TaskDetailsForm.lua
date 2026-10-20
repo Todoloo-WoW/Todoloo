@@ -426,6 +426,9 @@ function TodolooTaskDetailsFormMixin:RefreshResetButtons()
         button:SetEnabled(not inherited)
 
         button.Text:SetFontObject(inherited and "GameFontDisableSmall" or "GameFontNormalSmall")
+
+        local labelWidth = math.ceil(button.Text:GetStringWidth())
+        button:SetHitRectInsets(0, -(labelWidth + 5), 0, 0)
     end
 end
 
